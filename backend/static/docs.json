@@ -1,0 +1,155 @@
+{
+    "openapi": "3.0.0",
+    "info": {
+      "description": "<b>TecVERIFY</b> is a lightweight app that is used for 2-step verification 
+                      so you can verify your identity when you sign in to your <b>TecMFA</b> account 
+                      using Admin TOTP.<br><br>App Features<br>* Save Secret key.
+                      <br>* Generate TOTP for all Secret keys saved.",
+      "version": "1.0.0",
+      "title": "TecVERIFY",
+      "contact": {
+        "email": "amit.g@tecnics.com"
+      },
+      "license": {
+        "name": "MIT",
+        "url": "https://opensource.org/licenses/MIT"
+      }
+    },
+    "components": {
+      "schemas":{
+        "secret":{
+          "properties":{
+            "Updated":{
+              "type": "boolean"
+            }
+          }
+        },
+        "generateSecret":{
+          "properties":{
+            "adminSecret":{
+              "type":"string"
+            }
+          }
+        },
+        "totp":{
+            "type": "array",
+            "items":{
+              "type":"object",
+              "properties":{
+                "code":{
+                  "type":"string"
+                },
+                "secretname":{
+                  "type":"string"
+                }
+              }
+            }
+          }
+        }
+    },
+    "servers": [
+      {
+        "url": "/api/v1/"
+      }
+    ],
+    "tags": [
+      {
+        "name": "AdminSecret",
+        "description": "Collection of Secret key APIs."
+      },
+      {
+        "name": "TOTP",
+        "description":"Collection of TOTP APIs."
+      }
+    ],
+    "paths": {
+      "/secret": {
+        "post": {
+          "tags": [
+            "AdminSecret"
+          ],
+          "summary": "Used to Save a Secret key.",
+          "requestBody":{
+            "description":"Admin Secret",
+            "required": true,
+            "content":{
+              "application/x-www-form-urlencoded":{
+                "schema":{
+                  "properties":{
+                    "admin_secret":{
+                      "type":"string"
+                    },
+                    "secretname":{
+                      "type":"string"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "parameters":[{
+            "name": "token",
+            "in": "header",
+            "required": true,
+            "schema":{
+              "type": "string"
+            }
+          }],
+          "responses": {
+            "200": {
+              "description": "OK",
+              "schema": {
+                "$ref": "#/components/schemas/secret"
+              }
+            }
+          }
+        },
+        "get":{
+          "tags":[
+            "AdminSecret"
+          ],
+          "summary":"Used to retrieve a Random Secret key.",
+          "parameters":[{
+            "name": "token",
+            "in": "header",
+            "schema":{
+              "type": "string"
+            },
+            "required": true
+          }],
+          "responses":{
+            "200":{
+              "description":"Response of JSON with Secret key.",
+              "schema":{
+                "$ref":"#/components/schemas/generateSecret"
+              }
+            }
+          }
+        }
+      },
+      "/totp": {
+        "get": {
+          "tags": [
+            "TOTP"
+          ],
+          "summary": "Used to retrieve TOTPs based on Secret keys.",
+          "parameters":[{
+            "name": "token",
+            "in": "header",
+            "schema":{
+              "type": "string"
+            },
+            "required": true
+          }],
+          "responses": {
+            "200": {
+              "description": "Will get a TOTP in JSON with Key 'code'",
+              "schema": {
+                "$ref": "#/components/schemas/secret"
+              }
+            }
+          }
+        }
+      }
+    }
+  }

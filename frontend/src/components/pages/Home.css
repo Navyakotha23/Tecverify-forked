@@ -1,0 +1,307 @@
+.container{
+    width: 100%;
+    height: 100%;
+    position : fixed;
+    background: #f9f9f9;
+    overflow: auto;
+}
+.container-body{
+    position: absolute;
+    left: 50%;
+    top: 44%;
+    transform: translate(-50%, -50%);
+    width: 70%;
+    height: 80%;
+    border: 1px solid silver;
+    background: white;
+}
+
+.button {
+    background-color: #2fa2e0;
+    border: none;
+    color: white;
+    padding: 15px 32px;
+    text-align: center;
+    text-decoration: none;
+    display: inline-block;
+    font-size: 16px;
+    margin: 4px 2px;
+    cursor: pointer;
+    outline: none;
+    transition-duration: 0.2s;
+}
+.generate-secret-button {
+    background-color: #2084ba;
+    border: none;
+    color: white;
+    padding: 15px 30px;
+    text-align: center;
+    text-decoration: none;
+    display: inline-block;
+    font-size: 16px;
+    cursor: pointer;
+    outline: none;
+    transition-duration: 0.4s;
+    width: 80%;
+    border-radius: 5px;
+    margin-left: 10%;
+}
+.generate-secret-button:hover {
+    box-shadow: 0 2px 5px 0 rgba(0,0,0,0.24), 0 5px 10px 0 rgba(0,0,0,0.19);
+    background: #026296;
+}
+.button:hover {
+    box-shadow: 0 2px 5px 0 rgba(0,0,0,0.24), 0 5px 10px 0 rgba(0,0,0,0.19);
+}
+hr.divider {
+    background: silver;
+}
+.admin-secret-input{
+    margin-left: 10%;
+    border: 1px solid silver;
+    height: 35px;
+    outline: none;
+    border-radius: 6px;
+    padding-left: 12px;
+    margin-top: 10%;
+    width: 80%;
+}
+.random-otp{
+    padding-left: 10px;
+    margin-top: 14px;
+    color: #2084ba;
+    letter-spacing: 3px;
+}
+
+.admin-button {
+    position: fixed;
+    background-color: #2084ba;
+    border: none;
+    width: 35px;
+    top: 80%;
+    left: 90%;
+    color: white;
+    height: 35px;
+    text-align: center;
+    text-decoration: none;
+    display: inline-block;
+    font-size: 16px;
+    cursor: pointer;
+    outline: none;
+    transition-duration: 0.4s;
+    border-radius: 20px;
+}
+.admin-button:hover {
+    box-shadow: 0 2px 5px 0 rgba(0,0,0,0.24), 0 5px 10px 0 rgba(0,0,0,0.19);
+    background: #026296;
+}
+.close-button {
+    position: absolute;
+    border: none;
+    color: lightgray;
+    top: 3%;
+    left: 94%;
+    background: none;
+    text-align: center;
+    text-decoration: none;
+    display: inline-block;
+    font-size: 20px;
+    float: right;
+    cursor: pointer;
+    outline: none;
+}
+
+.logout-button {
+    border-radius: 3px;
+    margin-top: 14px;
+    margin-right: 20px;
+    height: 40px;
+    padding-top: 10px;
+    top: 200px;
+    float: right;
+}
+.popup-box {
+     position: fixed;
+     background: #00000050;
+     width: 100%;
+     height: 100vh;
+     top: 0;
+     left: 0;
+ }
+
+.box {
+    position: relative;
+    width: 30%;
+    margin: 0 auto;
+    height: auto;
+    max-height: 70vh;
+    margin-top: calc(115vh - 85vh - 20px);
+    background: #fff;
+    border-radius: 4px;
+    padding: 20px;
+    border: 1px solid #999;
+    overflow: auto;
+}
+.admin-popup-box {
+     position: fixed;
+     background: #00000050;
+     width: 100%;
+     height: 100vh;
+     top: 0;
+     left: 0;
+ }
+
+.admin-box {
+    position: relative;
+    width: 640px;
+    margin: 7% auto;
+    background: #fff;
+    height: 480px;
+    border-radius: 4px;
+    border: 1px solid #999;
+}
+
+.close-icon {
+    content: 'x';
+    cursor: pointer;
+    position: fixed;
+    right: calc(15% - 30px);
+    top: calc(100vh - 85vh - 33px);
+    background: #ededed;
+    width: 25px;
+    height: 25px;
+    border-radius: 50%;
+    line-height: 20px;
+    text-align: center;
+    border: 1px solid #999;
+    font-size: 20px;
+}
+.success-message {
+    position: absolute;
+    top: 70%;
+    height: 30px;
+    left: 10%;
+    padding-top: 5px;
+    text-align: center;
+    background: #d9ffd9;
+    width: 80%;
+    color: #145614;
+    border-radius: 5px;
+}
+.progress-bar {
+    background: #007dc1;
+    height: 5px;
+    transition: all 1s cubic-bezier(0.21, 0.19, 0.45, 0.55) 0s;
+}
+.tenant {
+    padding-left: 10px;
+    font-weight: 900;
+    font-size: 17px;
+}
+.loading-spinner {
+    margin-left: 49%;
+    margin-top: 20%;
+}
+.container-footer {
+    position: absolute;
+    border-top: 1px solid silver;
+    text-align: center;
+    width: 100%;
+    top: 94%;
+    padding: 7px 0 0 0;
+}
+.container-header {
+    border-top: 1px solid silver;
+    border-bottom: 1px solid silver;
+    height: 50px;
+    padding: 15px;
+    color: white;
+    background: #2084ba;
+}
+.bypass-codes {
+    height: 87%;
+    border: 1px solid silver;
+}
+.instructions {
+    width: 45%;
+    position: fixed;
+    text-align: justify;
+    overflow: auto;
+    height: 82%;
+    margin: 30px 10px 10px 29px;
+}
+.instructions-admin-secret {
+    width: 50%;
+    text-align: justify;
+    overflow: auto;
+    height: 380px;
+    padding: 30px 10px 10px 29px;
+}
+.container-center {
+    display: inline-flex;
+}
+.admin-secret {
+    width: 95%;
+    margin: 0 2.5% 2.5% 2.5%;
+    display: inline-flex;
+    border: 0;
+    border-radius: 26px;
+    height: 91%;
+}
+.shared-secret {
+    height: 37px;
+    border: 1px solid silver;
+    width: 80%;
+    color: darkslategray;
+    border-radius: 5px 0 0 5px;
+    padding-left: 10px;
+    outline: none;
+}
+.shared-secret-div {
+    display: flex;
+    margin-left: 10%;
+    margin-right: 0;
+    width: 244px;
+    height: 37px;
+    outline: none;
+    border-radius: 6px;
+}
+.copy-button {
+    cursor: pointer;
+    height: 100%;
+    color: white;
+    margin: 0 0 0 0;
+    border-radius: 0 5px 5px 0;
+    padding: 10px 10px 9px 10px;
+    background: rgb(32, 132, 186);
+    border: 1px solid rgb(32, 132, 186);
+    outline: none;
+}
+.save-button {
+    background-color: #2084ba;
+    border: none;
+    color: white;
+    padding: 15px;
+    font-size: 16px;
+    outline: none;
+    transition-duration: inherit;
+    width: 100px;
+    border-radius: 5px;
+    float: right;
+    margin-top: 100px;
+    margin-right: 25px;
+}
+.save-button:hover {
+    box-shadow: 0 2px 5px 0 rgba(0,0,0,0.24), 0 5px 10px 0 rgba(0,0,0,0.19);
+    background: #026296;
+}
+.footer {
+    border-top: 1px solid #E7E7E7;
+    text-align: center;
+    padding: 10px 0 0 0;
+    position: fixed;
+    left: 0;
+    bottom: 0;
+    height: 40px;
+    width: 100%;
+}
