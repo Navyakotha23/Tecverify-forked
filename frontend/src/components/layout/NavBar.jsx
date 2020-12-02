@@ -1,17 +1,27 @@
 import { useOktaAuth } from '@okta/okta-react';
 import React from 'react';
 import '../pages/Home.css';
-
-const Navbar = () => {
+const style = {
+    header : {
+        color: "white",
+        marginLeft: "20px",
+        marginTop: "9px",
+        width: '100%'
+    },
+    navBar: {
+        background: "#2084ba",
+        height: "60px",
+        display: "flex"
+    }
+}
+const Navbar = ({mainHeader}) => {
   const { authState, authService } = useOktaAuth();
-
-  const login = async () => authService.login('/login');
   const logout = async () => authService.logout('/login');
 
   return (
     <div>
-      <div style={{background: "#2084ba", height: "70px", display: "flex"}}>
-          <h1 style={{color: "white", marginLeft: "20px", marginTop: "14px", width: '100%'}}>TecMFA Bypass Code Generator</h1>
+      <div style={style.navBar}>
+          <h1 style={style.header}>{mainHeader}</h1>
               {
                 authState.isAuthenticated ? 
                 (

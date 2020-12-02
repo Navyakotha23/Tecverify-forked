@@ -10,10 +10,11 @@
     left: 50%;
     top: 44%;
     transform: translate(-50%, -50%);
-    width: 70%;
+    width: 706px;
     height: 80%;
     border: 1px solid silver;
     background: white;
+    overflow: auto;
 }
 
 .button {
@@ -79,7 +80,7 @@ hr.divider {
     border: none;
     width: 35px;
     top: 80%;
-    left: 90%;
+    left: 88%;
     color: white;
     height: 35px;
     text-align: center;
@@ -113,7 +114,7 @@ hr.divider {
 
 .logout-button {
     border-radius: 3px;
-    margin-top: 14px;
+    margin-top: 9px;
     margin-right: 20px;
     height: 40px;
     padding-top: 10px;
@@ -298,10 +299,77 @@ hr.divider {
 .footer {
     border-top: 1px solid #E7E7E7;
     text-align: center;
-    padding: 10px 0 0 0;
+    padding: 5px 0 0 0;
     position: fixed;
     left: 0;
     bottom: 0;
-    height: 40px;
+    height: 30px;
     width: 100%;
 }
+.trash-icon{
+    width: 20px;
+    height: 20px;
+    position: relative;
+    float: right;
+    right: 20px;
+    padding: 0;
+    top: 10px;
+    margin: 0;
+    background: none;
+    border: 0;
+    color: darkgrey;
+    outline: none;
+}
+.time-details{
+    padding: 0;
+    margin: 0;
+    position: relative;
+    float: right;
+    right: 20px;
+    top: 10px;
+    color: #565656;
+}
+.bypass-codes-unOrder-list{
+    list-style-type: none;
+    padding: 0;
+    overflow-y: auto;
+    background: scroll;
+    margin: 0;
+    height: 99%;
+}
+.delete-button{
+     background-color: #f76868;
+     border: none;
+     color: white;
+     text-align: center;
+     text-decoration: none;
+     display: inline-block;
+     font-size: 16px;
+     margin: 20px;
+     cursor: pointer;
+     outline: none;
+     transition-duration: 0.2s;
+     border-radius: 3px;
+     height: 40px;
+     padding-top: 10px;
+     top: 200px;
+     float: right;
+ }
+.cancel-button{
+    background-color: #ffffff;
+    border: 1px solid darkgrey;
+    color: #676767;
+    text-align: center;
+    text-decoration: none;
+    display: inline-block;
+    font-size: 16px;
+    margin: 20px 0 0 0;
+    cursor: pointer;
+    outline: none;
+    transition-duration: 0.2s;
+    border-radius: 3px;
+    height: 40px;
+    padding-top: 10px;
+    top: 200px;
+    float: right;
+ }

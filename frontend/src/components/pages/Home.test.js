@@ -1,12 +1,14 @@
 import React from 'react';
 import { render } from '@testing-library/react';
-import App from './App';
+import Home from './Home';
 import { shallow } from 'enzyme';
 
-jest.mock("./components/auth/Login", () => {
+
+jest.mock("../auth/Login", () => {
     return <div>SignInWidgetMock</div>;
 });
-let wrapped = shallow(<App>title</App>);
+
+let wrapped = shallow(<Home>title</Home>);
 describe('Title', () => {
     it('should render the Title Component correctly', () => {
         expect(wrapped).toMatchSnapshot();

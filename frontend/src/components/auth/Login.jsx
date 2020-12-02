@@ -2,9 +2,9 @@ import React, { useEffect } from 'react';
 import OktaSignIn from '@okta/okta-signin-widget';
 import '@okta/okta-signin-widget/dist/css/okta-sign-in.min.css';
 
-import config from '../../config';
-
 const Login = () => {
+  const config = window.config;
+
   useEffect(() => {
     const { pkce, issuer, clientId, redirectUri, scopes } = config.authConfig;
     const widget = new OktaSignIn({
@@ -30,9 +30,9 @@ const Login = () => {
   }, []);
 
   return (
-    <div>
-      <div id="sign-in-widget" />
-    </div>
+      <div>
+        <div id="sign-in-widget" style={{marginTop: '15px'}}/>
+      </div>
   );
 };
 export default Login;
