@@ -1,6 +1,6 @@
 # Setup
 
-`D:\>mkdir tecverify`
+D:\>`mkdir tecverify`
 
 `D:\>cd tecverify`
 
