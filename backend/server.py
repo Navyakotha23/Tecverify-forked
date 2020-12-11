@@ -3,7 +3,7 @@ import os.path
 import base64
 from random import randint
 from datetime import datetime
-from logging.config import fileConfig
+from logging.config import dictConfig
 
 import pyotp
 import requests
@@ -11,15 +11,18 @@ from flask_swagger_ui import get_swaggerui_blueprint
 from flask import Flask, request, g, jsonify
 from flask_cors import CORS
 
+# app specific
 app = Flask(__name__)
 app.config.from_pyfile('config.py')
 CORS(app)
 
 # logger specific #
-fileConfig('logging.cfg')
+dictConfig(app.config['LOGGING_CONFIG'])
 
 # swagger specific #
-SWAGGERUI_BLUEPRINT = get_swaggerui_blueprint(app.config['SWAGGER_URL'], app.config['SWAGGER_FILE'])
+SWAGGER_URL = '/docs'
+SWAGGER_FILE = '/static/docs.json'
+SWAGGERUI_BLUEPRINT = get_swaggerui_blueprint(SWAGGER_URL, SWAGGER_FILE)
 app.register_blueprint(SWAGGERUI_BLUEPRINT)
 # end swagger specific #
 
@@ -44,7 +47,7 @@ ID_LENGTH = 7
 def check_token_header():
     if request.method == OPTIONS:
         return {}, 200
-    if app.config['SWAGGER_URL'] not in request.url:
+    if SWAGGER_URL not in request.url:
         if TOKEN not in request.headers:
             return {'error': 'Required Headers missing.'}, 400
         elif request.headers[TOKEN] == '':

@@ -1,2 +1,0 @@
-2020-12-02 22:06:00,998 server      : INFO 127.0.0.1 GET /api/v1/totp http 200 OK 96 http://localhost:3000/ Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/87.0.4280.66 Safari/537.36
-2020-12-02 22:06:01,100 werkzeug    : INFO 127.0.0.1 - - [02/Dec/2020 22:06:01] "[37mGET /api/v1/totp HTTP/1.1[0m" 200 -
