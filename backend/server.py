@@ -17,7 +17,22 @@ app.config.from_pyfile('config.py')
 CORS(app)
 
 # logger specific #
-dictConfig(app.config['LOGGING_CONFIG'])
+level = app.config['LOGGING_LEVEL'] if 'LOGGING_LEVEL' in app.config else DEBUG
+max_bytes = app.config['LOGGING_MAX_BYTES'] if 'LOGGING_MAX_BYTES' in app.config else 1048576
+backup_count = app.config['LOGGING_BACKUP_COUNT'] if 'LOGGING_BACKUP_COUNT' in app.config else 10
+
+logging_config = dict(
+    version = 1,
+    formatters = { 'f': {'format': '%(asctime)s %(name)-12s %(levelname)-8s %(message)s'}},
+    handlers = {'h': {'class': 'logging.handlers.RotatingFileHandler', 'formatter': 'f',
+            'level': level,
+            'filename': './logs/logs.log',
+            'mode': 'a',
+            'maxBytes': max_bytes,
+            'backupCount': backup_count}},
+    root = {'handlers': ['h'], 'level': level,})
+dictConfig(logging_config)
+# end logger specifc
 
 # swagger specific #
 SWAGGER_URL = '/docs'
@@ -43,6 +58,7 @@ OPTIONS = 'OPTIONS'
 SECRET = 'secret'
 ID_LENGTH = 7
 
+# Middlewares
 @app.before_request
 def check_token_header():
     if request.method == OPTIONS:
@@ -74,7 +90,7 @@ def logging_after_request(response):
     )
     return response
 
-
+# routes
 @app.route('/api/v1/secret', methods=['POST'])
 def save_secret():
     form_data = validate_and_retrieve_formdata(request)
@@ -124,7 +140,7 @@ def get_totp():
         totp = generate_totp_for_all_users(secrets_json)
         return jsonify(totp), 200
 
-
+# helper functions
 def introspect(token):
     response = get_token_info(token)
     token_info = response.json()

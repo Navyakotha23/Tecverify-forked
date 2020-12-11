@@ -4,14 +4,6 @@ CLAIM_NAME = "Admin"
 AUTHORIZING_TOKEN = "id_token"
 FILE = "secrets.json"
 
-LOGGING_CONFIG = dict(
-    version = 1,
-    formatters = { 'f': {'format': '%(asctime)s %(name)-12s %(levelname)-8s %(message)s'}},
-    handlers = {'h': {'class': 'logging.handlers.RotatingFileHandler', 'formatter': 'f',
-            'level': 'DEBUG',
-            'filename': './logs/logs.log',
-            'mode': 'a',
-            'maxBytes': 1048576,
-            'backupCount': 10}},
-    root = {'handlers': ['h'], 'level': 'DEBUG',}
-)
+LOGGING_LEVEL = "DEBUG"
+LOGGING_MAX_BYTES = 1048576
+LOGGING_BACKUP_COUNT = 10
