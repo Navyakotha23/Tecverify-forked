@@ -2,7 +2,7 @@ import React from 'react';
 import { BrowserRouter as Router, Route, useHistory } from 'react-router-dom';
 import { Security, SecureRoute, LoginCallback } from '@okta/okta-react';
 import Login from './components/auth/Login';
-import Navbar from './components/layout/NavBar';
+import LoginError from './components/layout/LoginError';
 import Home from './components/pages/Home';
 import Dashboard from './components/pages/dashboard';
 
@@ -18,7 +18,7 @@ const HasAccessToRouter = () => {
           {...config.authConfig}
           onAuthRequired={customAuthHandler}
       >
-        <Navbar mainHeader={config.mainHeader}/>
+        <LoginError />
         <Route path="/" exact component={Dashboard} />
         <SecureRoute path="/home" exact component={Home} />
         <Route path="/implicit/callback" component={LoginCallback} />

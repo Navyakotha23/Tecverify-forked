@@ -2,19 +2,20 @@ import React, {useState} from 'react';
 import {useOktaAuth} from '@okta/okta-react';
 import "./Home.css";
 import Login from '../auth/Login';
-import Footer from '../layout/Footer'
 import ErrorPopup from '../layout/ErrorPopup'
 import DeleteSecretKey from '../layout/DeleteSecretKey'
 import "react-loader-spinner/dist/loader/css/react-spinner-loader.css"
 import Loader from 'react-loader-spinner'
 import {CopyToClipboard} from 'react-copy-to-clipboard';
+import Navbar from "../layout/NavBar";
 
 const Home = () => {
-    const OktaAuth = useOktaAuth();
+    const oktaAuth = useOktaAuth();
     const [expiresIn, setSeconds] = useState();
     const [randomOtp, setRandomOtp] = useState();
     const [adminStatus, setAdminStatus] = useState();
-    const [showLoadingSpinner, setShowLoadingSpinner] = useState(true);
+    const [secretNames, setSecretNames] = useState([]);
+    const [duplicateSecretNameFound, setDuplicateSecretNameFound] = useState();
     const [showLoadingSpinnerInAdminSecretPopup, setShowLoadingSpinnerInAdminSecretPopup] = useState(false);
     const [gettingAdminSecret, setGettingAdminSecret] = useState(false);
     const [successMessage, setSuccessMessage] = useState('');
@@ -27,9 +28,9 @@ const Home = () => {
     const [sharedSecret, setSharedSecret] = useState('');
     const [timeInSeconds, setTimeInSeconds] = useState('');
     const [logoutInErrorPopup, showLogoutInErrorPopup] = useState(false);
-    if (OktaAuth) {
-        const authState = OktaAuth.authState;
-        const authService = OktaAuth.authService;
+    if (oktaAuth) {
+        const authState = oktaAuth.authState;
+        const authService = oktaAuth.authService;
         const logout = async () => authService.logout('/login');
         const onClose = async () => setError('');
         const oktaTokenStorage = JSON.parse(localStorage.getItem('okta-token-storage'));
@@ -44,52 +45,63 @@ const Home = () => {
                     setAdminStatus(info[authorizeClaimName])
                 }
                 if (!randomOtp) {
-                    setShowLoadingSpinner(true)
                     getOtp()
                 }
             });
         }
-
 
         const version = require('../../../package.json').version;
 
-        const handleSubmit = (evt) => {
-            setShowLoadingSpinnerInAdminSecretPopup(true)
-            evt.preventDefault();
-            let formData = new FormData();
-            formData.append('secretname', adminSecret);
-            formData.append('admin_secret', sharedSecret);
-            fetch(`http://${config.backEndUrl}/api/v1/secret`, {
-                "method": "POST",
-                "headers": {
-                    "token": authorizeToken
-                },
-                "body": formData
-            }).then(response => {
-                const promise = response.json();
-                promise.then(() => {
-                    getOtp()
+        const handleSubmit = () => {
+            let noDuplicatesFound = false
+            if(secretNames.length > 0) {
+                secretNames.forEach(name => {
+                    if(name === adminSecret) {
+                        noDuplicatesFound = true;
+                    }
+                })
+            }
+            if (!noDuplicatesFound) {
+                setDuplicateSecretNameFound(false)
+                setShowLoadingSpinnerInAdminSecretPopup(true)
+                let formData = new FormData();
+                formData.append('secretname', adminSecret);
+                formData.append('admin_secret', sharedSecret);
+                fetch(`http://${config.backEndUrl}/api/v1/secret`, {
+                    "method": "POST",
+                    "headers": {
+                        "token": authorizeToken
+                    },
+                    "body": formData
+                }).then(response => {
+                    const promise = response.json();
+                    promise.then(() => {
+                        getOtp()
+                        setShowLoadingSpinnerInAdminSecretPopup(false)
+                    });
+                    if (response.status !== 200) {
+                        if (noError === '') {
+                            setError(response.statusText);
+                        }
+                        setShowLoadingSpinnerInAdminSecretPopup(false)
+                    } else {
+                        setSuccessMessage('Secret Name submitted!')
+                        setShowLoadingSpinnerInAdminSecretPopup(false)
+                    }
+                    setAdminSecret('');
+                    setSharedSecret('');
+                }).catch(err => {
+                    setError("Unable to submit Name");
+                    console.log(err);
                     setShowLoadingSpinnerInAdminSecretPopup(false)
                 });
-                if (response.status !== 200) {
-                    if (noError === '') {
-                        setError(response.statusText);
-                    }
-                    setShowLoadingSpinnerInAdminSecretPopup(false)
-                } else {
-                    setSuccessMessage('Secret Name submitted!')
-                    setShowLoadingSpinnerInAdminSecretPopup(false)
-                }
-                setAdminSecret('');
-                setSharedSecret('');
-            }).catch(err => {
-                setError("Unable to submit Name");
-                console.log(err);
-                setShowLoadingSpinnerInAdminSecretPopup(false)
-            });
+            } else {
+                setShowOtpDetails(false)
+                setDuplicateSecretNameFound(`${adminSecret}`)
+            }
         }
 
-        const getAdminSecret = () => {
+        const getSecretKey = () => {
             setGettingAdminSecret(true)
             fetch(`http://${config.backEndUrl}/api/v1/secret`, {
                 "method": "GET",
@@ -128,13 +140,20 @@ const Home = () => {
                     .then(response => response.json())
                     .then(response => {
                         if (response.length > 0) {
+                            let listOfSecretNames = [];
+                            setRandomOtp(response);
+                            response.forEach(code => {
+                                listOfSecretNames.push(code.secretname);
+                            })
+                            setSecretNames(listOfSecretNames);
+                        } else {
                             setRandomOtp(response);
                         }
-                        setShowLoadingSpinner(false)
+
                     })
                     .catch(err => {
                         console.error(err);
-                        setShowLoadingSpinner(false)
+
                     });
             } else {
                 setError(`Token Error : No token found with key (${authorizeTokenType}).`);
@@ -143,7 +162,8 @@ const Home = () => {
         }
 
         const deleteByPassCode = () => {
-            setShowLoadingSpinner(true)
+            setRandomOtp(null)
+
             const myHeaders = new Headers();
             myHeaders.append("token", oktaTokenStorage[authorizeTokenType][authorizeTokenType]);
             const requestOptions = {
@@ -155,12 +175,12 @@ const Home = () => {
             fetch(`http://${config.backEndUrl}/api/v1/secret/${selectedSecretId}`, requestOptions)
                 .then(response => response.text())
                 .then(result => {
-                    setShowLoadingSpinner(true)
+
                     getOtp()
                     console.log(result, selectedSecretId)
                 })
                 .catch(error => {
-                    setShowLoadingSpinner(false)
+
                     console.error('error', error)
                 });
         }
@@ -204,88 +224,97 @@ const Home = () => {
                     setTimeInSeconds(new Date().getTime() / 1000)
                 }
             }
-
             transition = (100 - adjustTimerBar(new Date().getTime() / 1000) === 0 || 100 - adjustTimerBar(new Date().getTime() / 1000) < 4) ? '0s' : 'all 1s cubic-bezier(0.21, 0.19, 0.45, 0.55) 0s';
-
         }
 
         return (
             authState.isAuthenticated
                 ?
                 <div className={"container"}>
-                    {
-                        showLoadingSpinner ?
-                            <div className={"container-body"}>
-                                <div className={'loading-spinner'}>
-                                    <Loader type="Oval" color="#007dc1" height={50} width={50}/>
-                                </div>
-                            </div>
-                            :
-                            <div className={"container-body"}>
-                                <div className={'container-center'}>
-                                    <div className={'instructions'}>
-                                        <h3>Instructions</h3>
-                                        <ul style={{listStyleType: 'none', padding: '0'}}>
-                                            {config.instructionsInBypassCodeGenerator.map(function (content, index) {
-                                                return <li key={index}>
-                                                    <p style={{margin: '10px 0 0 0', fontSize: 'larger'}}>{content}</p>
-                                                </li>
-                                            })}
-                                        </ul>
-                                    </div>
-                                    <div style={{
-                                        width: '40%',
-                                        position: 'absolute',
-                                        left: '55%',
-                                        top: '7%',
-                                        height: '87%',
-                                        padding: '0',
-                                        margin: '0'
+                    <Navbar mainHeader={config.mainHeader}/>
+                    <div>
+                        <div className={'instructions'}>
+                            <h3 className={'sub-heading'}>Instructions</h3>
+                            <ul style={{listStyleType: 'none', padding: '0'}}>
+                                {config.instructionsInBypassCodeGenerator.map(function (content, index) {
+                                    return <li key={index}>
+                                        <p className={'list-cls'}>
+                                            {content}
+                                        </p>
+                                    </li>
+                                })}
+                            </ul>
+                            <footer style={{top: '60%', position: 'relative', borderTop: '1px solid silver'}}>
+                                    <span style={{float: 'left', marginRight: '20px', marginTop: '10px'}}>
+                                        version {version}
+                                    </span>
+                                <span style={{float: 'left', marginLeft: '100px', marginTop: '10px'}}>
+                                    {config.authConfig.issuer.split('/')[2]}
+                                    </span>
+                            </footer>
+                        </div>
+                        <div style={{width: '33.3%'}}>
+                            <div className="mobile">
+                                <span className="titlecls">Bypass Codes</span>
+                                {adminSecretFormOpener}
+                                <div className={'outer-progress-bar'}>
+                                    <div className="progress-bar" style={{
+                                        width: 100 - adjustTimerBar(new Date().getTime() / 1000) + "%",
+                                        transition: transition,
                                     }}>
-                                        <h3 style={{textAlign: 'center'}}>Bypass Codes</h3>
-                                        <div className={'bypass-codes'}>
-                                            {
-                                                (randomOtp && randomOtp.length > 0) ?
-                                                    <div className="progress-bar" style={{
-                                                        width: 100 - adjustTimerBar(new Date().getTime() / 1000) + "%",
-                                                        transition: transition
-                                                    }}>
-                                                    </div> : ''
-                                            }
-                                            <ul className={'bypass-codes-unOrder-list'}>
-                                                {
-                                                    (randomOtp && randomOtp.length > 0) ? randomOtp.map(function (code, index) {
-                                                        return <li key={index}>
-                                                            <div>
-                                                                {
-                                                                    adminStatus ?
-                                                                        <DeleteSecretKey
-                                                                            setSelectedSecretName={setSelectedSecretName}
-                                                                            setSelectedSecretId={setSelectedSecretId}
-                                                                            showDeleteConfirmationPopup={showDeleteConfirmationPopup}
-                                                                            code={code}/> : ''
-                                                                }
-                                                                <p style={{padding: '10px 1px 1px 10px'}}>{code.secretname}</p>
-                                                                <p className={'time-details'}>{code.secretUpdatedAt}</p>
-                                                                <h2 className="random-otp">{code.code}</h2>
-                                                                <hr className={"divider"} style={{margin: '0'}}/>
-                                                            </div>
-                                                        </li>
-                                                    }) : <p style={{margin: '20px'}}>No Name found with this user.</p>
-                                                }
-                                            </ul>
-                                            {adminSecretFormOpener}
-                                        </div>
                                     </div>
                                 </div>
+                                <hr className={'divider'} style={{borderColor: '#d6d6d6', marginTop:'4px', marginBottom: '0', marginLeft: '19px'}}/>
+                                <ul style={{
+                                    listStyleType: 'none',
+                                    marginLeft: '18px',
+                                    marginRight: '17px',
+                                    overflow: 'auto',
+                                    marginTop: '5px',
+                                    maxHeight: '400px',
+                                    padding: '0'
+                                }}>
+                                    {
+                                        (randomOtp && randomOtp.length > 0) ? randomOtp.map(function (code, index) {
+                                            return (
+                                                <li className='otp-list-cls' key={index}>
+                                                     <div style={{display: 'flex'}}>
+                                                         {
+                                                             adminStatus ?
+                                                                 <DeleteSecretKey
+                                                                     setSelectedSecretName={setSelectedSecretName}
+                                                                     setSelectedSecretId={setSelectedSecretId}
+                                                                     showDeleteConfirmationPopup={showDeleteConfirmationPopup}
+                                                                     code={code}/> : ''
+                                                         }
+                                                         <p style={{padding: '10px 1px 1px 20px', fontSize: '18px'}}>{code.secretname}</p>
+                                                     </div>
+                                                     <div style={{display: 'flex'}}>
+                                                         <h2 className="random-otp" style={{marginTop: '7px', letterSpacing: '3px'}}>{code.code}</h2>
+                                                         <p className='time-details'>{code.secretUpdatedAt}</p>
+                                                     </div>
+                                                </li>
+                                            )}) :  <div>
+                                                {
+                                                     (randomOtp && randomOtp.length === 0) ?
+                                                         <p style={{margin: '20px'}}>No Names found with this user.</p>
+                                                         :
+                                                         <div style={{marginLeft: '42%', marginTop: '15%'}}>
+                                                             <Loader type="Oval" color="#007dc1" height={50} width={50}/>
+                                                         </div>
+                                                 }
+                                            </div>
+                                    }
+                                </ul>
                             </div>
-                    }
+                        </div>
+                    </div>
                     {
                         deleteConfirmationPopup ? (
                             <div className="popup-box">
                                 <div className="box" style={{width: '55%',minWidth: '300px', padding: '0'}}>
-                                    <h3 className="container-header" style={{background: '#f76868'}}>Confirm</h3>
-                                    <p style={{fontSize: "initial", margin: '20px'}}>Are you sure you want to delete
+                                    <h3 className="container-header">Confirm</h3>
+                                    <p style={{fontSize: "initial", margin: '30px 0px 20px 50px'}}>Are you sure you want to delete
                                         ByPass code <b>{selectedSecretName}</b> ?</p>
                                     <div style={{width: "100%"}}>
                                         <button className="button delete-button" onClick={() => {
@@ -305,7 +334,7 @@ const Home = () => {
                     }
                     {
                         noError ? (
-                            <ErrorPopup noError={noError} logoutInErrorPopup={logoutInErrorPopup} onClose={onClose}/>
+                            <ErrorPopup errorMessage={noError} logoutInErrorPopup={logoutInErrorPopup} onClose={onClose}/>
                         ) : ''
                     }
                     {
@@ -327,74 +356,81 @@ const Home = () => {
                                             :
                                             <div className={'admin-secret'}>
                                                 <div className={'instructions-admin-secret'}>
-                                                    <h3>Instructions</h3>
+                                                    <h3 className={'sub-heading'}>Instructions</h3>
                                                     <ul style={{listStyleType: 'none', padding: '0'}}>
                                                         {config.instructionsInAdminSecret.map(function (code, index) {
-                                                            return <li key={index}>
-                                                                <p style={{
-                                                                    margin: '10px 0 0 0',
-                                                                    fontSize: 'larger'
-                                                                }}>{code}</p>
-                                                            </li>
+                                                            return  <li key={index}>
+                                                                        <p className={'list-cls'}>
+                                                                            {code}
+                                                                        </p>
+                                                                    </li>
                                                         })}
                                                     </ul>
                                                 </div>
-                                                <div style={{width: "50%"}}>
-                                                    <form onSubmit={handleSubmit}>
+                                                <div style={{width: "55%"}}>
+                                                    <input
+                                                        className={'admin-secret-input'}
+                                                        type="text"
+                                                        maxLength={'15'}
+                                                        placeholder={"Secret Name"}
+                                                        value={adminSecret.trimStart()}
+                                                        onChange={e => setAdminSecret(e.target.value)}
+                                                    />
+                                                    <br/>
+                                                    <br/>
+                                                    <br/>
+                                                    <div>
+                                                        <button disabled={(gettingAdminSecret)} type="button"
+                                                                className="generate-secret-button"
+                                                                onClick={() => getSecretKey()}>
+                                                            {
+                                                                !gettingAdminSecret ?
+                                                                    'Generate Secret Key' :
+                                                                    <Loader type="Oval" color="white" height={15}
+                                                                            width={15}/>
+                                                            }
+                                                        </button>
+                                                    </div>
+                                                    <br/>
+                                                    <br/>
+                                                    <div className={'shared-secret-div'}>
                                                         <input
-                                                            className={'admin-secret-input'}
-                                                            type="text"
-                                                            placeholder={"Secret Name"}
-                                                            value={adminSecret}
-                                                            onChange={e => setAdminSecret(e.target.value)}
+                                                            className={'shared-secret'}
+                                                            readOnly={true}
+                                                            placeholder={"Secret Key"}
+                                                            value={sharedSecret}
+                                                            onChange={e => setSharedSecret(e.target.value)}
                                                         />
-                                                        <br/>
-                                                        <br/>
-                                                        <br/>
-                                                        <div>
-                                                            <button disabled={(gettingAdminSecret)} type="button"
-                                                                    className="generate-secret-button"
-                                                                    onClick={() => getAdminSecret()}>
-                                                                {
-                                                                    !gettingAdminSecret ?
-                                                                        'Generate Secret Key' :
-                                                                        <Loader type="Oval" color="white" height={15}
-                                                                                width={15}/>
-                                                                }
+                                                        <CopyToClipboard text={sharedSecret}
+                                                                         onCopy={() => {
+                                                                             setSuccessMessage('Secret Key copied to clipboard.');
+                                                                         }}>
+                                                            <button type='button' className={'copy-button'}>Copy
                                                             </button>
-                                                        </div>
-                                                        <br/>
-                                                        <br/>
-                                                        <div className={'shared-secret-div'}>
-                                                            <input
-                                                                className={'shared-secret'}
-                                                                readOnly={true}
-                                                                placeholder={"Secret Key"}
-                                                                value={sharedSecret}
-                                                                onChange={e => setSharedSecret(e.target.value)}
-                                                            />
-                                                            <CopyToClipboard text={sharedSecret}
-                                                                             onCopy={() => {
-                                                                                 setSuccessMessage('Secret Key copied to clipboard.');
-                                                                             }}>
-                                                                <button type='button' className={'copy-button'}>Copy
-                                                                </button>
-                                                            </CopyToClipboard>
-                                                        </div>
-                                                        <div>
-                                                            <button
-                                                                style={{cursor: (!adminSecret || !sharedSecret) ? 'no-drop' : 'pointer'}}
-                                                                type="submit" value="Submit" className="save-button"
-                                                                disabled={(!adminSecret || !sharedSecret)}>
-                                                                Save
-                                                            </button>
-                                                        </div>
-                                                    </form>
+                                                        </CopyToClipboard>
+                                                    </div>
+                                                    <div>
+                                                        <button
+                                                            style={{cursor: (!adminSecret || !sharedSecret) ? 'no-drop' : 'pointer'}}
+                                                            className="save-button"
+                                                            disabled={(!adminSecret || !sharedSecret)}
+                                                            onClick={() => handleSubmit()}>
+                                                            Save
+                                                        </button>
+                                                    </div>
                                                 </div>
                                                 {
                                                     successMessage ?
                                                         <div>
                                                             <span className={"success-message"}>{successMessage}</span>
+                                                        </div>
+                                                        :
+                                                        ''
+                                                }
+                                                {
+                                                    duplicateSecretNameFound ?
+                                                        <div>
+                                                            <span className={"error-message"}>Name <b>{duplicateSecretNameFound}</b> is already taken</span>
                                                         </div>
                                                         :
                                                         ''
@@ -405,10 +441,6 @@ const Home = () => {
                             </div>
                         ) : ''
                     }
-                    <Footer 
-                        environment={config.environment}
-                        issuer={config.authConfig.issuer}
-                        version={version}/>
                 </div>
                 :
                 <Login/>

@@ -1,20 +1,121 @@
 .container{
     width: 100%;
-    height: 100%;
+    min-width: 1300px;
+    min-height: 850px;
+    height: 110%;
     position : fixed;
-    background: #f9f9f9;
+    background-image: url("../../assets/images/bg.jpg");
+    background-size: 100% 100%;
+    background-repeat: no-repeat;
     overflow: auto;
 }
-.container-body{
+.instructions{
     position: absolute;
-    left: 50%;
-    top: 44%;
+    left: 33%;
+    top: 48%;
     transform: translate(-50%, -50%);
-    width: 706px;
-    height: 80%;
-    border: 1px solid silver;
-    background: white;
+    width: 600px;
+    height: 75%;
     overflow: auto;
+}
+.logout-button {
+    margin: 0;
+    padding: 0;
+    float: right;
+    background: none;
+    border: none;
+    color: white;
+    outline: none;
+}
+.logout-button:hover {
+    text-decoration: underline;
+}
+.navBar{
+    background: none;
+    height: 60px;
+    display: flex;
+    width: 70%;
+    margin-left: 12%;
+}
+.header{
+    color: black;
+    margin-top: 20px;
+    width: 100%;
+    font-size: 29px;
+    font-weight: lighter;
+}
+.sub-heading{
+    font-size: 20px;
+    margin: 0 0 20px 0;
+    padding: 0 0 10px 0;
+    position: relative;
+}
+.sub-heading::before{
+    content: "";
+    position: absolute;
+    width: 100%;
+    height: 1.5px;
+    background-color: #000;
+    bottom: 0;
+}
+.sub-heading::after{
+    content: "";
+    position: absolute;
+    width: 120px;
+    height: 3px;
+    background-color: rgb(255, 0, 0);
+    bottom: -0.5px;
+    left: 0;
+}
+.list-cls{
+    background: url("../../assets/images/list-bg.png") no-repeat left 7px;
+    padding: 0 0 15px 30px;
+    background-size: 15px;
+    font-size: 18px;
+    text-align: justify;
+}
+.otp-list-cls{
+    background: url("../../assets/images/list-bg.png") no-repeat left 32px;
+    background-size: 15px;
+    background-position: 3% 50%;
+    border-bottom: 1px solid #949494;
+}
+.titlecls{
+    font-size: 24px;
+    color: #255062;
+    margin: 50px 0 25px 30px;
+    display: inline-block;
+}
+.mobile{
+    background: url("../../assets/images/mobile.png") no-repeat left top;
+    background-size: 100% 100%;
+    margin-top: 60px;
+    width: 350px;
+    height: 550px;
+    left: 176%;
+    position: relative;
+}
+
+.admin-button {
+    margin-left: 88px;
+    background-color: #0a8dad;
+    border: none;
+    width: 35px;
+    color: white;
+    height: 35px;
+    text-align: center;
+    text-decoration: none;
+    display: inline-block;
+    font-size: 16px;
+    cursor: pointer;
+    outline: none;
+    transition-duration: 0.4s;
+    border-radius: 20px;
+}
+
+.admin-button:hover {
+    box-shadow: 0 2px 5px 0 rgba(0,0,0,0.24), 0 5px 10px 0 rgba(0,0,0,0.19);
+    background: #026296;
 }
 
 .button {
@@ -32,7 +133,7 @@
     transition-duration: 0.2s;
 }
 .generate-secret-button {
-    background-color: #2084ba;
+    background-color: #0083a2;
     border: none;
     color: white;
     padding: 15px 30px;
@@ -49,13 +150,19 @@
 }
 .generate-secret-button:hover {
     box-shadow: 0 2px 5px 0 rgba(0,0,0,0.24), 0 5px 10px 0 rgba(0,0,0,0.19);
-    background: #026296;
+    background: #0099c3;
 }
 .button:hover {
     box-shadow: 0 2px 5px 0 rgba(0,0,0,0.24), 0 5px 10px 0 rgba(0,0,0,0.19);
 }
 hr.divider {
-    background: silver;
+    width: 90%;
+    border-color: #d6d6d6;
+    border-bottom: 0;
+    border-left: 0;
+    position: absolute;
+    padding: 0;
+    border-right: 0;
 }
 .admin-secret-input{
     margin-left: 10%;
@@ -64,62 +171,38 @@ hr.divider {
     outline: none;
     border-radius: 6px;
     padding-left: 12px;
-    margin-top: 10%;
+    margin-top: 5%;
     width: 80%;
-}
-.random-otp{
-    padding-left: 10px;
-    margin-top: 14px;
-    color: #2084ba;
-    letter-spacing: 3px;
-}
-
-.admin-button {
-    position: fixed;
-    background-color: #2084ba;
-    border: none;
-    width: 35px;
-    top: 80%;
-    left: 88%;
-    color: white;
-    height: 35px;
-    text-align: center;
-    text-decoration: none;
-    display: inline-block;
-    font-size: 16px;
-    cursor: pointer;
-    outline: none;
-    transition-duration: 0.4s;
-    border-radius: 20px;
-}
-.admin-button:hover {
-    box-shadow: 0 2px 5px 0 rgba(0,0,0,0.24), 0 5px 10px 0 rgba(0,0,0,0.19);
-    background: #026296;
 }
 .close-button {
     position: absolute;
     border: none;
-    color: lightgray;
-    top: 3%;
+    color: #8e8e8e;
+    top: 5%;
     left: 94%;
     background: none;
     text-align: center;
     text-decoration: none;
     display: inline-block;
-    font-size: 20px;
+    font-size: 30px;
     float: right;
     cursor: pointer;
     outline: none;
 }
-
-.logout-button {
-    border-radius: 3px;
-    margin-top: 9px;
-    margin-right: 20px;
-    height: 40px;
-    padding-top: 10px;
-    top: 200px;
-    float: right;
+.outer-progress-bar{
+    width: 90%;
+    height: 5px;
+    left: 0;
+    position: absolute;
+    margin: 0 15px 0 18px;
+    border-bottom: 0;
+    border-left: 0;
+    border-right: 0;
+}
+.progress-bar {
+    background: #007dc1;
+    height: 5px;
+    transition: all 1s cubic-bezier(0.21, 0.19, 0.45, 0.55) 0s;
 }
 .popup-box {
      position: fixed;
@@ -129,18 +212,17 @@ hr.divider {
      top: 0;
      left: 0;
  }
-
 .box {
     position: relative;
-    width: 30%;
+    width: 400px;
     margin: 0 auto;
+    border: 1px solid silver;
     height: auto;
     max-height: 70vh;
     margin-top: calc(115vh - 85vh - 20px);
-    background: #fff;
+    background: white;
     border-radius: 4px;
     padding: 20px;
-    border: 1px solid #999;
     overflow: auto;
 }
 .admin-popup-box {
@@ -153,11 +235,11 @@ hr.divider {
  }
 
 .admin-box {
+    background: white;
     position: relative;
-    width: 640px;
+    width: 1000px;
     margin: 7% auto;
-    background: #fff;
-    height: 480px;
+    height: 550px;
     border-radius: 4px;
     border: 1px solid #999;
 }
@@ -189,57 +271,33 @@ hr.divider {
     color: #145614;
     border-radius: 5px;
 }
-.progress-bar {
-    background: #007dc1;
-    height: 5px;
-    transition: all 1s cubic-bezier(0.21, 0.19, 0.45, 0.55) 0s;
-}
-.tenant {
-    padding-left: 10px;
-    font-weight: 900;
-    font-size: 17px;
-}
-.loading-spinner {
-    margin-left: 49%;
-    margin-top: 20%;
-}
-.container-footer {
+.error-message {
     position: absolute;
-    border-top: 1px solid silver;
+    top: 70%;
+    height: 30px;
+    left: 10%;
+    padding-top: 5px;
     text-align: center;
-    width: 100%;
-    top: 94%;
-    padding: 7px 0 0 0;
+    background: #ffd9d9;
+    width: 80%;
+    color: #9c0000;
+    border-radius: 5px;
 }
 .container-header {
-    border-top: 1px solid silver;
-    border-bottom: 1px solid silver;
-    height: 50px;
-    padding: 15px;
-    color: white;
-    background: #2084ba;
-}
-.bypass-codes {
-    height: 87%;
-    border: 1px solid silver;
-}
-.instructions {
-    width: 45%;
-    position: fixed;
-    text-align: justify;
-    overflow: auto;
-    height: 82%;
-    margin: 30px 10px 10px 29px;
+    height: 60px;
+    margin-left: 2%;
+    padding: 35px;
+    color: black;
+    font-size: 30px;
+    font-weight: 200;
+    background: none;
 }
 .instructions-admin-secret {
-    width: 50%;
+    width: 45%;
     text-align: justify;
     overflow: auto;
     height: 380px;
     padding: 30px 10px 10px 29px;
-}
-.container-center {
-    display: inline-flex;
 }
 .admin-secret {
     width: 95%;
@@ -261,8 +319,7 @@ hr.divider {
 .shared-secret-div {
     display: flex;
     margin-left: 10%;
-    margin-right: 0;
-    width: 244px;
+    width: 453px;
     height: 37px;
     outline: none;
     border-radius: 6px;
@@ -274,12 +331,12 @@ hr.divider {
     margin: 0 0 0 0;
     border-radius: 0 5px 5px 0;
     padding: 10px 10px 9px 10px;
-    background: rgb(32, 132, 186);
+    background: #0083a2;
     border: 1px solid rgb(32, 132, 186);
     outline: none;
 }
 .save-button {
-    background-color: #2084ba;
+    background-color: #0083a2;
     border: none;
     color: white;
     padding: 15px;
@@ -289,29 +346,19 @@ hr.divider {
     width: 100px;
     border-radius: 5px;
     float: right;
-    margin-top: 100px;
-    margin-right: 25px;
+    margin-top: 150px;
+    margin-right: 50px;
 }
 .save-button:hover {
     box-shadow: 0 2px 5px 0 rgba(0,0,0,0.24), 0 5px 10px 0 rgba(0,0,0,0.19);
-    background: #026296;
-}
-.footer {
-    border-top: 1px solid #E7E7E7;
-    text-align: center;
-    padding: 5px 0 0 0;
-    position: fixed;
-    left: 0;
-    bottom: 0;
-    height: 30px;
-    width: 100%;
+    background: #039dc6;
 }
 .trash-icon{
     width: 20px;
     height: 20px;
     position: relative;
     float: right;
-    right: 20px;
+    left: 285px;
     padding: 0;
     top: 10px;
     margin: 0;
@@ -320,25 +367,8 @@ hr.divider {
     color: darkgrey;
     outline: none;
 }
-.time-details{
-    padding: 0;
-    margin: 0;
-    position: relative;
-    float: right;
-    right: 20px;
-    top: 10px;
-    color: #565656;
-}
-.bypass-codes-unOrder-list{
-    list-style-type: none;
-    padding: 0;
-    overflow-y: auto;
-    background: scroll;
-    margin: 0;
-    height: 99%;
-}
 .delete-button{
-     background-color: #f76868;
+     background-color: #007996;
      border: none;
      color: white;
      text-align: center;
@@ -355,6 +385,19 @@ hr.divider {
      top: 200px;
      float: right;
  }
+.random-otp{
+    margin-left: 35px;
+    margin-top: 7px;
+    margin-bottom: 5px;
+    font-weight: 600;
+    color: rgb(5, 152, 187);
+}
+.time-details{
+    font-size: 15px;
+    margin-left: 25px;
+    margin-top: 15px;
+    color: #757575;
+}
 .cancel-button{
     background-color: #ffffff;
     border: 1px solid darkgrey;
