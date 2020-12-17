@@ -427,8 +427,9 @@ const Home = () => {
                                                     </div>
                                                     <br/>
                                                     <br/>
-                                                    <div className={'shared-secret-div'} style={{display: "none"}}>
+                                                    <div className={'shared-secret-div'}>
                                                         <input
+                                                            style={{display: "none"}}
                                                             className={'shared-secret'}
                                                             readOnly={true}
                                                             placeholder={"Encrypted Key"}
@@ -439,7 +440,7 @@ const Home = () => {
                                                                          onCopy={() => {
                                                                              setSuccessOrErrorMessage('Encrypted Key', encryptedSecret)
                                                                          }}>
-                                                            <button type='button' className={'copy-button'}>Copy
+                                                            <button  style={{display: "none"}} type='button' className={'copy-button'}>Copy
                                                             </button>
                                                         </CopyToClipboard>
                                                     </div>
