@@ -15,7 +15,7 @@ const Home = () => {
     const [randomOtp, setRandomOtp] = useState();
     const [adminStatus, setAdminStatus] = useState();
     const [secretNames, setSecretNames] = useState([]);
-    const [duplicateSecretNameFound, setDuplicateSecretNameFound] = useState();
+    const [errorMessage, setErrorMessage] = useState();
     const [showLoadingSpinnerInAdminSecretPopup, setShowLoadingSpinnerInAdminSecretPopup] = useState(false);
     const [gettingAdminSecret, setGettingAdminSecret] = useState(false);
     const [successMessage, setSuccessMessage] = useState('');
@@ -26,7 +26,8 @@ const Home = () => {
     const [noError, setError] = useState('');
     const [adminSecret, setAdminSecret] = useState('');
     const [sharedSecret, setSharedSecret] = useState('');
-    const [timeInSeconds, setTimeInSeconds] = useState('');
+    const [encryptedSecret, setEncryptedSecret] = useState('');
+    const [timeInSeconds, setTimeInSeconds] = useState();
     const [logoutInErrorPopup, showLogoutInErrorPopup] = useState(false);
     if (oktaAuth) {
         const authState = oktaAuth.authState;
@@ -62,7 +63,7 @@ const Home = () => {
                 })
             }
             if (!noDuplicatesFound) {
-                setDuplicateSecretNameFound(false)
+                setErrorMessage(false)
                 setShowLoadingSpinnerInAdminSecretPopup(true)
                 let formData = new FormData();
                 formData.append('secretname', adminSecret);
@@ -97,7 +98,7 @@ const Home = () => {
                 });
             } else {
                 setShowOtpDetails(false)
-                setDuplicateSecretNameFound(`${adminSecret}`)
+                setErrorMessage(`Name (${adminSecret}) is already taken.`)
             }
         }
 
@@ -111,8 +112,10 @@ const Home = () => {
             }).then(response => {
                 const promise = response.json();
                 promise.then((val) => {
-                    if (val.adminSecret) {
-                        setSharedSecret(val.adminSecret);
+                    console.log(val);
+                    const {adminSecret} = val;
+                    if (adminSecret) {
+                        setSharedSecret(adminSecret);
                         setGettingAdminSecret(false)
                     }
                 });
@@ -143,7 +146,8 @@ const Home = () => {
                             let listOfSecretNames = [];
                             setRandomOtp(response);
                             response.forEach(code => {
-                                listOfSecretNames.push(code.secretname);
+                                const {secretname} = code;
+                                listOfSecretNames.push(secretname);
                             })
                             setSecretNames(listOfSecretNames);
                         } else {
@@ -194,6 +198,17 @@ const Home = () => {
             setSuccessMessage('');
             setSharedSecret('');
             setShowOtpDetails(true);
+            setErrorMessage('');
+        }
+
+        const setSuccessOrErrorMessage = (typeOfKey, key) => {
+            if(key !== '') {
+                setSuccessMessage(`${typeOfKey} copied to clipboard.`);
+                setErrorMessage('');
+            } else {
+                setErrorMessage('Cannot copy empty text.')
+                setSuccessMessage('');
+            }
         }
 
         if (oktaTokenStorage && oktaTokenStorage[authorizeTokenType]) {
@@ -276,6 +291,7 @@ const Home = () => {
                                 }}>
                                     {
                                         (randomOtp && randomOtp.length > 0) ? randomOtp.map(function (code, index) {
+                                            const {secretname, secretUpdatedAt} = code;
                                             return (
                                                 <li className='otp-list-cls' key={index}>
                                                      <div style={{display: 'flex'}}>
@@ -287,11 +303,11 @@ const Home = () => {
                                                                      showDeleteConfirmationPopup={showDeleteConfirmationPopup}
                                                                      code={code}/> : ''
                                                          }
-                                                         <p style={{padding: '10px 1px 1px 20px', fontSize: '18px'}}>{code.secretname}</p>
+                                                         <p style={{padding: '10px 1px 1px 20px', fontSize: '18px'}}>{secretname}</p>
                                                      </div>
                                                      <div style={{display: 'flex'}}>
                                                          <h2 className="random-otp" style={{marginTop: '7px', letterSpacing: '3px'}}>{code.code}</h2>
-                                                         <p className='time-details'>{code.secretUpdatedAt}</p>
+                                                         <p className='time-details'>{secretUpdatedAt}</p>
                                                      </div>
                                                 </li>
                                             )}) :  <div>
@@ -403,7 +419,25 @@ const Home = () => {
                                                         />
                                                         <CopyToClipboard text={sharedSecret}
                                                                          onCopy={() => {
-                                                                             setSuccessMessage('Secret Key copied to clipboard.');
+                                                                             setSuccessOrErrorMessage('Secret Key', sharedSecret)
+                                                                         }}>
+                                                            <button type='button' className={'copy-button'}>Copy
+                                                            </button>
+                                                        </CopyToClipboard>
+                                                    </div>
+                                                    <br/>
+                                                    <br/>
+                                                    <div className={'shared-secret-div'} style={{display: "none"}}>
+                                                        <input
+                                                            className={'shared-secret'}
+                                                            readOnly={true}
+                                                            placeholder={"Encrypted Key"}
+                                                            value={encryptedSecret}
+                                                            onChange={e => setEncryptedSecret(e.target.value)}
+                                                        />
+                                                        <CopyToClipboard text={encryptedSecret}
+                                                                         onCopy={() => {
+                                                                             setSuccessOrErrorMessage('Encrypted Key', encryptedSecret)
                                                                          }}>
                                                             <button type='button' className={'copy-button'}>Copy
                                                             </button>
@@ -428,9 +462,9 @@ const Home = () => {
                                                         ''
                                                 }
                                                 {
-                                                    duplicateSecretNameFound ?
+                                                    errorMessage ?
                                                         <div>
-                                                            <span className={"error-message"}>Name <b>{duplicateSecretNameFound}</b> is already taken</span>
+                                                            <span className={"error-message"}>{errorMessage}</span>
                                                         </div>
                                                         :
                                                         ''

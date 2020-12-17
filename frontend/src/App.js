@@ -13,18 +13,29 @@ const HasAccessToRouter = () => {
     history.push('/login');
   };
   const config = window.config;
-  return (
-      <Security
-          {...config.authConfig}
-          onAuthRequired={customAuthHandler}
-      >
-        <LoginError />
-        <Route path="/" exact component={Dashboard} />
-        <SecureRoute path="/home" exact component={Home} />
-        <Route path="/implicit/callback" component={LoginCallback} />
-        <Route path="/login" exact component={Login} />
-      </Security>
-  );
+    if(typeof config === "object") {
+        return (
+            <Security
+                {...config.authConfig}
+                onAuthRequired={customAuthHandler}
+            >
+                <LoginError />
+                <Route path="/" exact component={Dashboard} />
+                <SecureRoute path="/home" exact component={Home} />
+                <Route path="/implicit/callback" component={LoginCallback} />
+                <Route path="/login" exact component={Login} />
+            </Security>
+        );
+    } else {
+        return (<div className="popup-box" style={{background: '#ffffff50'}}>
+            <div className="config-error-box">
+                <div style={{background: '#ff4949', height: '50px', padding: '10px'}}>
+                    <h2>Alert</h2>
+                </div>
+                <p style={{fontSize: 'initial', textAlign: 'center', marginTop: '40px'}}>Error : Please check the configuration.</p>
+            </div>
+        </div>)
+    }
 };
 
 const App = () => (
