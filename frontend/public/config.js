@@ -31,5 +31,6 @@ var config = {
     instructionsInBypassCodeGenerator: INSTRUCTIONS_IN_BYPASS_CODE_GENERATOR,
     instructionsInAdminSecret: INSTRUCTIONS_IN_ADMIN_SECRET,
     backEndUrl: BACK_END_URL,
+    showEncryptedKey: false,
     mainHeader: MAIN_HEADER
 };

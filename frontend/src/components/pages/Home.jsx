@@ -9,6 +9,9 @@ import Loader from 'react-loader-spinner'
 import {CopyToClipboard} from 'react-copy-to-clipboard';
 import Navbar from "../layout/NavBar";
 
+const TOKEN = 'token';
+const POST = 'POST';
+const GET = 'GET';
 const Home = () => {
     const oktaAuth = useOktaAuth();
     const [expiresIn, setSeconds] = useState();
@@ -69,9 +72,9 @@ const Home = () => {
                 formData.append('secretname', adminSecret);
                 formData.append('admin_secret', sharedSecret);
                 fetch(`http://${config.backEndUrl}/api/v1/secret`, {
-                    "method": "POST",
+                    "method": POST,
                     "headers": {
-                        "token": authorizeToken
+                        TOKEN: authorizeToken
                     },
                     "body": formData
                 }).then(response => {
@@ -105,9 +108,9 @@ const Home = () => {
         const getSecretKey = () => {
             setGettingAdminSecret(true)
             fetch(`http://${config.backEndUrl}/api/v1/secret`, {
-                "method": "GET",
+                "method": GET,
                 "headers": {
-                    "token": authorizeToken
+                    TOKEN: authorizeToken
                 }
             }).then(response => {
                 const promise = response.json();
@@ -135,9 +138,9 @@ const Home = () => {
         const getOtp = () => {
             if (oktaTokenStorage && oktaTokenStorage[authorizeTokenType] && oktaTokenStorage[authorizeTokenType][authorizeTokenType]) {
                 fetch(`http://${config.backEndUrl}/api/v1/totp`, {
-                    "method": "GET",
+                    "method": GET,
                     "headers": {
-                        "token": oktaTokenStorage[authorizeTokenType][authorizeTokenType]
+                        TOKEN: oktaTokenStorage[authorizeTokenType][authorizeTokenType]
                     }
                 })
                     .then(response => response.json())
@@ -169,7 +172,7 @@ const Home = () => {
             setRandomOtp(null)
 
             const myHeaders = new Headers();
-            myHeaders.append("token", oktaTokenStorage[authorizeTokenType][authorizeTokenType]);
+            myHeaders.append(TOKEN, oktaTokenStorage[authorizeTokenType][authorizeTokenType]);
             const requestOptions = {
                 method: 'DELETE',
                 headers: myHeaders,
@@ -218,8 +221,7 @@ const Home = () => {
             setTimeout(() => {
                 setSeconds(convertHMS((expiresAt) - (new Date().getTime() / 1000)));
             }, 1000);
-
-            if (expiresIn === 100) {
+            if (expiresIn < 100) {
                 authService._oktaAuth.session.close();
                 logout();
             }
@@ -429,7 +431,7 @@ const Home = () => {
                                                     <br/>
                                                     <div className={'shared-secret-div'}>
                                                         <input
-                                                            style={{display: "none"}}
+                                                            style={config.showEncryptedKey ? {} : {display: "none"}}
                                                             className={'shared-secret'}
                                                             readOnly={true}
                                                             placeholder={"Encrypted Key"}
@@ -440,7 +442,7 @@ const Home = () => {
                                                                          onCopy={() => {
                                                                              setSuccessOrErrorMessage('Encrypted Key', encryptedSecret)
                                                                          }}>
-                                                            <button  style={{display: "none"}} type='button' className={'copy-button'}>Copy
+                                                            <button  style={config.showEncryptedKey ? {} : {display: "none"}} type='button' className={'copy-button'}>Copy
                                                             </button>
                                                         </CopyToClipboard>
                                                     </div>
