@@ -1,11 +1,9 @@
-import React, {useState} from 'react';
-import {useOktaAuth} from '@okta/okta-react';
+import React from 'react';
 import "../pages/Home.css";
 
-const DeleteSecretKey = ({setSelectedSecretId, setSelectedSecretName, showDeleteConfirmationPopup, code, token}) => {
+const DeleteSecretKey = ({setSelectedSecretId, setSelectedSecretName, showDeleteConfirmationPopup, code }) => {
 
     return (
-        // !deleteConfirmationPopup ?
             <button className={'trash-icon'} onClick={() => {
                 showDeleteConfirmationPopup(true);
                 setSelectedSecretName(code.secretname);
@@ -22,21 +20,6 @@ const DeleteSecretKey = ({setSelectedSecretId, setSelectedSecretName, showDelete
                         className="ci-primary"/>
                 </svg>
             </button>
-            // :
-            // <div className="popup-box">
-            //     <div className="box" style={{width: '55%', padding: '0'}}>
-            //         <h3 className="container-header" style={{background: '#f76868'}}>Confirm</h3>
-            //         <p style={{fontSize: "initial", margin: '20px'}}>Are yoy sure you want to delete ByPass code {code.secretname} ?</p>
-            //         <div style={{width: "100%"}}>
-            //             <button className="button delete-button" onClick={() => showDeleteConfirmationPopup(true)}>
-            //                 Confirm
-            //             </button>
-            //             <button className="button cancel-button" onClick={() => showDeleteConfirmationPopup(false)}>
-            //                 cancel
-            //             </button>
-            //         </div>
-            //     </div>
-            // </div>
     )
 }
 export default DeleteSecretKey
