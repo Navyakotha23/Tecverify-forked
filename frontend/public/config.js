@@ -1,8 +1,8 @@
 const CLIENT_ID = '0oauvb74ocd6zt1Yh0h7';
 const ISSUER = 'https://tecnics-dev.oktapreview.com/oauth2/ausuvcipegUUQa9Bk0h7'
 const MAIN_HEADER = 'TecMFA Bypass Code Generator'
-const FRONT_END_URL = "localhost:3000";
-const BACK_END_URL = "localhost:5000";
+const FRONT_END_URL = "http://localhost:3000";
+const BACK_END_URL = "http://localhost:5000";
 const AUTHORIZE_TOKEN_TYPE = "idToken";
 const AUTHORIZE_CLAIM_NAME = "Admin";
 const INSTRUCTIONS_IN_BYPASS_CODE_GENERATOR = [
@@ -17,7 +17,7 @@ var config = {
     authConfig: {
         clientId: CLIENT_ID,
         issuer: ISSUER,
-        redirectUri: `http://${FRONT_END_URL}/implicit/callback`,
+        redirectUri: `${FRONT_END_URL}/implicit/callback`,
         scopes: [
             'openid',
             'email',

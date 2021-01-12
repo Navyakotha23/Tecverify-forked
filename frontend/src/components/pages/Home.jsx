@@ -71,7 +71,7 @@ const Home = () => {
                 let formData = new FormData();
                 formData.append('secretname', adminSecret);
                 formData.append('admin_secret', sharedSecret);
-                fetch(`http://${config.backEndUrl}/api/v1/secret`, {
+                fetch(`${config.backEndUrl}/api/v1/secret`, {
                     "method": POST,
                     "headers": {
                         TOKEN: authorizeToken
@@ -107,7 +107,7 @@ const Home = () => {
 
         const getSecretKey = () => {
             setGettingAdminSecret(true)
-            fetch(`http://${config.backEndUrl}/api/v1/secret`, {
+            fetch(`${config.backEndUrl}/api/v1/secret`, {
                 "method": GET,
                 "headers": {
                     TOKEN: authorizeToken
@@ -129,7 +129,7 @@ const Home = () => {
                     setGettingAdminSecret(false)
                 }
             }).catch(err => {
-                setError("Unable to get Admin secret");
+                setSuccessOrErrorMessage('', '', 'Unable to get Admin secret key.')
                 console.log(err);
                 setGettingAdminSecret(false)
             });
@@ -137,7 +137,7 @@ const Home = () => {
 
         const getOtp = () => {
             if (oktaTokenStorage && oktaTokenStorage[authorizeTokenType] && oktaTokenStorage[authorizeTokenType][authorizeTokenType]) {
-                fetch(`http://${config.backEndUrl}/api/v1/totp`, {
+                fetch(`${config.backEndUrl}/api/v1/totp`, {
                     "method": GET,
                     "headers": {
                         TOKEN: oktaTokenStorage[authorizeTokenType][authorizeTokenType]
@@ -179,7 +179,7 @@ const Home = () => {
                 redirect: 'follow'
             };
             console.log(requestOptions, selectedSecretId)
-            fetch(`http://${config.backEndUrl}/api/v1/secret/${selectedSecretId}`, requestOptions)
+            fetch(`${config.backEndUrl}/api/v1/secret/${selectedSecretId}`, requestOptions)
                 .then(response => response.text())
                 .then(result => {
 
@@ -204,12 +204,17 @@ const Home = () => {
             setErrorMessage('');
         }
 
-        const setSuccessOrErrorMessage = (typeOfKey, key) => {
-            if(key !== '') {
-                setSuccessMessage(`${typeOfKey} copied to clipboard.`);
-                setErrorMessage('');
+        const setSuccessOrErrorMessage = (typeOfKey, key, secretKeyError = null) => {
+            if (!secretKeyError) {
+                if(key !== '') {
+                    setSuccessMessage(`${typeOfKey} copied to clipboard.`);
+                    setErrorMessage('');
+                } else {
+                    setErrorMessage('Cannot copy empty text.')
+                    setSuccessMessage('');
+                }
             } else {
-                setErrorMessage('Cannot copy empty text.')
+                setErrorMessage(secretKeyError)
                 setSuccessMessage('');
             }
         }

@@ -31,7 +31,7 @@ const Login = () => {
 
   return (
       <div>
-        <div id="sign-in-widget" style={{marginTop: '15px'}}/>
+        <div id="sign-in-widget" style={{top: '100px', position: 'relative'}}/>
       </div>
   );
 };

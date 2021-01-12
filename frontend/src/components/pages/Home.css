@@ -26,6 +26,7 @@
     border: none;
     color: white;
     outline: none;
+    cursor: pointer;
 }
 .logout-button:hover {
     text-decoration: underline;
@@ -378,6 +379,7 @@ hr.divider {
     border: 0;
     color: darkgrey;
     outline: none;
+    cursor: pointer;
 }
 .delete-button{
      background-color: #007996;
