@@ -3,8 +3,8 @@ import React from 'react';
 import '../pages/Home.css';
 
 const Navbar = ({mainHeader}) => {
-  const { authService } = useOktaAuth();
-  const logout = async () => authService.logout('/login');
+  const { oktaAuth } = useOktaAuth();
+  const logout = async () => oktaAuth.signOut('/login');
 
     return (
       <div className={'navBar'}>

@@ -9,6 +9,9 @@ import Loader from 'react-loader-spinner'
 import {CopyToClipboard} from 'react-copy-to-clipboard';
 import Navbar from "../layout/NavBar";
 
+const TOKEN = 'token';
+const POST = 'POST';
+const GET = 'GET';
 const Home = () => {
     const oktaAuth = useOktaAuth();
     const [expiresIn, setSeconds] = useState();
@@ -31,7 +34,7 @@ const Home = () => {
     const [logoutInErrorPopup, showLogoutInErrorPopup] = useState(false);
     if (oktaAuth) {
         const authState = oktaAuth.authState;
-        const authService = oktaAuth.authService;
+        const authService = oktaAuth.oktaAuth;
         const logout = async () => authService.logout('/login');
         const onClose = async () => setError('');
         const oktaTokenStorage = JSON.parse(localStorage.getItem('okta-token-storage'));
@@ -68,10 +71,10 @@ const Home = () => {
                 let formData = new FormData();
                 formData.append('secretname', adminSecret);
                 formData.append('admin_secret', sharedSecret);
-                fetch(`http://${config.backEndUrl}/api/v1/secret`, {
-                    "method": "POST",
+                fetch(`${config.backEndUrl}/api/v1/secret`, {
+                    "method": POST,
                     "headers": {
-                        "token": authorizeToken
+                        TOKEN: authorizeToken
                     },
                     "body": formData
                 }).then(response => {
@@ -104,10 +107,10 @@ const Home = () => {
 
         const getSecretKey = () => {
             setGettingAdminSecret(true)
-            fetch(`http://${config.backEndUrl}/api/v1/secret`, {
-                "method": "GET",
+            fetch(`${config.backEndUrl}/api/v1/secret`, {
+                "method": GET,
                 "headers": {
-                    "token": authorizeToken
+                    TOKEN: authorizeToken
                 }
             }).then(response => {
                 const promise = response.json();
@@ -126,7 +129,7 @@ const Home = () => {
                     setGettingAdminSecret(false)
                 }
             }).catch(err => {
-                setError("Unable to get Admin secret");
+                setSuccessOrErrorMessage('', '', 'Unable to get Admin secret key.')
                 console.log(err);
                 setGettingAdminSecret(false)
             });
@@ -134,10 +137,10 @@ const Home = () => {
 
         const getOtp = () => {
             if (oktaTokenStorage && oktaTokenStorage[authorizeTokenType] && oktaTokenStorage[authorizeTokenType][authorizeTokenType]) {
-                fetch(`http://${config.backEndUrl}/api/v1/totp`, {
-                    "method": "GET",
+                fetch(`${config.backEndUrl}/api/v1/totp`, {
+                    "method": GET,
                     "headers": {
-                        "token": oktaTokenStorage[authorizeTokenType][authorizeTokenType]
+                        TOKEN: oktaTokenStorage[authorizeTokenType][authorizeTokenType]
                     }
                 })
                     .then(response => response.json())
@@ -169,14 +172,14 @@ const Home = () => {
             setRandomOtp(null)
 
             const myHeaders = new Headers();
-            myHeaders.append("token", oktaTokenStorage[authorizeTokenType][authorizeTokenType]);
+            myHeaders.append(TOKEN, oktaTokenStorage[authorizeTokenType][authorizeTokenType]);
             const requestOptions = {
                 method: 'DELETE',
                 headers: myHeaders,
                 redirect: 'follow'
             };
             console.log(requestOptions, selectedSecretId)
-            fetch(`http://${config.backEndUrl}/api/v1/secret/${selectedSecretId}`, requestOptions)
+            fetch(`${config.backEndUrl}/api/v1/secret/${selectedSecretId}`, requestOptions)
                 .then(response => response.text())
                 .then(result => {
 
@@ -201,12 +204,17 @@ const Home = () => {
             setErrorMessage('');
         }
 
-        const setSuccessOrErrorMessage = (typeOfKey, key) => {
-            if(key !== '') {
-                setSuccessMessage(`${typeOfKey} copied to clipboard.`);
-                setErrorMessage('');
+        const setSuccessOrErrorMessage = (typeOfKey, key, secretKeyError = null) => {
+            if (!secretKeyError) {
+                if(key !== '') {
+                    setSuccessMessage(`${typeOfKey} copied to clipboard.`);
+                    setErrorMessage('');
+                } else {
+                    setErrorMessage('Cannot copy empty text.')
+                    setSuccessMessage('');
+                }
             } else {
-                setErrorMessage('Cannot copy empty text.')
+                setErrorMessage(secretKeyError)
                 setSuccessMessage('');
             }
         }
@@ -218,8 +226,7 @@ const Home = () => {
             setTimeout(() => {
                 setSeconds(convertHMS((expiresAt) - (new Date().getTime() / 1000)));
             }, 1000);
-
-            if (expiresIn === 100) {
+            if (expiresIn < 100) {
                 authService._oktaAuth.session.close();
                 logout();
             }
@@ -429,7 +436,7 @@ const Home = () => {
                                                     <br/>
                                                     <div className={'shared-secret-div'}>
                                                         <input
-                                                            style={{display: "none"}}
+                                                            style={config.showEncryptedKey ? {} : {display: "none"}}
                                                             className={'shared-secret'}
                                                             readOnly={true}
                                                             placeholder={"Encrypted Key"}
@@ -440,7 +447,7 @@ const Home = () => {
                                                                          onCopy={() => {
                                                                              setSuccessOrErrorMessage('Encrypted Key', encryptedSecret)
                                                                          }}>
-                                                            <button  style={{display: "none"}} type='button' className={'copy-button'}>Copy
+                                                            <button  style={config.showEncryptedKey ? {} : {display: "none"}} type='button' className={'copy-button'}>Copy
                                                             </button>
                                                         </CopyToClipboard>
                                                     </div>

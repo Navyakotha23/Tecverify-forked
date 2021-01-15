@@ -2,24 +2,24 @@ import React from 'react';
 import { BrowserRouter as Router, Route, useHistory } from 'react-router-dom';
 import { Security, SecureRoute, LoginCallback } from '@okta/okta-react';
 import Login from './components/auth/Login';
-import LoginError from './components/layout/LoginError';
+import { OktaAuth } from '@okta/okta-auth-js'
 import Home from './components/pages/Home';
 import Dashboard from './components/pages/dashboard';
 
 const HasAccessToRouter = () => {
-  const history = useHistory();
-
-  const customAuthHandler = () => {
+    const config = window.config;
+    console.log(config.authConfig);
+    const oktaAuth = new OktaAuth(config.authConfig);
+    const history = useHistory();
+    const customAuthHandler = () => {
     history.push('/login');
-  };
-  const config = window.config;
+    };
     if(typeof config === "object") {
         return (
             <Security
-                {...config.authConfig}
+                oktaAuth={oktaAuth}
                 onAuthRequired={customAuthHandler}
             >
-                <LoginError />
                 <Route path="/" exact component={Dashboard} />
                 <SecureRoute path="/home" exact component={Home} />
                 <Route path="/implicit/callback" component={LoginCallback} />
