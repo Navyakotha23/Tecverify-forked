@@ -34,7 +34,7 @@ const Home = () => {
     const [logoutInErrorPopup, showLogoutInErrorPopup] = useState(false);
     if (oktaAuth) {
         const authState = oktaAuth.authState;
-        const authService = oktaAuth.authService;
+        const authService = oktaAuth.oktaAuth;
         const logout = async () => authService.logout('/login');
         const onClose = async () => setError('');
         const oktaTokenStorage = JSON.parse(localStorage.getItem('okta-token-storage'));
