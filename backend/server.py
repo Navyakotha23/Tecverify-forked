@@ -3,7 +3,7 @@ import os.path
 import base64
 from random import randint
 from datetime import datetime
-from logging.config import fileConfig
+from logging.config import dictConfig
 
 import pyotp
 import requests
@@ -11,15 +11,33 @@ from flask_swagger_ui import get_swaggerui_blueprint
 from flask import Flask, request, g, jsonify
 from flask_cors import CORS
 
+# app specific
 app = Flask(__name__)
 app.config.from_pyfile('config.py')
 CORS(app)
 
 # logger specific #
-fileConfig('logging.cfg')
+level = app.config['LOGGING_LEVEL'] if 'LOGGING_LEVEL' in app.config else DEBUG
+max_bytes = app.config['LOGGING_MAX_BYTES'] if 'LOGGING_MAX_BYTES' in app.config else 1048576
+backup_count = app.config['LOGGING_BACKUP_COUNT'] if 'LOGGING_BACKUP_COUNT' in app.config else 10
+
+logging_config = dict(
+    version = 1,
+    formatters = { 'f': {'format': '%(asctime)s %(name)-12s %(levelname)-8s %(message)s'}},
+    handlers = {'h': {'class': 'logging.handlers.RotatingFileHandler', 'formatter': 'f',
+            'level': level,
+            'filename': './logs/logs.log',
+            'mode': 'a',
+            'maxBytes': max_bytes,
+            'backupCount': backup_count}},
+    root = {'handlers': ['h'], 'level': level,})
+dictConfig(logging_config)
+# end logger specifc
 
 # swagger specific #
-SWAGGERUI_BLUEPRINT = get_swaggerui_blueprint(app.config['SWAGGER_URL'], app.config['SWAGGER_FILE'])
+SWAGGER_URL = '/docs'
+SWAGGER_FILE = '/static/docs.json'
+SWAGGERUI_BLUEPRINT = get_swaggerui_blueprint(SWAGGER_URL, SWAGGER_FILE)
 app.register_blueprint(SWAGGERUI_BLUEPRINT)
 # end swagger specific #
 
@@ -40,11 +58,12 @@ OPTIONS = 'OPTIONS'
 SECRET = 'secret'
 ID_LENGTH = 7
 
+# Middlewares
 @app.before_request
 def check_token_header():
     if request.method == OPTIONS:
         return {}, 200
-    if app.config['SWAGGER_URL'] not in request.url:
+    if SWAGGER_URL not in request.url:
         if TOKEN not in request.headers:
             return {'error': 'Required Headers missing.'}, 400
         elif request.headers[TOKEN] == '':
@@ -71,7 +90,7 @@ def logging_after_request(response):
     )
     return response
 
-
+# routes
 @app.route('/api/v1/secret', methods=['POST'])
 def save_secret():
     form_data = validate_and_retrieve_formdata(request)
@@ -121,7 +140,7 @@ def get_totp():
         totp = generate_totp_for_all_users(secrets_json)
         return jsonify(totp), 200
 
-
+# helper functions
 def introspect(token):
     response = get_token_info(token)
     token_info = response.json()

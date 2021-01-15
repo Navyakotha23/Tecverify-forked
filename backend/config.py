@@ -4,5 +4,6 @@ CLAIM_NAME = "Admin"
 AUTHORIZING_TOKEN = "id_token"
 FILE = "secrets.json"
 
-SWAGGER_URL = '/docs'
-SWAGGER_FILE = '/static/docs.json'
+LOGGING_LEVEL = "DEBUG"
+LOGGING_MAX_BYTES = 1048576
+LOGGING_BACKUP_COUNT = 10

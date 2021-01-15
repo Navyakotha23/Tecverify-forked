@@ -3,7 +3,7 @@ services:
     frontend:
         container_name: tecverify-fe
         build:
-            context: ./tecverify-fe/tecverify-fe
+            context: ./frontend
             dockerfile: Dockerfile
         ports:
             [80:80]
@@ -11,7 +11,7 @@ services:
         restart: always
         container_name: tecverify-be
         build:
-            context: ./tecverify
+            context: ./backend
             dockerfile: Dockerfile
-        expose:
-            [5000]
+        ports:
+            [5000:5000]
