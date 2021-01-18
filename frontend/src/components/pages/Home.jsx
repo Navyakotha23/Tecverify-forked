@@ -8,6 +8,7 @@ import "react-loader-spinner/dist/loader/css/react-spinner-loader.css"
 import Loader from 'react-loader-spinner'
 import {CopyToClipboard} from 'react-copy-to-clipboard';
 import Navbar from "../layout/NavBar";
+import config from "../../config";
 
 const TOKEN = 'token';
 const POST = 'POST';
@@ -38,7 +39,6 @@ const Home = () => {
         const logout = async () => authService.logout('/login');
         const onClose = async () => setError('');
         const oktaTokenStorage = JSON.parse(localStorage.getItem('okta-token-storage'));
-        const config = window.config;
         const authorizeTokenType = config.authorizeTokenType
         const authorizeClaimName = config.authorizeClaimName
         let transition, authorizeToken, adminSecretFormOpener;
@@ -258,7 +258,7 @@ const Home = () => {
                         <div className={'instructions'}>
                             <h3 className={'sub-heading'}>Instructions</h3>
                             <ul style={{listStyleType: 'none', padding: '0'}}>
-                                {config.instructionsInBypassCodeGenerator.map(function (content, index) {
+                                {config.instructionsInBypassCodeGenerator.split(',').map(function (content, index) {
                                     return <li key={index}>
                                         <p className={'list-cls'}>
                                             {content}
@@ -381,7 +381,7 @@ const Home = () => {
                                                 <div className={'instructions-admin-secret'}>
                                                     <h3 className={'sub-heading'}>Instructions</h3>
                                                     <ul style={{listStyleType: 'none', padding: '0'}}>
-                                                        {config.instructionsInAdminSecret.map(function (code, index) {
+                                                        {config.instructionsInAdminSecret.split(',').map(function (code, index) {
                                                             return  <li key={index}>
                                                                         <p className={'list-cls'}>
                                                                             {code}
@@ -436,7 +436,7 @@ const Home = () => {
                                                     <br/>
                                                     <div className={'shared-secret-div'}>
                                                         <input
-                                                            style={config.showEncryptedKey ? {} : {display: "none"}}
+                                                            style={config.showEncryptedKey === 'true' ? {} : {display: "none"}}
                                                             className={'shared-secret'}
                                                             readOnly={true}
                                                             placeholder={"Encrypted Key"}
@@ -447,7 +447,7 @@ const Home = () => {
                                                                          onCopy={() => {
                                                                              setSuccessOrErrorMessage('Encrypted Key', encryptedSecret)
                                                                          }}>
-                                                            <button  style={config.showEncryptedKey ? {} : {display: "none"}} type='button' className={'copy-button'}>Copy
+                                                            <button  style={config.showEncryptedKey === 'true' ? {} : {display: "none"}} type='button' className={'copy-button'}>Copy
                                                             </button>
                                                         </CopyToClipboard>
                                                     </div>

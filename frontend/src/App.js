@@ -5,16 +5,23 @@ import Login from './components/auth/Login';
 import { OktaAuth } from '@okta/okta-auth-js'
 import Home from './components/pages/Home';
 import Dashboard from './components/pages/dashboard';
+import config from "./config";
 
 const HasAccessToRouter = () => {
-    const config = window.config;
-    console.log(config.authConfig);
-    const oktaAuth = new OktaAuth(config.authConfig);
+    const authConfig = {
+        clientId: config.authConfig.clientId,
+        disableHttpsCheck: config.authConfig.disableHttpsCheck,
+        issuer: config.authConfig.issuer,
+        pkce: config.authConfig.pkce,
+        redirectUri: config.authConfig.redirectUri,
+        scopes: config.authConfig.scopes.split(',')
+    };
+    const oktaAuth = new OktaAuth(authConfig);
     const history = useHistory();
     const customAuthHandler = () => {
     history.push('/login');
     };
-    if(typeof config === "object") {
+    if(typeof authConfig === "object") {
         return (
             <Security
                 oktaAuth={oktaAuth}
