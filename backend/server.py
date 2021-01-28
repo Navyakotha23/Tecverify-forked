@@ -1,5 +1,6 @@
 import json
 import os.path
+import os
 import base64
 from random import randint
 from datetime import datetime
@@ -13,11 +14,20 @@ from flask_cors import CORS
 
 # app specific
 app = Flask(__name__)
+# config_file = app.config.from_envvar('TEC_CONFIG')
 app.config.from_pyfile('config.py')
 CORS(app)
 
+#grab config values from file
+ISSUER = app.config['ISSUER']
+CLIENT_ID = app.config['CLIENT_ID']
+SECRETS_FILE = app.config['SECRETS_FILE']
+BE_AUTHORIZING_TOKEN = app.config['AUTHORIZING_TOKEN']
+AUTHORIZE_CLAIM_NAME = app.config['CLAIM_NAME']
+print(app.config)
+
 # logger specific #
-level = app.config['LOGGING_LEVEL'] if 'LOGGING_LEVEL' in app.config else DEBUG
+level = app.config['LOGGING_LEVEL'] if 'LOGGING_LEVEL' in app.config else 'DEBUG'
 max_bytes = app.config['LOGGING_MAX_BYTES'] if 'LOGGING_MAX_BYTES' in app.config else 1048576
 backup_count = app.config['LOGGING_BACKUP_COUNT'] if 'LOGGING_BACKUP_COUNT' in app.config else 10
 
@@ -95,7 +105,7 @@ def logging_after_request(response):
 def save_secret():
     form_data = validate_and_retrieve_formdata(request)
     token_info = g.get('user')
-    if token_info[app.config['CLAIM_NAME']] and form_data[SECRET]:
+    if token_info[AUTHORIZE_CLAIM_NAME] and form_data[SECRET]:
         if is_secret_valid(form_data[SECRET]):
             if update_secret(form_data):
                 return {"updated": True}, 200
@@ -112,7 +122,7 @@ def save_secret():
 @app.route('/api/v1/secret', methods=['GET'])
 def generate_secret():
     token_info = g.get('user')
-    if token_info[app.config['CLAIM_NAME']]:
+    if token_info[AUTHORIZE_CLAIM_NAME]:
         admin_secret = pyotp.random_base32(32)
         return {"adminSecret": admin_secret}, 200
     else:
@@ -122,7 +132,7 @@ def generate_secret():
 @app.route('/api/v1/secret/<secret_id>', methods=['DELETE'])
 def delete_secret(secret_id):
     token_info = g.get('user')
-    if token_info[app.config['CLAIM_NAME']]:
+    if token_info[AUTHORIZE_CLAIM_NAME]:
         secrets_list = fread()
         for secret in secrets_list:
             if secret_id in secret.values():
@@ -152,7 +162,7 @@ def introspect(token):
 
 def get_token_info(access_token):
     url = app.config['ISSUER'] + "/v1/introspect?client_id=" + app.config['CLIENT_ID']
-    body = {TOKEN: access_token, TOKEN_TYPE_HINT: app.config['AUTHORIZING_TOKEN']}
+    body = {TOKEN: access_token, TOKEN_TYPE_HINT: BE_AUTHORIZING_TOKEN}
     response = requests.post(url, data=body)
     app.logger.info("OKTA INTROSPECT URL: {0}".format(url))
     app.logger.info("OKTA INTROSPECT STATUSCODE: {0}".format(response.status_code))
@@ -235,7 +245,7 @@ def validate_and_retrieve_formdata(req):
 
 def fwrite(data):
     try:
-        with open(app.config['FILE'], 'w') as fHandle:
+        with open(SECRETS_FILE, 'w') as fHandle:
             json.dump(data, fHandle, indent=4)
         return True
     except Exception as e:
@@ -255,9 +265,9 @@ def fcreate():
 
 def fread():
     try:
-        if not os.path.isfile(app.config['FILE']):
+        if not os.path.isfile(SECRETS_FILE):
             fcreate()
-        with open(app.config['FILE'], 'r') as fHandle:
+        with open(SECRETS_FILE, 'r') as fHandle:
             secrets = json.load(fHandle)
         return secrets
     except Exception as e:
