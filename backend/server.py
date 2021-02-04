@@ -28,8 +28,8 @@ print(app.config)
 
 # logger specific #
 level = app.config['LOGGING_LEVEL'] if 'LOGGING_LEVEL' in app.config else 'DEBUG'
-max_bytes = app.config['LOGGING_MAX_BYTES'] if 'LOGGING_MAX_BYTES' in app.config else 1048576
-backup_count = app.config['LOGGING_BACKUP_COUNT'] if 'LOGGING_BACKUP_COUNT' in app.config else 10
+max_bytes = int(app.config['LOGGING_MAX_BYTES'] if 'LOGGING_MAX_BYTES' in app.config else 1048576)
+backup_count = int(app.config['LOGGING_BACKUP_COUNT'] if 'LOGGING_BACKUP_COUNT' in app.config else 10)
 
 logging_config = dict(
     version = 1,
