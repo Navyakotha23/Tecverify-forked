@@ -1,43 +1,46 @@
+const webpack = require('webpack');
 const path = require('path');
-const dotenv = require('dotenv');
 const fs = require('fs');
 
-const TESTENV = path.resolve(__dirname, '..', 'testenv');
+const TESTENV = path.resolve(__dirname, '', 'public/testjson.json');
 console.log('PATH', TESTENV);
+const env = {}
 if (fs.existsSync(TESTENV)) {
-  console.log('ENV config', fs.readFileSync(TESTENV));
-  const envConfig = dotenv.parse(fs.readFileSync(TESTENV));
-  Object.keys(envConfig).forEach((k) => {
-    process.env[k] = envConfig[k];
+  fs.readFile(TESTENV, 'utf8', async function(err, txt) {
+    let promise = new Promise((resolve, reject) => {
+      if (!err) {
+        const jsonData = JSON.parse(txt);
+        Object.keys(jsonData).forEach((k) => {
+          process.env[k] = jsonData[k];
+        });
+        [
+          'ISSUER',
+          'CLIENT_ID',
+          'SCOPES',
+          'MAIN_HEADER',
+          'FRONT_END_URL',
+          'BACK_END_URL',
+          'AUTHORIZE_TOKEN_TYPE',
+          'AUTHORIZE_CLAIM_NAME',
+          'INSTRUCTIONS_IN_BYPASS_CODE_GENERATOR',
+          'INSTRUCTIONS_IN_ADMIN_SECRET',
+          'SHOW_ENCRYPTED_KEY'
+        ].forEach((key) => {
+          if (!process.env[key]) {
+            throw new Error(`Environment variable ${key} must be set. See README.md`);
+          }
+          env[key] = JSON.stringify(process.env[key]);
+        });
+        resolve(env);
+      } else {
+        reject(err);
+      }
+    });
+    await promise;
   });
 } else {
   console.log('There is no path');
 }
-process.env.CLIENT_ID = process.env.CLIENT_ID || process.env.SPA_CLIENT_ID;
-
-const webpack = require('webpack');
-
-const env = {};
-
-[
-  'ISSUER',
-  'CLIENT_ID',
-  'SCOPES',
-  'MAIN_HEADER',
-  'FRONT_END_URL',
-  'BACK_END_URL',
-  'AUTHORIZE_TOKEN_TYPE',
-  'AUTHORIZE_CLAIM_NAME',
-  'INSTRUCTIONS_IN_BYPASS_CODE_GENERATOR',
-  'INSTRUCTIONS_IN_ADMIN_SECRET',
-  'SHOW_ENCRYPTED_KEY'
-].forEach((key) => {
-  if (!process.env[key]) {
-    throw new Error(`Environment variable ${key} must be set. See README.md`);
-  }
-  env[key] = JSON.stringify(process.env[key]);
-});
-
 module.exports = {
   webpack: (config) => {
     config.resolve.plugins = [];
