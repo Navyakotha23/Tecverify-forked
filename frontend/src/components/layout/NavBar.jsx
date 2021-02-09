@@ -4,7 +4,11 @@ import '../pages/Home.css';
 
 const Navbar = ({mainHeader}) => {
   const { oktaAuth } = useOktaAuth();
-  const logout = async () => oktaAuth.signOut('/login');
+  const logout = async () => {
+      sessionStorage.removeItem('config');
+      sessionStorage.removeItem('authConfig');
+      await oktaAuth.signOut('/login');
+  };
 
     return (
       <div className={'navBar'}>

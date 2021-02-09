@@ -5,50 +5,58 @@ import Login from './components/auth/Login';
 import { OktaAuth } from '@okta/okta-auth-js'
 import Home from './components/pages/Home';
 import Dashboard from './components/pages/dashboard';
-import config from "./config";
 
-const HasAccessToRouter = () => {
-    const authConfig = {
-        clientId: config.authConfig.clientId,
-        disableHttpsCheck: config.authConfig.disableHttpsCheck,
-        issuer: config.authConfig.issuer,
-        pkce: config.authConfig.pkce,
-        redirectUri: config.authConfig.redirectUri,
-        scopes: config.authConfig.scopes.split(',')
-    };
-    const oktaAuth = new OktaAuth(authConfig);
+const HasAccessToRouter = ({config}) => {
     const history = useHistory();
-    const customAuthHandler = () => {
-    history.push('/login');
-    };
-    if(typeof authConfig === "object") {
-        return (
-            <Security
-                oktaAuth={oktaAuth}
-                onAuthRequired={customAuthHandler}
-            >
-                <Route path="/" exact component={Dashboard} />
-                <SecureRoute path="/home" exact component={Home} />
-                <Route path="/implicit/callback" component={LoginCallback} />
-                <Route path="/login" exact component={Login} />
-            </Security>
-        );
-    } else {
-        return (<div className="popup-box" style={{background: '#ffffff50'}}>
-            <div className="config-error-box">
-                <div style={{background: '#ff4949', height: '50px', padding: '10px'}}>
-                    <h2>Alert</h2>
-                </div>
-                <p style={{fontSize: 'initial', textAlign: 'center', marginTop: '40px'}}>Error : Please check the configuration.</p>
-            </div>
-        </div>)
-    }
+            console.log(config);
+    sessionStorage.setItem('config', JSON.stringify(config));
+            const authConfig = {
+                clientId: config.CLIENT_ID,
+                disableHttpsCheck: config.DISABLE_HTTPS_CHECK,
+                issuer: config.ISSUER,
+                pkce: config.PKCE,
+                redirectUri: `${config.FRONT_END_URL}/implicit/callback`,
+                scopes: config.SCOPES
+            };
+            sessionStorage.setItem('authConfig', JSON.stringify(authConfig));
+            const oktaAuth = new OktaAuth(authConfig);
+            const customAuthHandler = () => {
+                history.push('/login');
+            };
+            if(typeof authConfig === "object") {
+                return (
+                    <Security
+                        oktaAuth={oktaAuth}
+                        onAuthRequired={customAuthHandler}
+                    >
+                        <Route path="/" exact component={Dashboard} />
+                        <Route
+                            path='/home'
+                            component={() => <Home config1={config} />}
+                        />
+                        {/*<Route path="/home" exact component={Home} />*/}
+                        <Route path="/implicit/callback" component={LoginCallback} />
+                        <Route path="/login" exact component={Login} />
+                    </Security>
+                );
+            } else {
+                return (<div className="popup-box" style={{background: '#ffffff50'}}>
+                    <div className="config-error-box">
+                        <div style={{background: '#ff4949', height: '50px', padding: '10px'}}>
+                            <h2>Alert</h2>
+                        </div>
+                        <p style={{fontSize: 'initial', textAlign: 'center', marginTop: '40px'}}>Error : Please check the configuration.</p>
+                    </div>
+                </div>)
+            }
+
+
 };
 
-const App = () => (
+const App = ({config}) => (
     <div>
       <Router>
-        <HasAccessToRouter />
+        <HasAccessToRouter config={config}/>
       </Router>
     </div>
 );

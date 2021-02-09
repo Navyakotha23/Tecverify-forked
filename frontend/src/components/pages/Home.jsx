@@ -8,12 +8,14 @@ import "react-loader-spinner/dist/loader/css/react-spinner-loader.css"
 import Loader from 'react-loader-spinner'
 import {CopyToClipboard} from 'react-copy-to-clipboard';
 import Navbar from "../layout/NavBar";
-import config from "../../config";
+// import config from "../../config";
 
 const TOKEN = 'token';
 const POST = 'POST';
 const GET = 'GET';
-const Home = () => {
+const Home = ({config1}) => {
+    console.log(config1);
+    const config = JSON.parse(sessionStorage.getItem('config'));
     const oktaAuth = useOktaAuth();
     const [expiresIn, setSeconds] = useState();
     const [randomOtp, setRandomOtp] = useState();
@@ -33,17 +35,16 @@ const Home = () => {
     const [encryptedSecret, setEncryptedSecret] = useState('');
     const [timeInSeconds, setTimeInSeconds] = useState();
     const [logoutInErrorPopup, showLogoutInErrorPopup] = useState(false);
-    if (oktaAuth) {
+    if (oktaAuth && config) {
         const authState = oktaAuth.authState;
         const authService = oktaAuth.oktaAuth;
         const logout = async () => authService.logout('/login');
         const onClose = async () => setError('');
         const oktaTokenStorage = JSON.parse(localStorage.getItem('okta-token-storage'));
-        const authorizeTokenType = config.authorizeTokenType
-        const authorizeClaimName = config.authorizeClaimName
+        const authorizeTokenType = config.AUTHORIZE_TOKEN_TYPE
+        const authorizeClaimName = config.AUTHORIZE_CLAIM_NAME
         let transition, authorizeToken, adminSecretFormOpener;
-        
-        if (!adminStatus) {
+        if (!adminStatus && oktaTokenStorage[authorizeTokenType]) {
             authService.getUser().then((info) => {
                 if (info && info.email && info[authorizeClaimName]) {
                     setAdminStatus(info[authorizeClaimName])
@@ -71,7 +72,7 @@ const Home = () => {
                 let formData = new FormData();
                 formData.append('secretname', adminSecret);
                 formData.append('admin_secret', sharedSecret);
-                fetch(`${config.backEndUrl}/api/v1/secret`, {
+                fetch(`${config.BACK_END_URL}/api/v1/secret`, {
                     "method": POST,
                     "headers": {
                         TOKEN: authorizeToken
@@ -107,7 +108,7 @@ const Home = () => {
 
         const getSecretKey = () => {
             setGettingAdminSecret(true)
-            fetch(`${config.backEndUrl}/api/v1/secret`, {
+            fetch(`${config.BACK_END_URL}/api/v1/secret`, {
                 "method": GET,
                 "headers": {
                     TOKEN: authorizeToken
@@ -137,7 +138,7 @@ const Home = () => {
 
         const getOtp = () => {
             if (oktaTokenStorage && oktaTokenStorage[authorizeTokenType] && oktaTokenStorage[authorizeTokenType][authorizeTokenType]) {
-                fetch(`${config.backEndUrl}/api/v1/totp`, {
+                fetch(`${config.BACK_END_URL}/api/v1/totp`, {
                     "method": GET,
                     "headers": {
                         TOKEN: oktaTokenStorage[authorizeTokenType][authorizeTokenType]
@@ -179,7 +180,7 @@ const Home = () => {
                 redirect: 'follow'
             };
             console.log(requestOptions, selectedSecretId)
-            fetch(`${config.backEndUrl}/api/v1/secret/${selectedSecretId}`, requestOptions)
+            fetch(`${config.BACK_END_URL}/api/v1/secret/${selectedSecretId}`, requestOptions)
                 .then(response => response.text())
                 .then(result => {
 
@@ -253,12 +254,12 @@ const Home = () => {
             authState.isAuthenticated
                 ?
                 <div className={"container"}>
-                    <Navbar mainHeader={config.mainHeader}/>
+                    <Navbar mainHeader={config.MAIN_HEADER}/>
                     <div>
                         <div className={'instructions'}>
                             <h3 className={'sub-heading'}>Instructions</h3>
                             <ul style={{listStyleType: 'none', padding: '0'}}>
-                                {config.instructionsInBypassCodeGenerator.split(',').map(function (content, index) {
+                                {config.INSTRUCTIONS_IN_BYPASS_CODE_GENERATOR.map(function (content, index) {
                                     return <li key={index}>
                                         <p className={'list-cls'}>
                                             {content}
@@ -271,7 +272,7 @@ const Home = () => {
                                         version {version}
                                     </span>
                                 <span style={{float: 'left', marginLeft: '100px', marginTop: '10px'}}>
-                                    {config.authConfig.issuer.split('/')[2]}
+                                    {config.ISSUER.split('/')[2]}
                                     </span>
                             </footer>
                         </div>
@@ -381,7 +382,7 @@ const Home = () => {
                                                 <div className={'instructions-admin-secret'}>
                                                     <h3 className={'sub-heading'}>Instructions</h3>
                                                     <ul style={{listStyleType: 'none', padding: '0'}}>
-                                                        {config.instructionsInAdminSecret.split(',').map(function (code, index) {
+                                                        {config.INSTRUCTIONS_IN_ADMIN_SECRET.map(function (code, index) {
                                                             return  <li key={index}>
                                                                         <p className={'list-cls'}>
                                                                             {code}
@@ -436,7 +437,7 @@ const Home = () => {
                                                     <br/>
                                                     <div className={'shared-secret-div'}>
                                                         <input
-                                                            style={config.showEncryptedKey === 'true' ? {} : {display: "none"}}
+                                                            style={config.SHOW_ENCRYPTED_KEY === 'true' ? {} : {display: "none"}}
                                                             className={'shared-secret'}
                                                             readOnly={true}
                                                             placeholder={"Encrypted Key"}
@@ -447,7 +448,7 @@ const Home = () => {
                                                                          onCopy={() => {
                                                                              setSuccessOrErrorMessage('Encrypted Key', encryptedSecret)
                                                                          }}>
-                                                            <button  style={config.showEncryptedKey === 'true' ? {} : {display: "none"}} type='button' className={'copy-button'}>Copy
+                                                            <button  style={config.SHOW_ENCRYPTED_KEY === 'true' ? {} : {display: "none"}} type='button' className={'copy-button'}>Copy
                                                             </button>
                                                         </CopyToClipboard>
                                                     </div>

@@ -4,4 +4,11 @@ import App from './App';
 
 import 'semantic-ui-css/semantic.min.css';
 
-ReactDOM.render(<App />, document.getElementById('root'));
+const root = document.getElementById('root');
+const url = root.getAttribute('data-url');
+const configPromise = fetch(url);
+configPromise.then((res) => res.json())
+    .then(config => {
+        ReactDOM.render(<App config={config}/>, root)
+    } );
+// ReactDOM.render(<App />, document.getElementById('root'));

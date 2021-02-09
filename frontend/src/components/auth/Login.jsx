@@ -1,20 +1,11 @@
-import React, {useEffect, useRef} from 'react';
+import React, {useEffect} from 'react';
 import OktaSignIn from '@okta/okta-signin-widget';
 import '@okta/okta-signin-widget/dist/css/okta-sign-in.min.css';
 import {useOktaAuth} from "@okta/okta-react";
-import config from "../../config";
 
 const Login = () => {
-  const authConfig = {
-    clientId: config.authConfig.clientId,
-    disableHttpsCheck: config.authConfig.disableHttpsCheck,
-    issuer: config.authConfig.issuer,
-    pkce: config.authConfig.pkce,
-    redirectUri: config.authConfig.redirectUri,
-    scopes: config.authConfig.scopes.split(',')
-  };
+  const authConfig = JSON.parse(sessionStorage.getItem('authConfig'));
   const { oktaAuth } = useOktaAuth();
-
   useEffect(() => {
     const widget = new OktaSignIn({
       el: '#sign-in-widget',
@@ -41,7 +32,7 @@ const Login = () => {
       throw err;
     });
 
-    return () => widget.remove();
+    // return () => widget.remove();
   }, [oktaAuth]);
 
   return (
