@@ -31,8 +31,6 @@ const Login = () => {
     }).catch((err) => {
       throw err;
     });
-
-    // return () => widget.remove();
   }, [oktaAuth]);
 
   return (

@@ -8,13 +8,11 @@ import "react-loader-spinner/dist/loader/css/react-spinner-loader.css"
 import Loader from 'react-loader-spinner'
 import {CopyToClipboard} from 'react-copy-to-clipboard';
 import Navbar from "../layout/NavBar";
-// import config from "../../config";
 
 const TOKEN = 'token';
 const POST = 'POST';
 const GET = 'GET';
-const Home = ({config1}) => {
-    console.log(config1);
+const Home = () => {
     const config = JSON.parse(sessionStorage.getItem('config'));
     const oktaAuth = useOktaAuth();
     const [expiresIn, setSeconds] = useState();
