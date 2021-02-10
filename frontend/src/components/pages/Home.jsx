@@ -42,7 +42,7 @@ const Home = () => {
         const authorizeTokenType = config.AUTHORIZE_TOKEN_TYPE
         const authorizeClaimName = config.AUTHORIZE_CLAIM_NAME
         let transition, authorizeToken, adminSecretFormOpener;
-        if (!adminStatus && oktaTokenStorage[authorizeTokenType]) {
+        if (!adminStatus && oktaTokenStorage && oktaTokenStorage[authorizeTokenType]) {
             authService.getUser().then((info) => {
                 if (info && info.email && info[authorizeClaimName]) {
                     setAdminStatus(info[authorizeClaimName])
