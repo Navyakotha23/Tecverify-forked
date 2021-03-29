@@ -16,6 +16,13 @@
       }
     },
     "components": {
+      "securitySchemes":{
+        "idTokenAuth":{
+          "type":"apiKey",
+          "in":"header",
+          "name":"token"
+        }
+      },
       "schemas":{
         "secret":{
           "properties":{
@@ -28,6 +35,13 @@
           "properties":{
             "adminSecret":{
               "type":"string"
+            }
+          }
+        },
+        "deleteSecret":{
+          "properties":{
+            "Deleted":{
+              "type": "boolean"
             }
           }
         },
@@ -47,6 +61,7 @@
           }
         }
     },
+    "security":[{"idTokenAuth":[]}],
     "servers": [
       {
         "url": "/api/v1/"
@@ -87,14 +102,6 @@
               }
             }
           },
-          "parameters":[{
-            "name": "token",
-            "in": "header",
-            "required": true,
-            "schema":{
-              "type": "string"
-            }
-          }],
           "responses": {
             "200": {
               "description": "OK",
@@ -109,19 +116,37 @@
             "AdminSecret"
           ],
           "summary":"Used to retrieve a Random Secret key.",
-          "parameters":[{
-            "name": "token",
-            "in": "header",
-            "schema":{
-              "type": "string"
-            },
-            "required": true
-          }],
           "responses":{
             "200":{
               "description":"Response of JSON with Secret key.",
               "schema":{
                 "$ref":"#/components/schemas/generateSecret"
+              }
+            }
+          }
+        }
+      },
+      "/secret/{secret_id}":{
+        "delete":{
+          "tags":[
+            "AdminSecret"
+          ],
+          "summary":"Delete a Secret Key.",
+          "parameters":[
+            {
+              "in":"path",
+              "name":"secret_id",
+              "required":true,
+              "schema":{
+                "type":"string"
+              }
+            }
+          ],
+          "responses":{
+            "200":{
+              "description":"Response of JSON with Secret key.",
+              "schema":{
+                "$ref":"#/components/schemas/deleteSecret"
               }
             }
           }
@@ -133,14 +158,6 @@
             "TOTP"
           ],
           "summary": "Used to retrieve TOTPs based on Secret keys.",
-          "parameters":[{
-            "name": "token",
-            "in": "header",
-            "schema":{
-              "type": "string"
-            },
-            "required": true
-          }],
           "responses": {
             "200": {
               "description": "Will get a TOTP in JSON with Key 'code'",
