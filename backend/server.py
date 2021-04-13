@@ -11,6 +11,7 @@ import requests
 from flask_swagger_ui import get_swaggerui_blueprint
 from flask import Flask, request, g, jsonify
 from flask_cors import CORS
+from ratelimit import limits
 
 # app specific
 app = Flask(__name__)
@@ -24,6 +25,8 @@ CLIENT_ID = app.config['CLIENT_ID']
 SECRETS_FILE = app.config['SECRETS_FILE']
 BE_AUTHORIZING_TOKEN = app.config['AUTHORIZING_TOKEN']
 AUTHORIZE_CLAIM_NAME = app.config['CLAIM_NAME']
+RATE_LIMIT_CALLS = int(app.config['RATE_LIMIT_CALLS'] if 'RATE_LIMIT_CALLS' in app.config else 10)
+RATE_LIMIT_PERIOD = int(app.config['RATE_LIMIT_PERIOD'] if 'RATE_LIMIT_PERIOD' in app.config else 1)
 print(app.config)
 
 # logger specific #
@@ -102,6 +105,7 @@ def logging_after_request(response):
 
 # routes
 @app.route('/api/v1/secret', methods=['POST'])
+@limits(calls=RATE_LIMIT_CALLS, period=RATE_LIMIT_PERIOD)
 def save_secret():
     form_data = validate_and_retrieve_formdata(request)
     token_info = g.get('user')
@@ -116,22 +120,25 @@ def save_secret():
     elif form_data[SECRET] is None or not form_data[SECRET]:
         return {'error': '\'admin_secret\' is missing'}, 400
     else:
-        return {'error': 'Access Denied.'}, 403
+        return {'error': 'UnAuthorized. Must be a Admin'}, 403
 
 
 @app.route('/api/v1/secret', methods=['GET'])
+@limits(calls=RATE_LIMIT_CALLS, period=RATE_LIMIT_PERIOD)
 def generate_secret():
     token_info = g.get('user')
     if token_info[AUTHORIZE_CLAIM_NAME]:
         admin_secret = pyotp.random_base32(32)
         return {"adminSecret": admin_secret}, 200
     else:
-        return {'error': 'Access Denied.'}, 403
+        return {'error': 'UnAuthorized. Must be a Admin'}, 403
 
 
 @app.route('/api/v1/secret/<secret_id>', methods=['DELETE'])
+@limits(calls=RATE_LIMIT_CALLS, period=RATE_LIMIT_PERIOD)
 def delete_secret(secret_id):
     token_info = g.get('user')
+    app.logger.info('{0} initiated deleting secret with id {1}'.format(token_info[SUB], secret_id))
     if token_info[AUTHORIZE_CLAIM_NAME]:
         secrets_list = fread()
         for secret in secrets_list:
@@ -140,10 +147,11 @@ def delete_secret(secret_id):
                 fwrite(secrets_list)
                 return {'Deleted': True}, 200
     else:
-        return {'error': 'Access Denied.'}, 403
+        return {'error': 'UnAuthorized. Must be a Admin'}, 403
 
 
 @app.route('/api/v1/totp', methods=['GET'])
+@limits(calls=RATE_LIMIT_CALLS, period=RATE_LIMIT_PERIOD)
 def get_totp():
     secrets_json = fread()
     if secrets_json is not None:
@@ -166,6 +174,8 @@ def get_token_info(access_token):
     response = requests.post(url, data=body)
     app.logger.info("OKTA INTROSPECT URL: {0}".format(url))
     app.logger.info("OKTA INTROSPECT STATUSCODE: {0}".format(response.status_code))
+    app.logger.info("USER INFO: {0}".format(response))
+    app.logger.info("***************** /\/\/\/\/\/\/\/\/\ **********")
     return response
 
 
