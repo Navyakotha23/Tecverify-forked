@@ -10,10 +10,9 @@ if AUTHORIZING_TOKEN.lower() == "idtoken":
 SECRETS_FILE = os.environ.get("SECRETS_FILE", default="secrets.json")
 
 LOGGING_LEVEL = os.environ.get("LOGGING_LEVEL", default="DEBUG")
-LOGGING_MAX_BYTES = os.environ.get("LOGGING_MAX_BYTES", default="1048576")
-LOGGING_BACKUP_COUNT = os.environ.get("LOGGING_BACKUP_COUNT", default="10")
-RATE_LIMIT_CALLS = os.environ.get("RATE_LIMIT_CALLS", default=10)
-RATE_LIMIT_PERIOD = os.environ.get("RATE_LIMIT_PERIOD", default=1)
+LOGGING_MAX_BYTES = os.environ.get("LOGGING_MAX_BYTES", default=1048576)
+LOGGING_BACKUP_COUNT = os.environ.get("LOGGING_BACKUP_COUNT", default=20)
+API_RATE_LIMITS = os.environ.get("DEFAULT_RATE_LIMITS", default=["20/minute"])
 
 
 

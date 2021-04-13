@@ -12,6 +12,8 @@ from flask_swagger_ui import get_swaggerui_blueprint
 from flask import Flask, request, g, jsonify
 from flask_cors import CORS
 from ratelimit import limits
+from flask_limiter import Limiter
+from flask_limiter.util import get_remote_address
 
 # app specific
 app = Flask(__name__)
@@ -19,20 +21,27 @@ app = Flask(__name__)
 app.config.from_pyfile('config.py')
 CORS(app)
 
+
 #grab config values from file
 ISSUER = app.config['ISSUER']
 CLIENT_ID = app.config['CLIENT_ID']
 SECRETS_FILE = app.config['SECRETS_FILE']
 BE_AUTHORIZING_TOKEN = app.config['AUTHORIZING_TOKEN']
 AUTHORIZE_CLAIM_NAME = app.config['CLAIM_NAME']
-RATE_LIMIT_CALLS = int(app.config['RATE_LIMIT_CALLS'] if 'RATE_LIMIT_CALLS' in app.config else 10)
-RATE_LIMIT_PERIOD = int(app.config['RATE_LIMIT_PERIOD'] if 'RATE_LIMIT_PERIOD' in app.config else 1)
+API_RATE_LIMITS = app.config['API_RATE_LIMITS']
 print(app.config)
 
+#Rate Limiter
+limiter = Limiter(
+    app,
+    key_func=get_remote_address,
+    default_limits=API_RATE_LIMITS
+)
+
 # logger specific #
-level = app.config['LOGGING_LEVEL'] if 'LOGGING_LEVEL' in app.config else 'DEBUG'
-max_bytes = int(app.config['LOGGING_MAX_BYTES'] if 'LOGGING_MAX_BYTES' in app.config else 1048576)
-backup_count = int(app.config['LOGGING_BACKUP_COUNT'] if 'LOGGING_BACKUP_COUNT' in app.config else 10)
+level = app.config['LOGGING_LEVEL']
+max_bytes = int(app.config['LOGGING_MAX_BYTES'])
+backup_count = int(app.config['LOGGING_BACKUP_COUNT'])
 
 logging_config = dict(
     version = 1,
@@ -101,11 +110,11 @@ def logging_after_request(response):
         request.referrer,
         request.user_agent,
     )
+    app.logger.info("____________________________________")
     return response
 
 # routes
 @app.route('/api/v1/secret', methods=['POST'])
-@limits(calls=RATE_LIMIT_CALLS, period=RATE_LIMIT_PERIOD)
 def save_secret():
     form_data = validate_and_retrieve_formdata(request)
     token_info = g.get('user')
@@ -124,7 +133,6 @@ def save_secret():
 
 
 @app.route('/api/v1/secret', methods=['GET'])
-@limits(calls=RATE_LIMIT_CALLS, period=RATE_LIMIT_PERIOD)
 def generate_secret():
     token_info = g.get('user')
     if token_info[AUTHORIZE_CLAIM_NAME]:
@@ -135,10 +143,8 @@ def generate_secret():
 
 
 @app.route('/api/v1/secret/<secret_id>', methods=['DELETE'])
-@limits(calls=RATE_LIMIT_CALLS, period=RATE_LIMIT_PERIOD)
 def delete_secret(secret_id):
     token_info = g.get('user')
-    app.logger.info('{0} initiated deleting secret with id {1}'.format(token_info[SUB], secret_id))
     if token_info[AUTHORIZE_CLAIM_NAME]:
         secrets_list = fread()
         for secret in secrets_list:
@@ -151,7 +157,6 @@ def delete_secret(secret_id):
 
 
 @app.route('/api/v1/totp', methods=['GET'])
-@limits(calls=RATE_LIMIT_CALLS, period=RATE_LIMIT_PERIOD)
 def get_totp():
     secrets_json = fread()
     if secrets_json is not None:
@@ -174,8 +179,7 @@ def get_token_info(access_token):
     response = requests.post(url, data=body)
     app.logger.info("OKTA INTROSPECT URL: {0}".format(url))
     app.logger.info("OKTA INTROSPECT STATUSCODE: {0}".format(response.status_code))
-    app.logger.info("USER INFO: {0}".format(response))
-    app.logger.info("***************** /\/\/\/\/\/\/\/\/\ **********")
+    app.logger.info("USER INFO: {0}".format(response.json()))
     return response
 
 
