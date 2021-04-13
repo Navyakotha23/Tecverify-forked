@@ -11,13 +11,11 @@ import requests
 from flask_swagger_ui import get_swaggerui_blueprint
 from flask import Flask, request, g, jsonify
 from flask_cors import CORS
-from ratelimit import limits
 from flask_limiter import Limiter
 from flask_limiter.util import get_remote_address
 
 # app specific
 app = Flask(__name__)
-# config_file = app.config.from_envvar('TEC_CONFIG')
 app.config.from_pyfile('config.py')
 CORS(app)
 
