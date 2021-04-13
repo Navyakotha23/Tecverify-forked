@@ -33,7 +33,8 @@ print(app.config)
 limiter = Limiter(
     app,
     key_func=get_remote_address,
-    default_limits=API_RATE_LIMITS
+    default_limits=API_RATE_LIMITS,
+    headers_enabled=True
 )
 
 # logger specific #

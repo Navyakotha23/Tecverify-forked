@@ -1,172 +1,176 @@
 {
-    "openapi": "3.0.0",
-    "info": {
-      "description": "<b>TecVERIFY</b> is a lightweight app that is used for 2-step verification 
+  "openapi": "3.0.0",
+  "info": {
+    "description": "<b>TecVERIFY</b> is a lightweight app that is used for 2-step verification 
                       so you can verify your identity when you sign in to your <b>TecMFA</b> account 
                       using Admin TOTP.<br><br>App Features<br>* Save Secret key.
                       <br>* Generate TOTP for all Secret keys saved.",
       "version": "1.0.0",
-      "title": "TecVERIFY",
-      "contact": {
-        "email": "amit.g@tecnics.com"
-      },
-      "license": {
-        "name": "MIT",
-        "url": "https://opensource.org/licenses/MIT"
+    "title": "TecVERIFY",
+    "contact": {
+      "email": "amit.g@tecnics.com"
+    },
+    "license": {
+      "name": "MIT",
+      "url": "https://opensource.org/licenses/MIT"
+    }
+  },
+  "components": {
+    "securitySchemes": {
+      "idTokenAuth": {
+        "type": "apiKey",
+        "in": "header",
+        "name": "token"
       }
     },
-    "components": {
-      "securitySchemes":{
-        "idTokenAuth":{
-          "type":"apiKey",
-          "in":"header",
-          "name":"token"
+    "schemas": {
+      "secret": {
+        "properties": {
+          "Updated": {
+            "type": "boolean"
+          }
         }
       },
-      "schemas":{
-        "secret":{
-          "properties":{
-            "Updated":{
-              "type": "boolean"
-            }
+      "generateSecret": {
+        "properties": {
+          "adminSecret": {
+            "type": "string"
           }
-        },
-        "generateSecret":{
-          "properties":{
-            "adminSecret":{
-              "type":"string"
-            }
+        }
+      },
+      "deleteSecret": {
+        "properties": {
+          "Deleted": {
+            "type": "boolean"
           }
-        },
-        "deleteSecret":{
-          "properties":{
-            "Deleted":{
-              "type": "boolean"
-            }
-          }
-        },
-        "totp":{
-            "type": "array",
-            "items":{
-              "type":"object",
-              "properties":{
-                "code":{
-                  "type":"string"
-                },
-                "secretname":{
-                  "type":"string"
-                }
-              }
+        }
+      },
+      "totp": {
+        "type": "array",
+        "items": {
+          "type": "object",
+          "properties": {
+            "code": {
+              "type": "string"
+            },
+            "secretname": {
+              "type": "string"
             }
           }
         }
+      }
+    }
+  },
+  "security": [
+    {
+      "idTokenAuth": []
+    }
+  ],
+  "servers": [
+    {
+      "url": "/api/v1/"
+    }
+  ],
+  "tags": [
+    {
+      "name": "AdminSecret",
+      "description": "Collection of Secret key APIs."
     },
-    "security":[{"idTokenAuth":[]}],
-    "servers": [
-      {
-        "url": "/api/v1/"
-      }
-    ],
-    "tags": [
-      {
-        "name": "AdminSecret",
-        "description": "Collection of Secret key APIs."
-      },
-      {
-        "name": "TOTP",
-        "description":"Collection of TOTP APIs."
-      }
-    ],
-    "paths": {
-      "/secret": {
-        "post": {
-          "tags": [
-            "AdminSecret"
-          ],
-          "summary": "Used to Save a Secret key.",
-          "requestBody":{
-            "description":"Admin Secret",
-            "required": true,
-            "content":{
-              "application/x-www-form-urlencoded":{
-                "schema":{
-                  "properties":{
-                    "admin_secret":{
-                      "type":"string"
-                    },
-                    "secretname":{
-                      "type":"string"
-                    }
+    {
+      "name": "TOTP",
+      "description": "Collection of TOTP APIs."
+    }
+  ],
+  "paths": {
+    "/secret": {
+      "post": {
+        "tags": [
+          "AdminSecret"
+        ],
+        "summary": "Save a Secret key.",
+        "requestBody": {
+          "description": "Admin Secret",
+          "required": true,
+          "content": {
+            "application/x-www-form-urlencoded": {
+              "schema": {
+                "properties": {
+                  "admin_secret": {
+                    "type": "string"
+                  },
+                  "secretname": {
+                    "type": "string"
                   }
                 }
               }
             }
-          },
-          "responses": {
-            "200": {
-              "description": "OK",
-              "schema": {
-                "$ref": "#/components/schemas/secret"
-              }
-            }
           }
         },
-        "get":{
-          "tags":[
-            "AdminSecret"
-          ],
-          "summary":"Used to retrieve a Random Secret key.",
-          "responses":{
-            "200":{
-              "description":"Response of JSON with Secret key.",
-              "schema":{
-                "$ref":"#/components/schemas/generateSecret"
-              }
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "$ref": "#/components/schemas/secret"
             }
           }
         }
       },
-      "/secret/{secret_id}":{
-        "delete":{
-          "tags":[
-            "AdminSecret"
-          ],
-          "summary":"Delete a Secret Key.",
-          "parameters":[
-            {
-              "in":"path",
-              "name":"secret_id",
-              "required":true,
-              "schema":{
-                "type":"string"
-              }
-            }
-          ],
-          "responses":{
-            "200":{
-              "description":"Response of JSON with Secret key.",
-              "schema":{
-                "$ref":"#/components/schemas/deleteSecret"
-              }
+      "get": {
+        "tags": [
+          "AdminSecret"
+        ],
+        "summary": "Get a Random Secret key.",
+        "responses": {
+          "200": {
+            "description": "Response of JSON with Secret key.",
+            "schema": {
+              "$ref": "#/components/schemas/generateSecret"
             }
           }
         }
-      },
-      "/totp": {
-        "get": {
-          "tags": [
-            "TOTP"
-          ],
-          "summary": "Used to retrieve TOTPs based on Secret keys.",
-          "responses": {
-            "200": {
-              "description": "Will get a TOTP in JSON with Key 'code'",
-              "schema": {
-                "$ref": "#/components/schemas/secret"
-              }
+      }
+    },
+    "/secret/{secret_id}": {
+      "delete": {
+        "tags": [
+          "AdminSecret"
+        ],
+        "summary": "Delete a Secret Key by secret id.",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "secret_id",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Response of JSON with Secret key.",
+            "schema": {
+              "$ref": "#/components/schemas/deleteSecret"
+            }
+          }
+        }
+      }
+    },
+    "/totp": {
+      "get": {
+        "tags": [
+          "TOTP"
+        ],
+        "summary": "Get TOTPs of all Secret keys.",
+        "responses": {
+          "200": {
+            "description": "Will get a TOTP in JSON with Key 'code'",
+            "schema": {
+              "$ref": "#/components/schemas/secret"
             }
           }
         }
       }
     }
   }
+}
