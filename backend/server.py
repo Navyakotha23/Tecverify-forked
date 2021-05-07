@@ -27,15 +27,21 @@ SECRETS_FILE = app.config['SECRETS_FILE']
 BE_AUTHORIZING_TOKEN = app.config['AUTHORIZING_TOKEN']
 AUTHORIZE_CLAIM_NAME = app.config['CLAIM_NAME']
 API_RATE_LIMITS = app.config['API_RATE_LIMITS']
-print(app.config)
+WHITELISTED_IPS = app.config['WHITELISTED_IPS']
 
-#Rate Limiter
+#Begin Rate Limiter
 limiter = Limiter(
     app,
     key_func=get_remote_address,
-    default_limits=API_RATE_LIMITS,
+    # default_limits=eval(API_RATE_LIMITS),
     headers_enabled=True
 )
+
+@limiter.request_filter
+def ip_whitelist():
+    return request.remote_addr in eval(WHITELISTED_IPS)
+
+#End Rate Limiter 
 
 # logger specific #
 level = app.config['LOGGING_LEVEL']
@@ -53,6 +59,8 @@ logging_config = dict(
             'backupCount': backup_count}},
     root = {'handlers': ['h'], 'level': level,})
 dictConfig(logging_config)
+app.logger.info(app.config)
+
 # end logger specifc
 
 # swagger specific #
@@ -114,6 +122,7 @@ def logging_after_request(response):
 
 # routes
 @app.route('/api/v1/secret', methods=['POST'])
+@limiter.limit(API_RATE_LIMITS)
 def save_secret():
     form_data = validate_and_retrieve_formdata(request)
     token_info = g.get('user')
@@ -132,6 +141,7 @@ def save_secret():
 
 
 @app.route('/api/v1/secret', methods=['GET'])
+@limiter.limit(API_RATE_LIMITS)
 def generate_secret():
     token_info = g.get('user')
     if token_info[AUTHORIZE_CLAIM_NAME]:
@@ -142,6 +152,7 @@ def generate_secret():
 
 
 @app.route('/api/v1/secret/<secret_id>', methods=['DELETE'])
+@limiter.limit(API_RATE_LIMITS)
 def delete_secret(secret_id):
     token_info = g.get('user')
     if token_info[AUTHORIZE_CLAIM_NAME]:
@@ -156,6 +167,7 @@ def delete_secret(secret_id):
 
 
 @app.route('/api/v1/totp', methods=['GET'])
+@limiter.limit(API_RATE_LIMITS)
 def get_totp():
     secrets_json = fread()
     if secrets_json is not None:

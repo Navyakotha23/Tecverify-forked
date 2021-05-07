@@ -1,0 +1,28 @@
+version: '3.1'
+services:
+    nginx:
+        image: nginx:alpine
+        container_name: nginx
+        depends_on:
+            [tecverify-be]
+        volumes:
+            - ./nginx_prod/nginx.conf:/etc/nginx/conf.d/default.conf
+            - ./certs/:/ssl/certs/
+        networks:
+            [my-network]
+        ports:
+            [443:443]
+    tecverify-be:
+        image: kasilok/tecverify-be
+        container_name: tecverify-be
+        env_file:
+            [./env-file.txt]
+        networks:
+            my-network:
+                aliases:
+                    [tecverify-be]
+        ports:
+            [5000:5000]
+
+networks:
+    my-network:

@@ -1,0 +1,13 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: kasilok/tecverify-be-name
+spec:
+  template:
+    metadata:
+      name: kasilok/tecverify-be-pod
+    spec:
+      containers:
+      - name: tecverify-be
+        image: kasilok/tecverify-be
+      restartPolicy: Never
