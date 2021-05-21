@@ -1,13 +1,39 @@
-apiVersion: batch/v1
-kind: Job
+apiVersion: apps/v1
+kind: Deployment
 metadata:
-  name: kasilok/tecverify-be-name
+  name: tecverify-be-deployment
+  labels:
+    app: tecverify-be
 spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: tecverify-be
   template:
     metadata:
-      name: kasilok/tecverify-be-pod
+      labels:
+        app: tecverify-be
     spec:
       containers:
       - name: tecverify-be
         image: kasilok/tecverify-be
-      restartPolicy: Never
+        ports:
+        - containerPort: 5000
+          protocol: TCP
+---
+
+kind: Service
+apiVersion: v1
+metadata:
+  name: tecverify-be-service
+  labels:
+    app: tecverify-be
+spec:
+  selector:
+    app: tecverify-be
+  ports:
+  - protocol: TCP
+    port: 5000
+    targetPort: 5000
+    nodePort: 31000
+  type: NodePort
