@@ -1,4 +1,4 @@
-docker-build-master:
+docker-build-and-push:
   image: docker:latest
   stage: build
   services:
