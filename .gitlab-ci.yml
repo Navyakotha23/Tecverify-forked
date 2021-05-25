@@ -1,6 +1,10 @@
+stages:
+  - build_image
+  - deploy
+
 docker-build-and-push:
   image: docker:latest
-  stage: build
+  stage: build_image
   services:
     - docker:dind
   variables:
@@ -13,4 +17,4 @@ docker-build-and-push:
     - docker push "$CI_REGISTRY_IMAGE"
   only:
     - master
-
+  
