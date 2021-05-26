@@ -2,6 +2,12 @@ stages:
   - build
   - deploy
 
+include:
+  - template: Managed-Cluster-Applications.gitlab-ci.yml
+
+apply:
+  image: "registry.gitlab.com/gitlab-org/cluster-integration/cluster-applications:v0.37.0"
+
 docker-build-and-push:
   image: docker:latest
   stage: build
@@ -24,4 +30,4 @@ deploy-to-digital-ocean:
     entrypoint: [""]
   stage: deploy
   script:
-    - kubectl config get-clusters
+    - kubectl version
