@@ -24,4 +24,4 @@ deploy-to-digital-ocean:
     entrypoint: [""]
   stage: deploy
   script:
-    - kubectl version
+    - kubectl
