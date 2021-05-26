@@ -47,6 +47,9 @@ def ip_whitelist():
 level = app.config['LOGGING_LEVEL']
 max_bytes = int(app.config['LOGGING_MAX_BYTES'])
 backup_count = int(app.config['LOGGING_BACKUP_COUNT'])
+log_folder = './logs'
+if not os.path.exists(log_folder):
+    os.makedirs(log_folder)
 
 logging_config = dict(
     version = 1,
