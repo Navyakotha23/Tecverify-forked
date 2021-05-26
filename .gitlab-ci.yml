@@ -19,7 +19,7 @@ docker-build-and-push:
     - master
   
 deploy-to-digital-ocean:
-  image: docker:latest
+  image: bitnami/kubectl:latest
   stage: deploy
   script:
     - kubectl version
