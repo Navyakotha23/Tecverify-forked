@@ -31,3 +31,4 @@ deploy-to-digital-ocean:
   stage: deploy
   script:
     - kubectl version
+  environment: dev
