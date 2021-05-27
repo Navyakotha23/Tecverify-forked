@@ -2,10 +2,6 @@ stages:
   - build
   - deploy
 
-variables:
-  TEST: 'Kasi'
-  KUBE_NAMESPACE: 'tecverify-dev'
-
 docker-build-and-push:
   image: docker:latest
   stage: build
