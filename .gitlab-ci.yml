@@ -4,6 +4,7 @@ stages:
 
 variables:
   TEST: 'Kasi'
+  KUBE_NAMESPACE: 'tecverify-dev'
 
 docker-build-and-push:
   image: docker:latest
@@ -28,7 +29,9 @@ deploy-to-digital-ocean:
   stage: deploy
   script:
     - kubectl version
-    - kubectl apply -f ./backend/tecverify-be.yml
+    - kubectl apply -n "$KUBE_NAMESPACE" -f ./backend/tecverify-be.yml
   after_script:
-    - echo "$TEST"
-  environment: dev
+    - kubectl get svc -n "$KUBE_NAMESPACE"
+  environment:
+    name: dev
+    url: http://139.59.49.122:5000/docs
