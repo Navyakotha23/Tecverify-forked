@@ -10,6 +10,7 @@ docker-build-and-push:
   variables:
     DOCKER_DRIVER: overlay2
     DOCKER_TLS_CERTDIR: ""
+    KUBE_NAMESPACE: tecverify-test
   before_script:
     - docker login -u "$CI_REGISTRY_USER" -p "$CI_REGISTRY_PASSWORD" $CI_REGISTRY
   script:
@@ -25,5 +26,5 @@ deploy-to-digital-ocean:
   stage: deploy
   script:
     - kubectl version
-    - kubectl apply -f ./backend/tecverify-be.yml
+    - kubectl apply -n "$KUBE_NAMESPACE" -f ./backend/tecverify-be.yml
   environment: dev
