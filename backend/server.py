@@ -59,8 +59,9 @@ logging_config = dict(
             'filename': './logs/logs.log',
             'mode': 'a',
             'maxBytes': max_bytes,
-            'backupCount': backup_count}},
-    root = {'handlers': ['h'], 'level': level,})
+            'backupCount': backup_count},
+            'file': {'class': 'logging.StreamHandler', 'formatter': 'f', 'level': level}},
+    root = {'handlers': ['h', 'file'], 'level': level,})
 dictConfig(logging_config)
 app.logger.info(app.config)
 
