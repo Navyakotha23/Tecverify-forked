@@ -28,5 +28,5 @@ deploy-to-digital-ocean:
     - kubectl version
     - kubectl apply -f ./backend/tecverify-be.yml
   after_script:
-    echo "$TEST"
+    - echo "$TEST"
   environment: dev
