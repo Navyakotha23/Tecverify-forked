@@ -26,5 +26,5 @@ deploy-to-digital-ocean:
   stage: deploy
   script:
     - kubectl version
-    - kubectl apply -n "$KUBE_NAMESPACE" -f ./backend/tecverify-be.yml
+    - kubectl apply -f ./backend/tecverify-be.yml
   environment: dev
