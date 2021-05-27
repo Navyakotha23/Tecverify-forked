@@ -3,7 +3,7 @@ stages:
   - deploy
 
 variables:
-  - TEST: 'Kasi'
+  TEST: 'Kasi'
 
 docker-build-and-push:
   image: docker:latest
