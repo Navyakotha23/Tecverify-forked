@@ -45,3 +45,5 @@ assign-ip:
   stage: assign_ip
   script:
    - echo "$URL"
+  dependencies:
+   - deploy
