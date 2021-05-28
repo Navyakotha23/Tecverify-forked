@@ -27,7 +27,7 @@ deploy-to-digital-ocean:
     - kubectl version
     - kubectl apply -f ./backend/tecverify-be.yml
   after_script:
-    - kubectl get svc
+    - kubectl get svc -o yaml
   environment:
     name: dev
     url: http://139.59.49.122:5000/docs
