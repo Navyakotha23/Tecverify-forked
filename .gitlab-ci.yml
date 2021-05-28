@@ -2,6 +2,9 @@ stages:
   - build
   - deploy
 
+variables:
+  KUBE_NAMESPACE: "tecverify-dev"
+
 docker-build-and-push:
   image: docker:latest
   stage: build
@@ -16,13 +19,16 @@ docker-build-and-push:
     - docker build --pull -t "$CI_REGISTRY_IMAGE" ./backend/
     - docker push "$CI_REGISTRY_IMAGE"
   only:
-    - master
+    - merge_requests
   
 deploy-to-digital-ocean:
   image: 
     name: bitnami/kubectl:latest
     entrypoint: [""]
   stage: deploy
+  before_script:
+    - echo "$KUBE_NAMESPACE"
+    - kubectl describe namespace "$KUBE_NAMESPACE"
   script:
     - kubectl version
     - kubectl apply -f ./backend/tecverify-be.yml
