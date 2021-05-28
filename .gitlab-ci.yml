@@ -3,7 +3,7 @@ stages:
   - deploy
   
 variables:
-    URL: ''
+    URL: 'test'
 
 docker-build-and-push:
   image: docker:latest
@@ -37,4 +37,4 @@ deploy-to-digital-ocean:
     - echo "$URL"
   environment:
     name: dev
-    url: http://$CI_ENVIRONMENT_SLUG:5000/docs
+    url: http://$URL:5000/docs
