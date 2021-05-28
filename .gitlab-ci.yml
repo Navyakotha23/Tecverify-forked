@@ -28,7 +28,9 @@ deploy-to-digital-ocean:
   script:
     - kubectl apply -f ./backend/tecverify-be.yml
   after_script:
-    - kubectl get svc tecverify-be-service -o jsonpath='{.status}'
+    - IP=''
+    - if ["$IP" = ""]; then echo "empty"
+    - kubectl get svc tecverify-be-service -o jsonpath='{.status.LoadBalancer.}'
   environment:
     name: dev
     url: http://139.59.49.122:5000/docs
