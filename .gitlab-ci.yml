@@ -2,10 +2,6 @@ stages:
   - build
   - deploy
 
-variables:
-  TEST: 'Kasi'
-  KUBE_NAMESPACE: 'tecverify-dev'
-
 docker-build-and-push:
   image: docker:latest
   stage: build
@@ -29,7 +25,6 @@ deploy-to-digital-ocean:
   stage: deploy
   script:
     - kubectl version
-    # - kubectl create namespace "$KUBE_NAMESPACE"
     - kubectl apply -f ./backend/tecverify-be.yml
   after_script:
     - kubectl get svc
