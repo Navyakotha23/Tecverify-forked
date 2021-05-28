@@ -36,6 +36,7 @@ deploy-to-digital-ocean:
     - echo "$CI_ENVIRONMENT_REF"
     - URL=$(kubectl get svc tecverify-be-service -o jsonpath='{.status.loadBalancer.ingress[0].ip}')
     - echo "$URL"
+    - export "$URL"
   environment:
     name: dev
     url: http://$URL:5000/docs
