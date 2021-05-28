@@ -1,6 +1,7 @@
 stages:
   - build
   - deploy
+  - assign_ip
   
 variables:
     URL: 'test'
@@ -38,3 +39,8 @@ deploy-to-digital-ocean:
   environment:
     name: dev
     url: http://$URL:5000/docs
+
+assign-ip:
+  stage: assign_ip
+  script:
+   - echo "$URL"
