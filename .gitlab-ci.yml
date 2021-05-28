@@ -30,7 +30,7 @@ deploy-to-digital-ocean:
   after_script:
     - IP=''
     - echo "$IP"
-    - kubectl get svc tecverify-be-service -o jsonpath='{.status.LoadBalancer.ingress[0].ip}'
+    - kubectl get svc tecverify-be-service -o jsonpath='{.status.loadBalancer.ingress[0].ip}'
     - if ["$IP" = ""]; then echo "empty"; else echo "not empty"; fi;
     - echo "$IP"
   environment:
