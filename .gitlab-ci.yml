@@ -30,9 +30,9 @@ deploy-to-digital-ocean:
   after_script:
     - IP=''
     - echo IP
-    - if ["$IP" = ""]; then echo "empty"; else echo "not empty"; fi;
     - IP = 'kubectl get svc tecverify-be-service -o jsonpath='{.status.LoadBalancer.ingress[0].ip}''
     - if ["$IP" = ""]; then echo "empty"; else echo "not empty"; fi;
+    - echo "$IP"
   environment:
     name: dev
     url: http://139.59.49.122:5000/docs
