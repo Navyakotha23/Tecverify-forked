@@ -1,6 +1,9 @@
 stages:
   - build
   - deploy
+  
+variables:
+    URL: ''
 
 docker-build-and-push:
   image: docker:latest
@@ -29,8 +32,8 @@ deploy-to-digital-ocean:
     - kubectl apply -f ./backend/tecverify-be.yml
   after_script:
     - echo "$CI_ENVIRONMENT_URL"
-    - CI_ENVIRONMENT_URL=$(kubectl get svc tecverify-be-service -o jsonpath='{.status.loadBalancer.ingress[0].ip}')
-    - echo "$CI_ENVIRONMENT_URL"
+    - URL=$(kubectl get svc tecverify-be-service -o jsonpath='{.status.loadBalancer.ingress[0].ip}')
+    - echo "$URL"
   environment:
     name: dev
-    url: http://$CI_ENVIRONMENT_URL:5000/docs
+    url: http://$URL:5000/docs
