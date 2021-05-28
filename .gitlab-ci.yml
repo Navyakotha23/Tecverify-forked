@@ -46,4 +46,4 @@ assign-ip:
   script:
    - echo "$URL"
   dependencies:
-   - deploy
+   - deploy-to-digital-ocean
