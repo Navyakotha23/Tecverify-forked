@@ -36,4 +36,4 @@ deploy-to-digital-ocean:
     - echo "$URL"
   environment:
     name: dev
-    url: http://$URL:5000/docs
+    url: http://"$URL":5000/docs
