@@ -32,8 +32,9 @@ deploy-to-digital-ocean:
     - kubectl apply -f ./backend/tecverify-be.yml
   after_script:
     - echo "$CI_ENVIRONMENT_SLUG"
+    - echo "$CI_ENVIRONMENT_REF"
     - URL=$(kubectl get svc tecverify-be-service -o jsonpath='{.status.loadBalancer.ingress[0].ip}')
     - echo "$URL"
   environment:
     name: dev
-    url: http://"$URL":5000/docs
+    url: http://$CI_ENVIRONMENT_SLUG:5000/docs
