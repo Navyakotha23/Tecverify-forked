@@ -29,10 +29,10 @@ deploy-to-digital-ocean:
   stage: deploy
   script:
     - kubectl version
-    - kubectl create namespace "$KUBE_NAMESPACE"
-    - kubectl apply -n "$KUBE_NAMESPACE" -f ./backend/tecverify-be.yml
+    # - kubectl create namespace "$KUBE_NAMESPACE"
+    - kubectl apply -f ./backend/tecverify-be.yml
   after_script:
-    - kubectl get svc -n "$KUBE_NAMESPACE"
+    - kubectl get svc
   environment:
     name: dev
     url: http://139.59.49.122:5000/docs
