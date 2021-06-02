@@ -20,7 +20,7 @@ docker-build-and-push:
     - docker build --pull -t "$CI_REGISTRY_IMAGE" ./backend/
     - docker push "$CI_REGISTRY_IMAGE"
   only:
-    - merge_requests
+    - master
   
 deploy-to-digital-ocean:
   image: 
