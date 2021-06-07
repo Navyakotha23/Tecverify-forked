@@ -6,6 +6,8 @@ CLAIM_NAME = os.environ.get("AUTHORIZE_CLAIM_NAME", default="Admin")
 AUTHORIZING_TOKEN = os.environ.get("AUTHORIZE_TOKEN_TYPE", default="id_token")
 if AUTHORIZING_TOKEN.lower() == "idtoken":
     AUTHORIZING_TOKEN = "id_token"
+elif AUTHORIZING_TOKEN.lower() == "accesstoken":
+    AUTHORIZING_TOKEN = "token"
 
 SECRETS_FILE = os.environ.get("SECRETS_FILE", default="secrets.json")
 

@@ -17,7 +17,7 @@
   },
   "components": {
     "securitySchemes": {
-      "idTokenAuth": {
+      "tokenAuth": {
         "type": "apiKey",
         "in": "header",
         "name": "token"
@@ -63,7 +63,7 @@
   },
   "security": [
     {
-      "idTokenAuth": []
+      "tokenAuth": []
     }
   ],
   "servers": [

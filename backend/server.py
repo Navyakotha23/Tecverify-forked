@@ -24,7 +24,7 @@ CORS(app)
 ISSUER = app.config['ISSUER']
 CLIENT_ID = app.config['CLIENT_ID']
 SECRETS_FILE = app.config['SECRETS_FILE']
-BE_AUTHORIZING_TOKEN = app.config['AUTHORIZING_TOKEN']
+AUTHORIZING_TOKEN = app.config['AUTHORIZING_TOKEN']
 AUTHORIZE_CLAIM_NAME = app.config['CLAIM_NAME']
 API_RATE_LIMITS = app.config['API_RATE_LIMITS']
 WHITELISTED_IPS = app.config['WHITELISTED_IPS']
@@ -100,7 +100,7 @@ def check_token_header():
         if TOKEN not in request.headers:
             return {'error': 'Required Headers missing.'}, 400
         elif request.headers[TOKEN] == '':
-            return {'error': 'The \'token\' parameter cant be empty'}, 400
+            return {'error': "The 'token' parameter can't be empty"}, 400
         elif request.headers[TOKEN]:
             is_token_valid, token_info = introspect(request.headers[TOKEN])
             if not is_token_valid:
@@ -130,36 +130,36 @@ def logging_after_request(response):
 def save_secret():
     form_data = validate_and_retrieve_formdata(request)
     token_info = g.get('user')
-    if token_info[AUTHORIZE_CLAIM_NAME] and form_data[SECRET]:
+    if AUTHORIZE_CLAIM_NAME in token_info and token_info[AUTHORIZE_CLAIM_NAME] and form_data[SECRET]:
         if is_secret_valid(form_data[SECRET]):
             if update_secret(form_data):
                 return {"updated": True}, 200
             else:
-                return {"updated": False, "error": "Update Failed. Contact Administrator."}, 500
+                return {"updated": False, "error": "Update Failed !!!"}, 500
         else:
             return {"updated": False, "error": ADMIN_SECRET + " is invalid. Try another one."}, 500
     elif form_data[SECRET] is None or not form_data[SECRET]:
-        return {'error': '\'admin_secret\' is missing'}, 400
+        return {'error': "'admin_secret' is missing"}, 400
     else:
-        return {'error': 'UnAuthorized. Must be a Admin'}, 403
+        return {'error': 'UnAuthorized !!!'}, 403
 
 
 @app.route('/api/v1/secret', methods=['GET'])
 @limiter.limit(API_RATE_LIMITS)
 def generate_secret():
     token_info = g.get('user')
-    if token_info[AUTHORIZE_CLAIM_NAME]:
+    if AUTHORIZE_CLAIM_NAME in token_info and token_info[AUTHORIZE_CLAIM_NAME]:
         admin_secret = pyotp.random_base32(32)
         return {"adminSecret": admin_secret}, 200
     else:
-        return {'error': 'UnAuthorized. Must be a Admin'}, 403
+        return {'error': 'UnAuthorized !!!'}, 403
 
 
 @app.route('/api/v1/secret/<secret_id>', methods=['DELETE'])
 @limiter.limit(API_RATE_LIMITS)
 def delete_secret(secret_id):
     token_info = g.get('user')
-    if token_info[AUTHORIZE_CLAIM_NAME]:
+    if AUTHORIZE_CLAIM_NAME in token_info and token_info[AUTHORIZE_CLAIM_NAME]:
         secrets_list = fread()
         for secret in secrets_list:
             if secret_id in secret.values():
@@ -167,16 +167,20 @@ def delete_secret(secret_id):
                 fwrite(secrets_list)
                 return {'Deleted': True}, 200
     else:
-        return {'error': 'UnAuthorized. Must be a Admin'}, 403
+        return {'error': 'UnAuthorized !!!'}, 403
 
 
 @app.route('/api/v1/totp', methods=['GET'])
 @limiter.limit(API_RATE_LIMITS)
 def get_totp():
-    secrets_json = fread()
-    if secrets_json is not None:
-        totp = generate_totp_for_all_users(secrets_json)
-        return jsonify(totp), 200
+    token_info = g.get('user')
+    if AUTHORIZE_CLAIM_NAME in token_info:
+        secrets_json = fread()
+        if secrets_json is not None:
+            totp = generate_totp_for_all_users(secrets_json)
+            return jsonify(totp), 200
+    else:
+        return {'error': 'UnAuthorized !!!'}, 403
 
 # helper functions
 def introspect(token):
@@ -188,9 +192,9 @@ def introspect(token):
         return False, token_info
 
 
-def get_token_info(access_token):
-    url = app.config['ISSUER'] + "/v1/introspect?client_id=" + app.config['CLIENT_ID']
-    body = {TOKEN: access_token, TOKEN_TYPE_HINT: BE_AUTHORIZING_TOKEN}
+def get_token_info(token):
+    url = ISSUER + "/v1/introspect?client_id=" + CLIENT_ID
+    body = {TOKEN: token, TOKEN_TYPE_HINT: AUTHORIZING_TOKEN}
     response = requests.post(url, data=body)
     app.logger.info("OKTA INTROSPECT URL: {0}".format(url))
     app.logger.info("OKTA INTROSPECT STATUSCODE: {0}".format(response.status_code))
