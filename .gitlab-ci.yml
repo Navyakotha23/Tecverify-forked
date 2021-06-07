@@ -1,10 +1,6 @@
 stages:
   - build
   - deploy
-  - assign_ip
-  
-variables:
-    URL: 'test'
 
 docker-build-and-push:
   image: docker:latest
@@ -32,19 +28,8 @@ deploy-to-digital-ocean:
   script:
     - kubectl apply -f ./backend/tecverify-be.yml
   after_script:
-    - echo "$CI_ENVIRONMENT_SLUG"
-    - echo "$CI_ENVIRONMENT_REF"
-    - URL=$(kubectl get svc tecverify-be-service -o jsonpath='{.status.loadBalancer.ingress[0].ip}')
-    - echo "$URL" >> deploy.env
-    - export
+    - kubectl get svc tecverify-be-service -o jsonpath='{.status.loadBalancer.ingress[0].ip}'
   environment:
     name: dev
-    url: http://$URL:5000/docs
+    url: http://139.59.49.122:5000/docs
 
-assign-ip:
-  stage: assign_ip
-  script:
-   - echo "$URL"
-   - echo "$test"
-  dependencies:
-   - deploy-to-digital-ocean
