@@ -81,15 +81,15 @@ TOKEN = "token"
 ID_TOKEN = "id_token"
 TOKEN_TYPE_HINT = "token_type_hint"
 SCOPE = "scope"
-ADMIN_SECRET = "admin_secret"
-SECRETNAME = "secretname"
+ADMIN_SECRET = "adminSecret"
+SECRETNAME = "secretName"
 ACTIVE = 'active'
 ISS = 'iss'
 UID = 'uid'
 AUD = 'aud'
 OPTIONS = 'OPTIONS'
 SECRET = 'secret'
-ID_LENGTH = 7
+ID_LENGTH = 12
 
 # Middlewares
 @app.before_request
@@ -139,7 +139,7 @@ def save_secret():
         else:
             return {"updated": False, "error": ADMIN_SECRET + " is invalid. Try another one."}, 500
     elif form_data[SECRET] is None or not form_data[SECRET]:
-        return {'error': "'admin_secret' is missing"}, 400
+        return {'error': "'adminSecret' is missing"}, 400
     else:
         return {'error': 'UnAuthorized !!!'}, 403
 
@@ -177,7 +177,7 @@ def get_totp():
     if AUTHORIZE_CLAIM_NAME in token_info:
         secrets_json = fread()
         if secrets_json is not None:
-            totp = generate_totp_for_all_users(secrets_json)
+            totp = generate_totp_for_all_secrets(secrets_json)
             return jsonify(totp), 200
     else:
         return {'error': 'UnAuthorized !!!'}, 403
@@ -230,12 +230,12 @@ def generate_totp(secret):
         return None
 
 
-def generate_totp_for_all_users(secrets_json):
-    users_list_with_totp = []
+def generate_totp_for_all_secrets(secrets_json):
+    secrets_with_totp = []
     for user in secrets_json:
         totp = generate_totp(user[SECRET])
-        users_list_with_totp.append({SECRETNAME: user[SECRETNAME], 'code': totp, 'id': user['id'], 'secretUpdatedAt': user['updatedAt']})
-    return users_list_with_totp
+        secrets_with_totp.append({'id': user['id'], 'otp': totp, SECRETNAME: user[SECRETNAME], 'secretUpdatedAt': user['updatedAt']})
+    return secrets_with_totp
 
 
 def update_secret(form_data):

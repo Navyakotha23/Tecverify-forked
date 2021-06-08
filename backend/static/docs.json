@@ -50,10 +50,16 @@
         "items": {
           "type": "object",
           "properties": {
-            "code": {
+            "id": {
               "type": "string"
             },
-            "secretname": {
+            "otp": {
+              "type": "string"
+            },
+            "secretName": {
+              "type": "string"
+            },
+            "secretUpdatedAt": {
               "type": "string"
             }
           }
@@ -95,10 +101,10 @@
             "application/x-www-form-urlencoded": {
               "schema": {
                 "properties": {
-                  "admin_secret": {
+                  "adminSecret": {
                     "type": "string"
                   },
-                  "secretname": {
+                  "secretName": {
                     "type": "string"
                   }
                 }

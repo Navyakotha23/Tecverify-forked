@@ -68,8 +68,8 @@ const Home = () => {
                 setErrorMessage(false)
                 setShowLoadingSpinnerInAdminSecretPopup(true)
                 let formData = new FormData();
-                formData.append('secretname', adminSecret);
-                formData.append('admin_secret', sharedSecret);
+                formData.append('secretName', adminSecret);
+                formData.append('adminSecret', sharedSecret);
                 fetch(`${config.BACK_END_URL}/api/v1/secret`, {
                     "method": POST,
                     "headers": {
@@ -148,8 +148,8 @@ const Home = () => {
                             let listOfSecretNames = [];
                             setRandomOtp(response);
                             response.forEach(code => {
-                                const {secretname} = code;
-                                listOfSecretNames.push(secretname);
+                                const {secretName} = code;
+                                listOfSecretNames.push(secretName);
                             })
                             setSecretNames(listOfSecretNames);
                         } else {
@@ -297,7 +297,7 @@ const Home = () => {
                                 }}>
                                     {
                                         (randomOtp && randomOtp.length > 0) ? randomOtp.map(function (code, index) {
-                                            const {secretname, secretUpdatedAt} = code;
+                                            const {secretName, secretUpdatedAt} = code;
                                             return (
                                                 <li className='otp-list-cls' key={index}>
                                                      <div style={{display: 'flex'}}>
@@ -309,10 +309,10 @@ const Home = () => {
                                                                      showDeleteConfirmationPopup={showDeleteConfirmationPopup}
                                                                      code={code}/> : ''
                                                          }
-                                                         <p style={{padding: '10px 1px 1px 20px', fontSize: '18px'}}>{secretname}</p>
+                                                         <p style={{padding: '10px 1px 1px 20px', fontSize: '18px'}}>{secretName}</p>
                                                      </div>
                                                      <div style={{display: 'flex'}}>
-                                                         <h2 className="random-otp" style={{marginTop: '7px', letterSpacing: '3px'}}>{code.code}</h2>
+                                                         <h2 className="random-otp" style={{marginTop: '7px', letterSpacing: '3px'}}>{code.otp}</h2>
                                                          <p className='time-details'>{secretUpdatedAt}</p>
                                                      </div>
                                                 </li>
