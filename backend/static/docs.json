@@ -101,7 +101,7 @@
             "application/x-www-form-urlencoded": {
               "schema": {
                 "properties": {
-                  "adminSecret": {
+                  "Secret": {
                     "type": "string"
                   },
                   "secretName": {
