@@ -34,4 +34,6 @@ deploy-to-digital-ocean:
   environment:
     name: dev
     url: http://139.59.49.122:5000/docs
+  only:
+    - master
 
