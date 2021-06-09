@@ -14,7 +14,7 @@ const Login = () => {
       redirectUri : authConfig.redirectUri,
       logo: '/logo.png',
       authParams: {
-        pkce : authConfig.pkce,
+        pkce : true,
         issuer : authConfig.issuer,
         responseType: ["token"],
         display: 'page',

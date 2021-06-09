@@ -11,9 +11,9 @@ const HasAccessToRouter = ({config}) => {
     sessionStorage.setItem('config', JSON.stringify(config));
     const authConfig = {
         clientId: config.CLIENT_ID,
-        disableHttpsCheck: config.DISABLE_HTTPS_CHECK,
+        disableHttpsCheck: false,
         issuer: config.ISSUER,
-        pkce: config.PKCE,
+        pkce: true,
         redirectUri: `${config.FRONT_END_URL}/implicit/callback`,
         scopes: config.SCOPES
     };

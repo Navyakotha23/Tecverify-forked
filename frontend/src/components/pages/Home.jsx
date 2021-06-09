@@ -33,6 +33,7 @@ const Home = () => {
     const [encryptedSecret, setEncryptedSecret] = useState('');
     const [timeInSeconds, setTimeInSeconds] = useState();
     const [logoutInErrorPopup, showLogoutInErrorPopup] = useState(false);
+    const SHOW_ENCRYPTED_KEY = false;
     if (oktaAuth && config) {
         const authState = oktaAuth.authState;
         const authService = oktaAuth.oktaAuth;
@@ -435,7 +436,7 @@ const Home = () => {
                                                     <br/>
                                                     <div className={'shared-secret-div'}>
                                                         <input
-                                                            style={config.SHOW_ENCRYPTED_KEY === 'true' ? {} : {display: "none"}}
+                                                            style={SHOW_ENCRYPTED_KEY === 'true' ? {} : {display: "none"}}
                                                             className={'shared-secret'}
                                                             readOnly={true}
                                                             placeholder={"Encrypted Key"}
@@ -446,7 +447,7 @@ const Home = () => {
                                                                          onCopy={() => {
                                                                              setSuccessOrErrorMessage('Encrypted Key', encryptedSecret)
                                                                          }}>
-                                                            <button  style={config.SHOW_ENCRYPTED_KEY === 'true' ? {} : {display: "none"}} type='button' className={'copy-button'}>Copy
+                                                            <button  style={SHOW_ENCRYPTED_KEY === 'true' ? {} : {display: "none"}} type='button' className={'copy-button'}>Copy
                                                             </button>
                                                         </CopyToClipboard>
                                                     </div>

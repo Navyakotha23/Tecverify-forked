@@ -20,28 +20,43 @@ app.config.from_pyfile('config.py')
 CORS(app)
 
 
-#grab config values from file
+# grab config values from file
 ISSUER = app.config['ISSUER']
 CLIENT_ID = app.config['CLIENT_ID']
 SECRETS_FILE = app.config['SECRETS_FILE']
 AUTHORIZING_TOKEN = app.config['AUTHORIZING_TOKEN']
 AUTHORIZE_CLAIM_NAME = app.config['CLAIM_NAME']
-API_RATE_LIMITS = app.config['API_RATE_LIMITS']
+ENABLE_API_RATE_LIMITS = app.config['ENABLE_API_RATE_LIMITS']
+# API_RATE_LIMITS = app.config['API_RATE_LIMITS']
 WHITELISTED_IPS = app.config['WHITELISTED_IPS']
 
-#Begin Rate Limiter
+# Begin Rate Limiter
+def construct_rate_limit():
+    rate_limits_per_minute = app.config['API_RATE_LIMITS_PER_MINUTE']
+    rate_limits_per_hour = app.config['API_RATE_LIMITS_PER_HOUR']
+    rate_limits = ''
+    if rate_limits_per_minute is not None:
+        rate_limits = rate_limits + rate_limits_per_minute+'/minute;'
+    if rate_limits_per_hour is not None:
+        rate_limits = rate_limits + rate_limits_per_hour+'/hour;'
+    return rate_limits[:-1] if rate_limits else None
+
+RATE_LIMIT = construct_rate_limit() if ENABLE_API_RATE_LIMITS else None
+print(RATE_LIMIT)
+
 limiter = Limiter(
     app,
     key_func=get_remote_address,
-    # default_limits=eval(API_RATE_LIMITS),
-    headers_enabled=True
+    headers_enabled=True,
+    enabled=ENABLE_API_RATE_LIMITS
 )
 
 @limiter.request_filter
 def ip_whitelist():
     return request.remote_addr in eval(WHITELISTED_IPS)
 
-#End Rate Limiter 
+# End Rate Limiter
+
 
 # logger specific #
 level = app.config['LOGGING_LEVEL']
@@ -52,16 +67,17 @@ if not os.path.exists(log_folder):
     os.makedirs(log_folder)
 
 logging_config = dict(
-    version = 1,
-    formatters = { 'f': {'format': '%(asctime)s %(name)-12s %(levelname)-8s %(message)s'}},
-    handlers = {'h': {'class': 'logging.handlers.RotatingFileHandler', 'formatter': 'f',
-            'level': level,
-            'filename': './logs/logs.log',
-            'mode': 'a',
-            'maxBytes': max_bytes,
-            'backupCount': backup_count},
-            'file': {'class': 'logging.StreamHandler', 'formatter': 'f', 'level': level}},
-    root = {'handlers': ['h', 'file'], 'level': level,})
+    version=1,
+    formatters={
+        'f': {'format': '%(asctime)s %(name)-12s %(levelname)-8s %(message)s'}},
+    handlers={'h': {'class': 'logging.handlers.RotatingFileHandler', 'formatter': 'f',
+                    'level': level,
+                    'filename': './logs/logs.log',
+                    'mode': 'a',
+                    'maxBytes': max_bytes,
+                    'backupCount': backup_count},
+              'file': {'class': 'logging.StreamHandler', 'formatter': 'f', 'level': level}},
+    root={'handlers': ['h', 'file'], 'level': level, })
 dictConfig(logging_config)
 app.logger.info(app.config)
 
@@ -92,6 +108,8 @@ SECRET = 'secret'
 ID_LENGTH = 12
 
 # Middlewares
+
+
 @app.before_request
 def check_token_header():
     if request.method == OPTIONS:
@@ -125,8 +143,10 @@ def logging_after_request(response):
     return response
 
 # routes
+
+
 @app.route('/api/v1/secret', methods=['POST'])
-@limiter.limit(API_RATE_LIMITS)
+@limiter.limit(RATE_LIMIT)
 def save_secret():
     form_data = validate_and_retrieve_formdata(request)
     token_info = g.get('user')
@@ -145,7 +165,7 @@ def save_secret():
 
 
 @app.route('/api/v1/secret', methods=['GET'])
-@limiter.limit(API_RATE_LIMITS)
+@limiter.limit(RATE_LIMIT)
 def generate_secret():
     token_info = g.get('user')
     if AUTHORIZE_CLAIM_NAME in token_info and token_info[AUTHORIZE_CLAIM_NAME]:
@@ -156,7 +176,7 @@ def generate_secret():
 
 
 @app.route('/api/v1/secret/<secret_id>', methods=['DELETE'])
-@limiter.limit(API_RATE_LIMITS)
+@limiter.limit(RATE_LIMIT)
 def delete_secret(secret_id):
     token_info = g.get('user')
     if AUTHORIZE_CLAIM_NAME in token_info and token_info[AUTHORIZE_CLAIM_NAME]:
@@ -171,7 +191,7 @@ def delete_secret(secret_id):
 
 
 @app.route('/api/v1/totp', methods=['GET'])
-@limiter.limit(API_RATE_LIMITS)
+@limiter.limit(RATE_LIMIT)
 def get_totp():
     token_info = g.get('user')
     if AUTHORIZE_CLAIM_NAME in token_info:
@@ -183,6 +203,8 @@ def get_totp():
         return {'error': 'UnAuthorized !!!'}, 403
 
 # helper functions
+
+
 def introspect(token):
     response = get_token_info(token)
     token_info = response.json()
@@ -197,7 +219,8 @@ def get_token_info(token):
     body = {TOKEN: token, TOKEN_TYPE_HINT: AUTHORIZING_TOKEN}
     response = requests.post(url, data=body)
     app.logger.info("OKTA INTROSPECT URL: {0}".format(url))
-    app.logger.info("OKTA INTROSPECT STATUSCODE: {0}".format(response.status_code))
+    app.logger.info(
+        "OKTA INTROSPECT STATUSCODE: {0}".format(response.status_code))
     app.logger.info("USER INFO: {0}".format(response.json()))
     return response
 
@@ -234,7 +257,8 @@ def generate_totp_for_all_secrets(secrets_json):
     secrets_with_totp = []
     for user in secrets_json:
         totp = generate_totp(user[SECRET])
-        secrets_with_totp.append({'id': user['id'], 'otp': totp, SECRETNAME: user[SECRETNAME], 'secretUpdatedAt': user['updatedAt']})
+        secrets_with_totp.append(
+            {'id': user['id'], 'otp': totp, SECRETNAME: user[SECRETNAME], 'secretUpdatedAt': user['updatedAt']})
     return secrets_with_totp
 
 
@@ -257,10 +281,12 @@ def generate_unique_uid(secrets_list):
     else:
         return generate_unique_uid(secrets_list)
 
+
 def generate_id():
     range_start = 10**(ID_LENGTH-1)
     range_end = (10**ID_LENGTH)-1
     return str(randint(range_start, range_end))
+
 
 def is_uid_unique(uid, secrets_list):
     uid_list = [secret['id'] for secret in secrets_list]
