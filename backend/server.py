@@ -1,6 +1,7 @@
 import json
 import os.path
 import os
+import uuid
 import base64
 from random import randint
 from datetime import datetime
@@ -287,9 +288,10 @@ def generate_unique_uid(secrets_list):
 
 
 def generate_id():
-    range_start = 10**(ID_LENGTH-1)
-    range_end = (10**ID_LENGTH)-1
-    return str(randint(range_start, range_end))
+    # range_start = 10**(ID_LENGTH-1)
+    # range_end = (10**ID_LENGTH)-1
+    # return str(randint(range_start, range_end))
+    return str(uuid.uuid4())
 
 
 def is_uid_unique(uid, secrets_list):
