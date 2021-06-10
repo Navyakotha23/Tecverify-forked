@@ -11,6 +11,7 @@ itsdangerous==1.1.0
 Jinja2==2.11.3
 limits==1.5.1
 MarkupSafe==1.1.1
+pyDes==2.0.1
 pyotp==2.6.0
 requests==2.25.1
 six==1.15.0
