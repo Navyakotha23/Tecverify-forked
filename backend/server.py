@@ -7,6 +7,7 @@ from datetime import datetime
 from logging.config import dictConfig
 
 import pyotp
+import pyDes
 import requests
 from flask_swagger_ui import get_swaggerui_blueprint
 from flask import Flask, request, g, jsonify
@@ -29,6 +30,7 @@ AUTHORIZE_CLAIM_NAME = app.config['CLAIM_NAME']
 ENABLE_API_RATE_LIMITS = app.config['ENABLE_API_RATE_LIMITS']
 # API_RATE_LIMITS = app.config['API_RATE_LIMITS']
 WHITELISTED_IPS = app.config['WHITELISTED_IPS']
+SALT = app.config['SALT']
 
 # Begin Rate Limiter
 def construct_rate_limit():
@@ -256,7 +258,8 @@ def generate_totp(secret):
 def generate_totp_for_all_secrets(secrets_json):
     secrets_with_totp = []
     for user in secrets_json:
-        totp = generate_totp(user[SECRET])
+        secret = decrypt_secret(user[SECRET])
+        totp = generate_totp(secret)
         secrets_with_totp.append(
             {'id': user['id'], 'otp': totp, SECRETNAME: user[SECRETNAME], 'secretUpdatedAt': user['updatedAt']})
     return secrets_with_totp
@@ -266,6 +269,7 @@ def update_secret(form_data):
     secrets_list = fread()
     if secrets_list is not None:
         uid = generate_unique_uid(secrets_list)
+        form_data['secret'] = encrypt_secret(form_data['secret'])
         form_data['id'] = uid
         form_data['updatedAt'] = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
         secrets_list.append(form_data)
@@ -324,7 +328,7 @@ def fcreate():
 
 def fread():
     try:
-        if not os.path.isfile(SECRETS_FILE):
+        if not os.path.isfile(SECRETS_FILE) or os.stat(SECRETS_FILE).st_size == 0:
             fcreate()
         with open(SECRETS_FILE, 'r') as fHandle:
             secrets = json.load(fHandle)
@@ -332,6 +336,18 @@ def fread():
     except Exception as e:
         app.logger.error(e)
         return None
+
+def encrypt_secret(secret):
+    key = pyDes.des(SALT, pyDes.CBC, "\0\0\0\0\0\0\0\0", pad=None, padmode=pyDes.PAD_PKCS5)
+    cipher_bytes = key.encrypt(secret)
+    cipher_string = str(cipher_bytes)
+    return cipher_string
+
+def decrypt_secret(ciphered_secret):
+    key = pyDes.des(SALT, pyDes.CBC, "\0\0\0\0\0\0\0\0", pad=None, padmode=pyDes.PAD_PKCS5)
+    ciphered_bytes = eval(ciphered_secret)
+    deciphered_secret = key.decrypt(ciphered_bytes).decode()
+    return deciphered_secret
 
 
 if __name__ == '__main__':
