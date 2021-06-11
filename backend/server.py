@@ -90,7 +90,7 @@ app.logger.info(app.config)
 SWAGGER_URL = '/docs'
 SWAGGER_FILE = '/static/docs.json'
 SWAGGERUI_BLUEPRINT = get_swaggerui_blueprint(SWAGGER_URL, SWAGGER_FILE)
-app.register_blueprint(SWAGGERUI_BLUEPRINT, url_prefix=SWAGGER_URL)
+app.register_blueprint(SWAGGERUI_BLUEPRINT)
 # end swagger specific #
 
 # constants
