@@ -3,3 +3,4 @@ venv/
 *.log
 secrets.json
 .idea
+__pycache__/

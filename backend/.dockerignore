@@ -1,1 +1,4 @@
 venv
+deployment
+__pycache__
+k8s-deployment.yml

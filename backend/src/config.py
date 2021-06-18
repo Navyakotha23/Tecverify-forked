@@ -9,7 +9,7 @@ if AUTHORIZING_TOKEN.lower() == "idtoken":
 elif AUTHORIZING_TOKEN.lower() == "accesstoken":
     AUTHORIZING_TOKEN = "token"
 
-SECRETS_FILE = os.environ.get("SECRETS_FILE", default="secrets.json")
+SECRETS_FILE = os.environ.get("SECRETS_FILE", default="../data/secrets.json")
 
 LOGGING_LEVEL = os.environ.get("LOGGING_LEVEL", default="DEBUG")
 LOGGING_MAX_BYTES = os.environ.get("LOGGING_MAX_BYTES", default=104857600)
