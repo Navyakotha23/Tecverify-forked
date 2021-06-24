@@ -419,7 +419,7 @@ const Home = () => {
                                                     <div className={'shared-secret-div'}>
                                                         <input
                                                             className={'shared-secret'}
-                                                            readOnly={true}
+                                                            readOnly={false}
                                                             placeholder={"Secret Key"}
                                                             value={sharedSecret}
                                                             onChange={e => setSharedSecret(e.target.value)}

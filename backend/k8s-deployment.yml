@@ -20,6 +20,13 @@ spec:
         ports:
         - containerPort: 5000
           protocol: TCP
+        resources:
+          limits:
+            memory: 128Mi
+            cpu: 500m
+          requests:
+            memory: 64Mi
+            cpu: 200m
 ---
 
 kind: Service
