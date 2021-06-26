@@ -58,6 +58,9 @@ spec:
         - name: tecverify-fe
           image: kasilok/tecverify-fe
           imagePullPolicy: "Always"
+          volumeMounts:
+            - name: fe-config-volume
+              mountPath: /etc/config
           resources:
             limits:
               cpu: 100m
@@ -79,3 +82,7 @@ spec:
           #   periodSeconds: 5
           ports:
             - containerPort: 80
+      volumes:
+        - name: fe-config-volume
+          configMap:
+            name: tecverify-fe-config
