@@ -34,7 +34,7 @@ deploy-to-digital-ocean:
     - kubectl get svc tecverify-fe -o jsonpath='{.status.loadBalancer.ingress[0].ip}'
   environment:
     name: dev
-    url: http://139.59.49.122:5000/docs
+    url: http://139.59.48.64:3000/home
   only:
     - master
 
