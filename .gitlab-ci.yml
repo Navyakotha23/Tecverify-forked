@@ -28,6 +28,7 @@ deploy-to-digital-ocean:
   before_script:
     - kubectl version
   script:
+    - kubectl create configmap tecverify-fe-config --from-file=app.config.json=./k8s/app.config.json
     - kubectl apply -f ./k8s/service.yml
     - kubectl apply -f ./k8s/deployment.yml
   after_script:
