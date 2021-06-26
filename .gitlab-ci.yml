@@ -28,9 +28,10 @@ deploy-to-digital-ocean:
   before_script:
     - kubectl version
   script:
-    - kubectl apply -f ./backend/k8s/
+    - kubectl apply -f ./k8s/service.yml
+    - kubectl apply -f ./k8s/deployment.yml
   after_script:
-    - kubectl get svc tecverify-be-service -o jsonpath='{.status.loadBalancer.ingress[0].ip}'
+    - kubectl get svc tecverify-fe -o jsonpath='{.status.loadBalancer.ingress[0].ip}'
   environment:
     name: dev
     url: http://139.59.49.122:5000/docs

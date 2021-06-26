@@ -1,0 +1,77 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: tecverify-be
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: tecverify-be
+  template:
+    metadata:
+      labels:
+        app: tecverify-be
+
+    spec:
+      containers:
+        - name: tecverify-be
+          image: kasilok/tecverify-be
+          imagePullPolicy: "Always"
+          resources:
+            limits:
+              cpu: "200m"
+            requests:
+              cpu: "50m"
+          # livenessProbe:
+          #   httpGet:
+          #     path: /health
+          #     port: 8000
+          #   initialDelaySeconds: 30
+          #   periodSeconds: 5
+          # readinessProbe:
+          #   httpGet:
+          #     path: /ready
+          #     port: 8000
+          #   initialDelaySeconds: 30
+          #   periodSeconds: 5
+          ports:
+            - containerPort: 5000
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: tecverify-fe
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: tecverify-fe
+      
+  template:
+    metadata:
+      labels:
+        app: tecverify-fe
+    spec:
+      containers:
+        - name: tecverify-fe
+          image: kasilok/tecverify-fe
+          imagePullPolicy: "Always"
+          resources:
+            limits:
+              cpu: "200m"
+            requests:
+              cpu: "100m"
+          # livenessProbe:
+          #   httpGet:
+          #     path: /health
+          #     port: 8080
+          #   initialDelaySeconds: 30
+          #   periodSeconds: 5
+          # readinessProbe:
+          #   httpGet:
+          #     path: /ready
+          #     port: 8080
+          #   initialDelaySeconds: 30
+          #   periodSeconds: 5
+          ports:
+            - containerPort: 80

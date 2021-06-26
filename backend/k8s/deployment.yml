@@ -1,7 +1,7 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: tecverify-be-deployment
+  name: tecverify-be
   labels:
     app: tecverify-be
 spec:
@@ -31,15 +31,15 @@ spec:
 apiVersion: v1
 kind: Service
 metadata:
-  name: tecverify-be-service
+  name: tecverify-be
   labels:
     app: tecverify-be
 spec:
   selector:
     app: tecverify-be
+  type: LoadBalancer
   ports:
   - protocol: TCP
     port: 5000
     targetPort: 5000
     nodePort: 31000
-  type: LoadBalancer
