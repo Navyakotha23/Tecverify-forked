@@ -60,7 +60,7 @@ spec:
           imagePullPolicy: "Always"
           volumeMounts:
             - name: fe-config-volume
-              mountPath: /usr/share/nginx/config/
+              mountPath: /usr/share/nginx/html/config/
           resources:
             limits:
               cpu: 100m
