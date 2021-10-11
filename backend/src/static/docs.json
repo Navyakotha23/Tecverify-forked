@@ -3,7 +3,7 @@
   "info": {
     "description": "<b>TecVERIFY</b> is a lightweight app that is used for 2-step verification \\n so you can verify your identity when you sign in to your <b>TecMFA</b> account \\n using Admin TOTP.<br><br>App Features<br>* Save Secret key. \\n <br>* Generate TOTP for all Secret keys saved.",
       "version": "1.0.0",
-    "title": "TecVERIFY",
+    "title": "TecVERIFY - Naveen Masuna",
     "contact": {
       "email": "amit.g@tecnics.com"
     },
@@ -61,6 +61,26 @@
             }
           }
         }
+      },
+      "hotp": {
+        "type": "array",
+        "items": {
+          "type": "object",
+          "properties": {
+            "id": {
+              "type": "string"
+            },
+            "otp": {
+              "type": "string"
+            },
+            "secretName": {
+              "type": "string"
+            },
+            "secretUpdatedAt": {
+              "type": "string"
+            }
+          }
+        }
       }
     }
   },
@@ -82,6 +102,10 @@
     {
       "name": "TOTP",
       "description": "Collection of TOTP APIs."
+    },
+    {
+      "name": "HOTP",
+      "description": "Collection of HOTP APIs."
     }
   ],
   "paths": {
@@ -170,6 +194,32 @@
             "description": "Will get a TOTP in JSON with Key 'code'",
             "schema": {
               "$ref": "#/components/schemas/secret"
+            }
+          }
+        }
+      }
+    },
+    "/hotp/{counterParam}": {
+      "get": {
+        "tags": [
+          "HOTP"
+        ],
+        "summary": "Get HOTPs of all Secret keys.",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "counterParam",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Will get a HOTP in JSON with Key 'code'",
+            "schema": {
+              "$ref": "#/components/schemas/hotp"
             }
           }
         }

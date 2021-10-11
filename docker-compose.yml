@@ -6,12 +6,14 @@ services:
             context: ./frontend
             dockerfile: Dockerfile
         ports:
-            [80:80]
+            [3000:80]
     backend:
         restart: always
         container_name: tecverify-be
         build:
             context: ./backend
             dockerfile: Dockerfile
+        env_file: 
+            - ./env-file.txt
         ports:
             [5000:5000]

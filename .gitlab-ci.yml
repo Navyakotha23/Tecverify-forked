@@ -18,24 +18,24 @@ docker-build-and-push:
     - docker push "$CI_BE_REGISTRY_IMAGE"
     - docker push "$CI_FE_REGISTRY_IMAGE"
   only:
-    - master
+    - TestCI
   
-deploy-to-digital-ocean:
-  image: 
-    name: bitnami/kubectl:latest
-    entrypoint: [""]
-  stage: deploy
-  before_script:
-    - kubectl version
-  script:
-    - kubectl apply -f ./k8s/config.yml
-    - kubectl apply -f ./k8s/service.yml
-    - kubectl apply -f ./k8s/deployment.yml
-  after_script:
-    - kubectl get svc tecverify-fe -o jsonpath='{.status.loadBalancer.ingress[0].ip}'
-  environment:
-    name: dev
-    url: http://139.59.48.64:3000/home
-  only:
-    - master
+# deploy-to-digital-ocean:
+#   image: 
+#     name: bitnami/kubectl:latest
+#     entrypoint: [""]
+#   stage: deploy
+#   before_script:
+#     - kubectl version
+#   script:
+#     - kubectl apply -f ./k8s/config.yml
+#     - kubectl apply -f ./k8s/service.yml
+#     - kubectl apply -f ./k8s/deployment.yml
+#   after_script:
+#     - kubectl get svc tecverify-fe -o jsonpath='{.status.loadBalancer.ingress[0].ip}'
+#   environment:
+#     name: dev
+#     url: http://139.59.48.64:3000/home
+#   only:
+#     - master
 

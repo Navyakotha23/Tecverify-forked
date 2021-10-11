@@ -16,4 +16,4 @@ class Crypto:
         This method decrypts cipher to text using Salt specified as environment variable
         """
         bytes = eval(cipher)
-        return self.key.decrypt(bytes).decode()
+        return self.key.decrypt(bytes).decode()  

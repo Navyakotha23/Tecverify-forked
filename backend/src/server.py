@@ -5,6 +5,7 @@ from logging.config import dictConfig
 from crypto import Crypto
 from adminSecret import AdminSecret
 from totp import TOTP
+from hotp import HOTP ###
 from oktaOperations import OktaOperations
 
 import pyotp
@@ -34,6 +35,7 @@ SALT = app.config['SALT']
 crypt_obj = Crypto(SALT)
 admin_secret = AdminSecret(SECRETS_FILE, crypt_obj)
 totp = TOTP(crypt_obj)
+hotp = HOTP(crypt_obj) ###
 okta = OktaOperations(CLIENT_ID, ISSUER, AUTHORIZING_TOKEN, AUTHORIZE_CLAIM_NAME)
 
 # Begin Rate Limiter
@@ -127,11 +129,16 @@ def check_token_header():
             is_token_valid, token_info = okta.introspect_token(request.headers[TOKEN])
             if not is_token_valid:
                 return {'error': 'Invalid Token', 'info': token_info}, 403
+            print("\ntoken_info:")
+            print(token_info)
+            print("\n")
             g.user = token_info
 
 
 @app.after_request
 def logging_after_request(response):
+    print("after_request")
+    print(request.remote_addr)
     app.logger.info(
         "%s %s %s %s %s %s %s %s",
         request.remote_addr,
@@ -143,6 +150,7 @@ def logging_after_request(response):
         request.referrer,
         request.user_agent,
     )
+    print("\n")
     app.logger.info("____________________________________")
     return response
 
@@ -204,6 +212,19 @@ def get_totp():
     else:
         return {'error': 'UnAuthorized !!!'}, 403
 
+############
+@app.route('/api/v1/hotp/<int:counterParam>', methods=['GET'])
+@limiter.limit(RATE_LIMIT)
+def get_hotp(counterParam):
+    print(counterParam)
+    token_info = g.get('user')
+    if AUTHORIZE_CLAIM_NAME in token_info:
+        secrets_list = admin_secret.read()
+        hotp_list = hotp.generate_hotp_for_all_secrets(secrets_list, counterParam)
+        return jsonify(hotp_list), 200
+    else:
+        return {'error': 'UnAuthorized !!!'}, 403
+############
 
 if __name__ == '__main__':
     app.run(host="0.0.0.0")
