@@ -15,7 +15,7 @@ spec:
     spec:
       containers:
         - name: tecverify-be
-          image: kasilok/tecverify-be
+          image: naveenmasuna/backend_tecverify:version_1
           imagePullPolicy: "Always"
           resources:
             limits:
@@ -56,7 +56,7 @@ spec:
     spec:
       containers:
         - name: tecverify-fe
-          image: kasilok/tecverify-fe
+          image: naveenmasuna/frontend_tecverify:version_1
           imagePullPolicy: "Always"
           volumeMounts:
             - name: fe-config-volume
