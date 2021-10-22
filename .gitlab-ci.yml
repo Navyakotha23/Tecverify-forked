@@ -38,4 +38,3 @@ deploy-to-digital-ocean:
     url: http://139.59.48.64:3000/home
   only:
     - master
-
