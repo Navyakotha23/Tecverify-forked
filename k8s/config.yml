@@ -6,8 +6,8 @@ data:
   app.config.json: |-
     {
     "MAIN_HEADER": "TecVerify",
-    "CLIENT_ID": "0oa2dxm3lbONcEqeb5d7",
-    "ISSUER": "https://dev-27926041.okta.com/oauth2/aus2dxnjsgiyARX8N5d7",
+    "CLIENT_ID": "0oa2mxe5a5X72jIvV5d7",
+    "ISSUER": "https://dev-75743556.okta.com/oauth2/aus2mxe8i8CyLHxHw5d7",
     "BACK_END_URL": "http://144.126.253.31:3000",
     "FRONT_END_URL": "http://144.126.253.31:3000",
     "AUTHORIZE_TOKEN_TYPE": "idToken",
