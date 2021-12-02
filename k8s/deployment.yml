@@ -15,7 +15,7 @@ spec:
     spec:
       containers:
         - name: tecverify-be
-          image: naveenmasuna/backend_tecverify:version_1
+          image: naveenmasuna/backend_tecverify:version_2
           imagePullPolicy: "Always"
           resources:
             limits:

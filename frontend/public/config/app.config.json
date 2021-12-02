@@ -1,7 +1,7 @@
 {
     "MAIN_HEADER": "TecVerify",
-    "CLIENT_ID": "0oa1zfjq06QsFcNG55d7", 
-    "ISSUER": "https://dev-27926041.okta.com/oauth2/aus1zfkynokaHgalF5d7",
+    "CLIENT_ID": "0oa12ufjk4vZbdNOV0h8", 
+    "ISSUER": "https://tecnics-dev.oktapreview.com/oauth2/aus12ufnbyirBbGFx0h8",
     "BACK_END_URL": "http://localhost:5000",
     "FRONT_END_URL": "http://localhost:3000",
     "AUTHORIZE_TOKEN_TYPE": "idToken",

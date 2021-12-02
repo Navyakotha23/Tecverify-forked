@@ -118,7 +118,11 @@ ID_LENGTH = 12
 
 @app.before_request
 def check_token_header():
+    print("\n\nSTART-----START-----START-----START-----START-----START-----START-----START-----START-----START")
+    # app.logger.info("---before_request middleware---")
+    print("-----In before_request middleware in check_token_header()-----")
     if request.method == OPTIONS:
+        # Need to print token_info here and check
         return {}, 200
     if SWAGGER_URL not in request.url:
         if TOKEN not in request.headers:
@@ -129,16 +133,16 @@ def check_token_header():
             is_token_valid, token_info = okta.introspect_token(request.headers[TOKEN])
             if not is_token_valid:
                 return {'error': 'Invalid Token', 'info': token_info}, 403
-            print("\ntoken_info:")
+            print("-----token_info in before_request middleware at the bottom of check_token_header(): -----")
             print(token_info)
-            print("\n")
+            print(token_info['sub'])
             g.user = token_info
 
 
 @app.after_request
 def logging_after_request(response):
-    print("after_request")
-    print(request.remote_addr)
+    # app.logger.info("---after_request middleware---")
+    print("-----In after_request middleware in logging_after_request(response)-----")
     app.logger.info(
         "%s %s %s %s %s %s %s %s",
         request.remote_addr,
@@ -150,8 +154,8 @@ def logging_after_request(response):
         request.referrer,
         request.user_agent,
     )
-    print("\n")
     app.logger.info("____________________________________")
+    print("END-----END-----END-----END-----END-----END-----END-----END-----END-----END-----END-----END\n\n")
     return response
 
 # TecVerify EndPoints Begin
@@ -159,11 +163,14 @@ def logging_after_request(response):
 @app.route('/api/v1/secret', methods=['POST'])
 @limiter.limit(RATE_LIMIT)
 def save_secret():
+    print("-----In Save Secret API in save_secret()-----")
     form_data = admin_secret.parse_form_data(request)
     token_info = g.get('user')
+    logged_in_Okta_user_id = token_info['sub']
+    print("logged_in_Okta_user_id: " + logged_in_Okta_user_id)
     if AUTHORIZE_CLAIM_NAME in token_info and token_info[AUTHORIZE_CLAIM_NAME] and form_data[SECRET]:
         if totp.is_secret_valid(form_data[SECRET]):
-            if admin_secret.update_secret(form_data):
+            if admin_secret.update_secret(form_data, logged_in_Okta_user_id):
                 return {"updated": True}, 200
             else:
                 return {"updated": False, "error": "Update Failed !!!"}, 500
@@ -204,10 +211,15 @@ def delete_secret(secret_id):
 @app.route('/api/v1/totp', methods=['GET'])
 @limiter.limit(RATE_LIMIT)
 def get_totp():
+    print("-----In TOTP API in get_totp()-----")
     token_info = g.get('user')
+    print("-----token_info in get_totp() In TOTP API: -----")
+    print(token_info)
+    logged_in_Okta_user_id = token_info['sub']
+    print("logged_in_Okta_user_id: " + logged_in_Okta_user_id)
     if AUTHORIZE_CLAIM_NAME in token_info:
         secrets_list = admin_secret.read()
-        totp_list = totp.generate_totp_for_all_secrets(secrets_list)
+        totp_list = totp.generate_totp_for_all_secrets(secrets_list, logged_in_Okta_user_id)
         return jsonify(totp_list), 200
     else:
         return {'error': 'UnAuthorized !!!'}, 403

@@ -9,16 +9,20 @@ class AdminSecret:
         self.file = file
         self.crypt_obj = crypt_obj
 
-    def update_secret(self, form_data) -> bool:
+    def update_secret(self, form_data, okta_logged_in_user_id) -> bool:
         """
         This method updates file with form data received.
         """
+        print("-----In update_secret(self, form_data, okta_logged_in_user_id) in adminSecret.py-----")
         secrets_list = self.read()
         id = self.generate_unique_id(secrets_list)
         form_data['secret'] = self.crypt_obj.encrypt(form_data['secret'])
         form_data['id'] = id
         form_data['updatedAt'] = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+        form_data['oktaUserId'] = okta_logged_in_user_id
         secrets_list.append(form_data)
+        print(form_data['oktaUserId'])
+        print("-----Out of update_secret(self, form_data, okta_logged_in_user_id) in adminSecret.py-----")
         return self.write(secrets_list)
 
     def write(self, data) -> bool:

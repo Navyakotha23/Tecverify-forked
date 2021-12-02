@@ -2,3 +2,6 @@ venv
 deployment
 __pycache__
 k8s-deployment.yml
+venv_backend
+env-file.txt
+data

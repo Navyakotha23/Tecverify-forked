@@ -36,7 +36,7 @@ deploy-to-digital-ocean:
   environment:
     name: dev
     # url: http://144.126.253.31:3000/home
-    url: http://tecverify-kubernetes-test.tecnics.com/home
+    url: https://tecverify-k8s-test.tecnics.com/home
   only:
     - TestCI
 
