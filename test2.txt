@@ -5,3 +5,5 @@ set privileged to "true" in TecVerify-Runner in config.toml
 Test1 - Trying to open Frontend
 
 Deleted tecverify-fe service and Testing - 2
+
+Test with new Gitlab runner
