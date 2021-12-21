@@ -13,20 +13,39 @@ class OktaOperations:
         This method introspects idToken or accessToken with Okta.
         If Active, returns True and TokenInfo; else, returns False and TokenInfo.
         """
+        print("-----In introspect_token(self, token)-----")
         response = self.call_introspect_api(token)
+        print("Token response: ")
+        print(response)
         token_info = response.json()
+        print("token_info: ")
+        print(token_info)
         if response.status_code == 200:
+            print("Token status: ")
+            print(self.is_token_active(token_info))
+            print("-----Out of introspect_token(self, token)-----")
             return self.is_token_active(token_info), token_info
         else:
+            print("Token status: ")
+            print(self.is_token_active(token_info))
+            print("-----Out of introspect_token(self, token)-----")
             return False, token_info
 
     def call_introspect_api(self, token):
         """
         This method makes an introspect api call to Okta with token and returns Okta API response.
         """
-        url = self.issuer + "/v1/introspect?client_id=" + self.client_id
+        print("----------In call_introspect_api(self, token)----------")
+        url = self.issuer + "/oauth2/v1/introspect?client_id=" + self.client_id
+        print("url: ")
+        print(url)
         body = {'token': token, 'token_type_hint': self.authorizing_token}
-        response = requests.post(url, data=body)        
+        print("body: ")
+        print(body)
+        response = requests.post(url, data=body)   
+        print("response: ")
+        print(response)  
+        print("----------Out of call_introspect_api(self, token)----------")
         return response
 
     def is_token_active(self, response) -> bool:

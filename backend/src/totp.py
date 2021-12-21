@@ -21,10 +21,10 @@ class TOTP:
         """
         print("-----In generate_totp_for_all_secrets(self, secrets_list, okta_logged_in_user_id) in totp.py-----")
         secrets_with_totp = []
+        print("***okta_logged_in_user_id: " + okta_logged_in_user_id)
         for user in secrets_list:
-            secret = self.crypt_obj.decrypt(user['secret']) 
+            secret = self.crypt_obj.decrypt(user['secret'])
             saved_secret_okta_user_id = user['oktaUserId']
-            print("okta_logged_in_user_id: " + okta_logged_in_user_id)
             print("saved_secret_okta_user_id: " + saved_secret_okta_user_id)
             if okta_logged_in_user_id == saved_secret_okta_user_id :
                 print("okta_logged_in_user_id and saved_secret_okta_user_id are SAME. So, generating OTP for that secret key.")
@@ -33,7 +33,7 @@ class TOTP:
                 {'id': user['id'], 'otp': totp, 'secretName': user['secretName'], 'secretUpdatedAt': user['updatedAt']})
             else:
                 print("okta_logged_in_user_id and saved_secret_okta_user_id are NOT same")
-        print("-----out generate_totp_for_all_secrets(self, secrets_list, okta_logged_in_user_id) in totp.py-----")
+        print("-----Out of generate_totp_for_all_secrets(self, secrets_list, okta_logged_in_user_id) in totp.py-----")
         return secrets_with_totp
 
     def is_secret_valid(self, secret):

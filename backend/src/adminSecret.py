@@ -19,9 +19,10 @@ class AdminSecret:
         form_data['secret'] = self.crypt_obj.encrypt(form_data['secret'])
         form_data['id'] = id
         form_data['updatedAt'] = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+        print("okta_logged_in_user_id: " + okta_logged_in_user_id)
         form_data['oktaUserId'] = okta_logged_in_user_id
+        print("form_data['oktaUserId']: " + form_data['oktaUserId'])
         secrets_list.append(form_data)
-        print(form_data['oktaUserId'])
         print("-----Out of update_secret(self, form_data, okta_logged_in_user_id) in adminSecret.py-----")
         return self.write(secrets_list)
 
