@@ -17,11 +17,11 @@ class AdminSecret:
         secrets_list = self.read()
         id = self.generate_unique_id(secrets_list)
         form_data['secret'] = self.crypt_obj.encrypt(form_data['secret'])
-        form_data['id'] = id
-        form_data['updatedAt'] = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
         print("okta_logged_in_user_id: " + okta_logged_in_user_id)
         form_data['oktaUserId'] = okta_logged_in_user_id
         print("form_data['oktaUserId']: " + form_data['oktaUserId'])
+        form_data['id'] = id
+        form_data['updatedAt'] = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
         secrets_list.append(form_data)
         print("-----Out of update_secret(self, form_data, okta_logged_in_user_id) in adminSecret.py-----")
         return self.write(secrets_list)
@@ -94,4 +94,13 @@ class AdminSecret:
         admin_secret = request.form['adminSecret'] if 'adminSecret' in request.form else None
         secret_name = request.form['secretName'] if 'secretName' in request.form else None
         return {'secretName': secret_name, 'secret': admin_secret}
+
+    def parse_form_data_for_okta_userid(self, request):
+        """
+        This method parse form data and returns SecretName, Secret and OktaUserId
+        """
+        secret_name = request.form['secretName'] if 'secretName' in request.form else None
+        admin_secret = request.form['adminSecret'] if 'adminSecret' in request.form else None
+        okta_userid = request.form['oktaUserId'] if 'oktaUserId' in request.form else None
+        return {'secretName': secret_name, 'secret': admin_secret, 'oktaUserId': okta_userid}
 

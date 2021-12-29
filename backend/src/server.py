@@ -114,6 +114,7 @@ OPTIONS = 'OPTIONS'
 SECRET = 'secret'
 ID_LENGTH = 12
 
+
 # Middlewares
 
 @app.before_request
@@ -132,11 +133,13 @@ def check_token_header():
         # print(request.url)
         # print("request.headers")
         # print(request.headers)
-        print("request.headers[TOKEN]: ")
-        print(request.headers[TOKEN])
+        #
+        # print("request.headers[TOKEN]: ")
+        # print(request.headers[TOKEN])
         if TOKEN not in request.headers:
             print("TOKEN not in request.headers")
-            return {'error': 'Required Headers missing.'}, 400
+            g.tokenHeaderMissing = True
+            # return {'error': 'Required Headers missing.'}, 400
         elif request.headers[TOKEN] == '':
             print("TOKEN parameter is empty")
             return {'error': "The 'token' parameter can't be empty"}, 400
@@ -183,24 +186,43 @@ def logging_after_request(response):
 @limiter.limit(RATE_LIMIT)
 def save_secret():
     print("\n22222222222222222222- In Save Secret API in save_secret() -22222222222222222222")
-    form_data = admin_secret.parse_form_data(request)
-    token_info = g.get('user')
-    logged_in_Okta_user_id = token_info['sub']
-    print("logged_in_Okta_user_id: " + logged_in_Okta_user_id)
-    # if AUTHORIZE_CLAIM_NAME in token_info and token_info[AUTHORIZE_CLAIM_NAME] and form_data[SECRET]:
-    if form_data[SECRET]:
-        if totp.is_secret_valid(form_data[SECRET]):
-            if admin_secret.update_secret(form_data, logged_in_Okta_user_id):
-                print("22222222222222222222- Out of Save Secret API in save_secret() -22222222222222222222")
-                return {"updated": True}, 200
+
+    tokenMissing = g.get('tokenHeaderMissing')
+    if tokenMissing:
+        print("token header is missing so need to check if formdata contains Okta User ID")
+        form_data = admin_secret.parse_form_data_for_okta_userid(request)
+        okta_user_id_in_form_data = form_data['oktaUserId']
+        print("okta_user_id_in_form_data: " + okta_user_id_in_form_data)
+        if form_data[SECRET] and form_data['oktaUserId']:
+            if totp.is_secret_valid(form_data[SECRET]):
+                if admin_secret.update_secret(form_data, okta_user_id_in_form_data):
+                    print("22222222222222222222- Out of Save Secret API in save_secret() -22222222222222222222")
+                    return {"updated": True}, 200
+                else:
+                    return {"updated": False, "error": "Update Failed !!!"}, 500
             else:
-                return {"updated": False, "error": "Update Failed !!!"}, 500
-        else:
-            return {"updated": False, "error": ADMIN_SECRET + " is in invalid format. Try another one."}, 500
-    elif form_data[SECRET] is None or not form_data[SECRET]:
-        return {'error': "'adminSecret' is missing"}, 400
-    # else:
-    #     return {'error': 'UnAuthorized !!!'}, 403
+                return {"updated": False, "error": ADMIN_SECRET + " is in invalid format. Try another one."}, 500
+        elif form_data[SECRET] is None or not form_data[SECRET]:
+            return {'error': "'adminSecret' is missing"}, 400
+    else:
+        form_data = admin_secret.parse_form_data(request)
+        token_info = g.get('user')
+        logged_in_Okta_user_id = token_info['sub']
+        print("logged_in_Okta_user_id: " + logged_in_Okta_user_id)
+        # if AUTHORIZE_CLAIM_NAME in token_info and token_info[AUTHORIZE_CLAIM_NAME] and form_data[SECRET]:
+        if form_data[SECRET]:
+            if totp.is_secret_valid(form_data[SECRET]):
+                if admin_secret.update_secret(form_data, logged_in_Okta_user_id):
+                    print("22222222222222222222- Out of Save Secret API in save_secret() -22222222222222222222")
+                    return {"updated": True}, 200
+                else:
+                    return {"updated": False, "error": "Update Failed !!!"}, 500
+            else:
+                return {"updated": False, "error": ADMIN_SECRET + " is in invalid format. Try another one."}, 500
+        elif form_data[SECRET] is None or not form_data[SECRET]:
+            return {'error': "'adminSecret' is missing"}, 400
+        # else:
+        #     return {'error': 'UnAuthorized !!!'}, 403
 
 
 @app.route('/api/v1/secret', methods=['GET'])

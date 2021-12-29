@@ -15,6 +15,9 @@ const HasAccessToRouter = ({config}) => {
         issuer: config.ISSUER,
         pkce: true,
         redirectUri: `${config.FRONT_END_URL}/implicit/callback`,
+
+        authTokenType: config.AUTHORIZE_TOKEN_TYPE,
+        
         scopes: config.SCOPES
     };
     sessionStorage.setItem('authConfig', JSON.stringify(authConfig));

@@ -34,7 +34,13 @@ const Home = () => {
     const [timeInSeconds, setTimeInSeconds] = useState();
     const [logoutInErrorPopup, showLogoutInErrorPopup] = useState(false);
     const SHOW_ENCRYPTED_KEY = false;
+
+    console.log("Testing");
+
     if (oktaAuth && config) {
+
+        console.log(oktaAuth);
+
         const authState = oktaAuth.authState;
         const authService = oktaAuth.oktaAuth;
         const logout = async () => authService.logout('/login');
@@ -221,6 +227,19 @@ const Home = () => {
 
         if (oktaTokenStorage && oktaTokenStorage[authorizeTokenType]) {
             const expiresAt = oktaTokenStorage[authorizeTokenType].expiresAt;
+
+            console.log("oktaTokenStorage[authorizeTokenType]: ");
+            console.log(oktaTokenStorage[authorizeTokenType]);
+
+            console.log("oktaTokenStorage[authorizeTokenType][authorizeTokenType]: ");
+            console.log(oktaTokenStorage[authorizeTokenType][authorizeTokenType]);
+
+            console.log("oktaTokenStorage['accessToken']['accessToken']: ");
+            console.log(oktaTokenStorage['accessToken']['accessToken']);
+
+            console.log("oktaTokenStorage[authorizeTokenType]['claims']['email']: ");
+            console.log(oktaTokenStorage[authorizeTokenType]['claims']['email']);
+
             authorizeToken = oktaTokenStorage[authorizeTokenType][authorizeTokenType];
 
             setTimeout(() => {
@@ -231,12 +250,15 @@ const Home = () => {
                 logout();
             }
 
-            adminSecretFormOpener = (adminStatus ?
-                <button
-                    className={"admin-button"}
-                    onClick={() => showAdminSecretForm()}>
-                    +
-                </button> : '')
+            // adminSecretFormOpener = (adminStatus ?
+            //     <button
+            //         className={"admin-button"}
+            //         onClick={() => showAdminSecretForm()}>
+            //         +
+            //     </button> : '')
+
+            console.log("adminStatus: ");
+            console.log(adminStatus);
 
             const currentTimeSeconds = getSeconds(new Date().getTime() / 1000);
 
@@ -278,7 +300,15 @@ const Home = () => {
                         <div style={{width: '33.3%'}}>
                             <div className="mobile">
                                 <span className="titlecls">Bypass Codes</span>
-                                {adminSecretFormOpener}
+
+                                {/* {adminSecretFormOpener} */}
+
+                                <button
+                                    className={"admin-button"}
+                                    onClick={() => showAdminSecretForm()}>
+                                    +
+                                </button>
+
                                 <div className={'outer-progress-bar'}>
                                     <div className="progress-bar" style={{
                                         width: 100 - adjustTimerBar(new Date().getTime() / 1000) + "%",
