@@ -34,13 +34,7 @@ const Home = () => {
     const [timeInSeconds, setTimeInSeconds] = useState();
     const [logoutInErrorPopup, showLogoutInErrorPopup] = useState(false);
     const SHOW_ENCRYPTED_KEY = false;
-
-    console.log("Testing");
-
     if (oktaAuth && config) {
-
-        console.log(oktaAuth);
-
         const authState = oktaAuth.authState;
         const authService = oktaAuth.oktaAuth;
         const logout = async () => authService.logout('/login');
@@ -48,10 +42,14 @@ const Home = () => {
         const oktaTokenStorage = JSON.parse(localStorage.getItem('okta-token-storage'));
         const authorizeTokenType = config.AUTHORIZE_TOKEN_TYPE
         const authorizeClaimName = config.AUTHORIZE_CLAIM_NAME
+        const addButtonStatus = config.SHOW_ADD_SECRET_BUTTON
+        const deleteIconStatus = config.SHOW_DELETE_ICON
+        const userEmail = oktaTokenStorage[authorizeTokenType]['claims']['email'];
         let transition, authorizeToken, adminSecretFormOpener;
         if (!adminStatus && oktaTokenStorage && oktaTokenStorage[authorizeTokenType]) {
             authService.getUser().then((info) => {
                 if (info && info.email && info[authorizeClaimName]) {
+                    console.log(info.email);
                     setAdminStatus(info[authorizeClaimName])
                 }
                 if (!randomOtp) {
@@ -227,19 +225,6 @@ const Home = () => {
 
         if (oktaTokenStorage && oktaTokenStorage[authorizeTokenType]) {
             const expiresAt = oktaTokenStorage[authorizeTokenType].expiresAt;
-
-            console.log("oktaTokenStorage[authorizeTokenType]: ");
-            console.log(oktaTokenStorage[authorizeTokenType]);
-
-            console.log("oktaTokenStorage[authorizeTokenType][authorizeTokenType]: ");
-            console.log(oktaTokenStorage[authorizeTokenType][authorizeTokenType]);
-
-            console.log("oktaTokenStorage['accessToken']['accessToken']: ");
-            console.log(oktaTokenStorage['accessToken']['accessToken']);
-
-            console.log("oktaTokenStorage[authorizeTokenType]['claims']['email']: ");
-            console.log(oktaTokenStorage[authorizeTokenType]['claims']['email']);
-
             authorizeToken = oktaTokenStorage[authorizeTokenType][authorizeTokenType];
 
             setTimeout(() => {
@@ -250,15 +235,6 @@ const Home = () => {
                 logout();
             }
 
-            // adminSecretFormOpener = (adminStatus ?
-            //     <button
-            //         className={"admin-button"}
-            //         onClick={() => showAdminSecretForm()}>
-            //         +
-            //     </button> : '')
-
-            console.log("adminStatus: ");
-            console.log(adminStatus);
 
             const currentTimeSeconds = getSeconds(new Date().getTime() / 1000);
 
@@ -275,7 +251,7 @@ const Home = () => {
             authState.isAuthenticated
                 ?
                 <div className={"container"}>
-                    <Navbar mainHeader={config.MAIN_HEADER}/>
+                    <Navbar userEmail={userEmail} mainHeader={config.MAIN_HEADER}/>
                     <div>
                         <div className={'instructions'}>
                             <h3 className={'sub-heading'}>Instructions</h3>
@@ -300,15 +276,14 @@ const Home = () => {
                         <div style={{width: '33.3%'}}>
                             <div className="mobile">
                                 <span className="titlecls">Bypass Codes</span>
-
-                                {/* {adminSecretFormOpener} */}
-
-                                <button
-                                    className={"admin-button"}
-                                    onClick={() => showAdminSecretForm()}>
-                                    +
-                                </button>
-
+                                 {
+                                     addButtonStatus ?
+                                     <button
+                                         className={"admin-button"}
+                                         onClick={() => showAdminSecretForm()}>
+                                         +
+                                     </button> : ''
+                                 }
                                 <div className={'outer-progress-bar'}>
                                     <div className="progress-bar" style={{
                                         width: 100 - adjustTimerBar(new Date().getTime() / 1000) + "%",
@@ -333,7 +308,7 @@ const Home = () => {
                                                 <li className='otp-list-cls' key={index}>
                                                      <div style={{display: 'flex'}}>
                                                          {
-                                                             adminStatus ?
+                                                             deleteIconStatus ?
                                                                  <DeleteSecretKey
                                                                      setSelectedSecretName={setSelectedSecretName}
                                                                      setSelectedSecretId={setSelectedSecretId}
