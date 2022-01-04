@@ -14,10 +14,10 @@ const POST = 'POST';
 const GET = 'GET';
 const Home = () => {
     const config = JSON.parse(sessionStorage.getItem('config'));
-    const oktaAuth = useOktaAuth();
+    const { oktaAuth, authState } = useOktaAuth();
     const [expiresIn, setSeconds] = useState();
     const [randomOtp, setRandomOtp] = useState();
-    const [adminStatus, setAdminStatus] = useState();
+    const [userEmail, setUserEmail] = useState();
     const [secretNames, setSecretNames] = useState([]);
     const [errorMessage, setErrorMessage] = useState();
     const [showLoadingSpinnerInAdminSecretPopup, setShowLoadingSpinnerInAdminSecretPopup] = useState(false);
@@ -34,23 +34,22 @@ const Home = () => {
     const [timeInSeconds, setTimeInSeconds] = useState();
     const [logoutInErrorPopup, showLogoutInErrorPopup] = useState(false);
     const SHOW_ENCRYPTED_KEY = false;
+    const logout = async () => {
+        // sessionStorage.removeItem('config');
+        // sessionStorage.removeItem('authConfig');
+        await oktaAuth.signOut('/login');
+    };
     if (oktaAuth && config) {
-        const authState = oktaAuth.authState;
-        const authService = oktaAuth.oktaAuth;
-        const logout = async () => authService.logout('/login');
         const onClose = async () => setError('');
         const oktaTokenStorage = JSON.parse(localStorage.getItem('okta-token-storage'));
         const authorizeTokenType = config.AUTHORIZE_TOKEN_TYPE
-        const authorizeClaimName = config.AUTHORIZE_CLAIM_NAME
         const addButtonStatus = config.SHOW_ADD_SECRET_BUTTON
         const deleteIconStatus = config.SHOW_DELETE_ICON
-        const userEmail = oktaTokenStorage[authorizeTokenType]['claims']['email'];
-        let transition, authorizeToken, adminSecretFormOpener;
-        if (!adminStatus && oktaTokenStorage && oktaTokenStorage[authorizeTokenType]) {
-            authService.getUser().then((info) => {
-                if (info && info.email && info[authorizeClaimName]) {
-                    console.log(info.email);
-                    setAdminStatus(info[authorizeClaimName])
+        let transition, authorizeToken;
+        if (oktaTokenStorage && oktaTokenStorage[authorizeTokenType]) {
+            oktaAuth.getUser().then((info) => {
+                if (info && info.email) {
+                    setUserEmail(info.email);
                 }
                 if (!randomOtp) {
                     getOtp()
@@ -231,10 +230,9 @@ const Home = () => {
                 setSeconds(convertHMS((expiresAt) - (new Date().getTime() / 1000)));
             }, 1000);
             if (expiresIn < 100) {
-                authService._oktaAuth.session.close();
+                // authService._oktaAuth.session.close();
                 logout();
             }
-
 
             const currentTimeSeconds = getSeconds(new Date().getTime() / 1000);
 
@@ -276,14 +274,14 @@ const Home = () => {
                         <div style={{width: '33.3%'}}>
                             <div className="mobile">
                                 <span className="titlecls">Bypass Codes</span>
-                                 {
-                                     addButtonStatus ?
-                                     <button
-                                         className={"admin-button"}
-                                         onClick={() => showAdminSecretForm()}>
-                                         +
-                                     </button> : ''
-                                 }
+                                {
+                                    addButtonStatus ?
+                                        <button
+                                            className={"admin-button"}
+                                            onClick={() => showAdminSecretForm()}>
+                                            +
+                                        </button> : ''
+                                }
                                 <div className={'outer-progress-bar'}>
                                     <div className="progress-bar" style={{
                                         width: 100 - adjustTimerBar(new Date().getTime() / 1000) + "%",
@@ -306,32 +304,32 @@ const Home = () => {
                                             const {secretName, secretUpdatedAt} = code;
                                             return (
                                                 <li className='otp-list-cls' key={index}>
-                                                     <div style={{display: 'flex'}}>
-                                                         {
-                                                             deleteIconStatus ?
-                                                                 <DeleteSecretKey
-                                                                     setSelectedSecretName={setSelectedSecretName}
-                                                                     setSelectedSecretId={setSelectedSecretId}
-                                                                     showDeleteConfirmationPopup={showDeleteConfirmationPopup}
-                                                                     code={code}/> : ''
-                                                         }
-                                                         <p style={{padding: '10px 1px 1px 20px', fontSize: '18px'}}>{secretName}</p>
-                                                     </div>
-                                                     <div style={{display: 'flex'}}>
-                                                         <h2 className="random-otp" style={{marginTop: '7px', letterSpacing: '3px'}}>{code.otp}</h2>
-                                                         <p className='time-details'>{secretUpdatedAt}</p>
-                                                     </div>
+                                                    <div style={{display: 'flex'}}>
+                                                        {
+                                                            deleteIconStatus ?
+                                                                <DeleteSecretKey
+                                                                    setSelectedSecretName={setSelectedSecretName}
+                                                                    setSelectedSecretId={setSelectedSecretId}
+                                                                    showDeleteConfirmationPopup={showDeleteConfirmationPopup}
+                                                                    code={code}/> : ''
+                                                        }
+                                                        <p style={{padding: '10px 1px 1px 20px', fontSize: '18px'}}>{secretName}</p>
+                                                    </div>
+                                                    <div style={{display: 'flex'}}>
+                                                        <h2 className="random-otp" style={{marginTop: '7px', letterSpacing: '3px'}}>{code.otp}</h2>
+                                                        <p className='time-details'>{secretUpdatedAt}</p>
+                                                    </div>
                                                 </li>
                                             )}) :  <div>
-                                                {
-                                                     (randomOtp && randomOtp.length === 0) ?
-                                                         <p style={{margin: '20px'}}>No Names found with this user.</p>
-                                                         :
-                                                         <div style={{marginLeft: '42%', marginTop: '15%'}}>
-                                                             <Loader type="Oval" color="#007dc1" height={50} width={50}/>
-                                                         </div>
-                                                 }
-                                            </div>
+                                            {
+                                                (randomOtp && randomOtp.length === 0) ?
+                                                    <p style={{margin: '20px'}}>No Names found with this user.</p>
+                                                    :
+                                                    <div style={{marginLeft: '42%', marginTop: '15%'}}>
+                                                        <Loader type="Oval" color="#007dc1" height={50} width={50}/>
+                                                    </div>
+                                            }
+                                        </div>
                                     }
                                 </ul>
                             </div>
@@ -388,10 +386,10 @@ const Home = () => {
                                                     <ul style={{listStyleType: 'none', padding: '0'}}>
                                                         {config.INSTRUCTIONS_IN_ADMIN_SECRET.map(function (code, index) {
                                                             return  <li key={index}>
-                                                                        <p className={'list-cls'}>
-                                                                            {code}
-                                                                        </p>
-                                                                    </li>
+                                                                <p className={'list-cls'}>
+                                                                    {code}
+                                                                </p>
+                                                            </li>
                                                         })}
                                                     </ul>
                                                 </div>
