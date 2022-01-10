@@ -1,4 +1,4 @@
-import React, {useEffect} from 'react';
+import React, {useEffect, useLayoutEffect} from 'react';
 import OktaSignIn from '@okta/okta-signin-widget';
 import '@okta/okta-signin-widget/dist/css/okta-sign-in.min.css';
 import {useOktaAuth} from "@okta/okta-react";
@@ -6,8 +6,9 @@ import {useOktaAuth} from "@okta/okta-react";
 const Login = () => {
   const authConfig = JSON.parse(sessionStorage.getItem('authConfig'));
   const { oktaAuth } = useOktaAuth();
+  let widget;
   useEffect(() => {
-    const widget = new OktaSignIn({
+    widget = new OktaSignIn({
       el: '#sign-in-widget',
       baseUrl: authConfig.issuer ? authConfig.issuer.split('/oauth2')[0] : '',
       clientId : authConfig.clientId,
@@ -32,7 +33,15 @@ const Login = () => {
       throw err;
     });
   }, [oktaAuth]);
-
+  useLayoutEffect(() => {
+    return () => {
+      try {
+        if (widget) {
+          widget.remove();
+        }
+      } catch (e) {}
+    }
+  }, []);
   return (
       <div>
         <div id="sign-in-widget" style={{top: '50px', position: 'relative'}}/>

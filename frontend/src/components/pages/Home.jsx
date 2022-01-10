@@ -37,6 +37,7 @@ const Home = () => {
     const logout = async () => {
         // sessionStorage.removeItem('config');
         // sessionStorage.removeItem('authConfig');
+        await oktaAuth.revokeAccessToken();
         await oktaAuth.signOut('/login');
     };
     if (oktaAuth && config) {
@@ -46,7 +47,7 @@ const Home = () => {
         const addButtonStatus = config.SHOW_ADD_SECRET_BUTTON
         const deleteIconStatus = config.SHOW_DELETE_ICON
         let transition, authorizeToken;
-        if (oktaTokenStorage && oktaTokenStorage[authorizeTokenType]) {
+        if (oktaTokenStorage && oktaTokenStorage[authorizeTokenType] && oktaTokenStorage['accessToken']) {
             oktaAuth.getUser().then((info) => {
                 if (info && info.email) {
                     setUserEmail(info.email);
@@ -54,6 +55,8 @@ const Home = () => {
                 if (!randomOtp) {
                     getOtp()
                 }
+            }).catch(err => {
+                console.log(err);
             });
         }
 

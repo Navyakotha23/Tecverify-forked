@@ -7,6 +7,7 @@ const Navbar = ({userEmail, mainHeader}) => {
     const logout = async () => {
         // sessionStorage.removeItem('config');
         // sessionStorage.removeItem('authConfig');
+        await oktaAuth.revokeAccessToken();
         await oktaAuth.signOut('/login');
     };
 
@@ -17,7 +18,7 @@ const Navbar = ({userEmail, mainHeader}) => {
                 <span className="user-email">
                       {userEmail}
                 </span>
-                <button className="logout-button" onClick={logout}>
+                <button className="logout-button" onClick={() => logout()}>
                     Logout
                 </button>
             </div>
