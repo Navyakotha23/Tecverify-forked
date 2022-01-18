@@ -4,10 +4,11 @@ CLIENT_ID = os.environ.get("CLIENT_ID")
 ISSUER = os.environ.get("ISSUER")
 CLAIM_NAME = os.environ.get("AUTHORIZE_CLAIM_NAME", default="Admin")
 AUTHORIZING_TOKEN = os.environ.get("AUTHORIZE_TOKEN_TYPE", default="id_token")
+# These are for introspect API call.
 if AUTHORIZING_TOKEN.lower() == "idtoken":
-    AUTHORIZING_TOKEN = "id_token"
+    AUTHORIZING_TOKEN = "id_token" # If we pass idToken then token_type_hint should be id_token
 elif AUTHORIZING_TOKEN.lower() == "accesstoken":
-    AUTHORIZING_TOKEN = "token"
+    AUTHORIZING_TOKEN = "token" # If we pass accessToken then token_type_hint should be token
 
 SECRETS_FILE = os.environ.get("SECRETS_FILE", default="../data/secrets.json")
 
