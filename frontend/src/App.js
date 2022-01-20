@@ -11,14 +11,13 @@ const HasAccessToRouter = ({config}) => {
     sessionStorage.setItem('config', JSON.stringify(config));
     const authConfig = {
         clientId: config.CLIENT_ID,
-        disableHttpsCheck: false,
+        disableHttpsCheck: config.DISABLE_HTTPS_CHECK,
         issuer: config.ISSUER,
-        pkce: true,
+        pkce: config.PKCE,
         redirectUri: `${config.FRONT_END_URL}/implicit/callback`,
-
         authTokenType: config.AUTHORIZE_TOKEN_TYPE,
-        
-        scopes: config.SCOPES
+        scopes: config.SCOPES,
+        updateCheckText: config.UPDATE_CHECK_TEXT
     };
     sessionStorage.setItem('authConfig', JSON.stringify(authConfig));
     const oktaAuth = new OktaAuth(authConfig);
