@@ -7,7 +7,7 @@ const Navbar = ({userEmail, mainHeader}) => {
     const logout = async () => {
         // sessionStorage.removeItem('config');
         // sessionStorage.removeItem('authConfig');
-        await oktaAuth.revokeAccessToken();
+        // await oktaAuth.revokeAccessToken();
         await oktaAuth.signOut('/login');
     };
 

@@ -10,7 +10,7 @@
     "SHOW_DELETE_ICON": true,
     "DISABLE_HTTPS_CHECK": true,
     "UPDATE_CHECK_TEXT": "check",
-    "PKCE": false,
+    "PKCE": true,
     "SCOPES": [
         "openid",
         "email",
