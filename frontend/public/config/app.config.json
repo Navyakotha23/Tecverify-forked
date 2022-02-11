@@ -11,6 +11,7 @@
     "DISABLE_HTTPS_CHECK": true,
     "UPDATE_CHECK_TEXT": "check",
     "PKCE": true,
+    "COPY_TO_CLIPBOARD_BUTTON": true,
     "SCOPES": [
         "openid",
         "email",

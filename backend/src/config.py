@@ -1,13 +1,25 @@
 import os
 
 CLIENT_ID = os.environ.get("CLIENT_ID")
+
+MS_SQL_SERVER = os.environ.get("MS_SQL_SERVER")
+MS_SQL_USERNAME = os.environ.get("MS_SQL_USERNAME")
+MS_SQL_PASSWORD = os.environ.get("MS_SQL_PASSWORD")
+DATABASE_NAME = os.environ.get("DATABASE_NAME", default="TecVerify")
+TABLE_NAME = os.environ.get("TABLE_NAME", default="Secrets")
+
+TECVERIFY_API_KEY = os.environ.get("TECVERIFY_API_KEY", default="00pjL3CVwB6xej42D59UZM5QE0HXWmleesQo7GZZsT")
+
+SHOW_LOGS = os.environ.get("SHOW_LOGS", default=False)
+
 ISSUER = os.environ.get("ISSUER")
 CLAIM_NAME = os.environ.get("AUTHORIZE_CLAIM_NAME", default="Admin")
 AUTHORIZING_TOKEN = os.environ.get("AUTHORIZE_TOKEN_TYPE", default="id_token")
+# These are for introspect API call.
 if AUTHORIZING_TOKEN.lower() == "idtoken":
-    AUTHORIZING_TOKEN = "id_token"
+    AUTHORIZING_TOKEN = "id_token" # If we pass idToken then token_type_hint should be id_token
 elif AUTHORIZING_TOKEN.lower() == "accesstoken":
-    AUTHORIZING_TOKEN = "token"
+    AUTHORIZING_TOKEN = "token" # If we pass accessToken then token_type_hint should be token
 
 SECRETS_FILE = os.environ.get("SECRETS_FILE", default="../data/secrets.json")
 

@@ -2,9 +2,9 @@ import React from 'react';
 import Home from './Home';
 import { shallow } from 'enzyme';
 
-jest.mock("../auth/Login", () => {
-    return <div>SignInWidgetMock</div>;
-});
+// jest.mock("../auth/Login", () => {
+//     return <div>SignInWidgetMock</div>;
+// });
 
 jest.mock('@okta/okta-react', () => ({
     useOktaAuth: () => {

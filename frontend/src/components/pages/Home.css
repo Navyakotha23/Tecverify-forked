@@ -390,6 +390,20 @@ hr.divider {
     outline: none;
     cursor: pointer;
 }
+.copy-icon{
+    width: 25px;
+    height: 20px;
+    position: relative;
+    padding: 0;
+    top: 15px;
+    left: 15px;
+    margin: 0;
+    border: 0;
+    color: darkgrey;
+    outline: none;
+    cursor: pointer;
+    background: url("../../assets/images/copy.png") no-repeat left top;
+}
 .delete-button{
      background-color: #007996;
      border: none;
@@ -417,7 +431,7 @@ hr.divider {
 }
 .time-details{
     font-size: 15px;
-    margin-left: 25px;
+    margin-left: 70px;
     margin-top: 15px;
     color: #757575;
 }

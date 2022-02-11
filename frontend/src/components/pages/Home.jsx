@@ -4,6 +4,7 @@ import "./Home.css";
 import Login from '../auth/Login';
 import ErrorPopup from '../layout/ErrorPopup'
 import DeleteSecretKey from '../layout/DeleteSecretKey'
+import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 import "react-loader-spinner/dist/loader/css/react-spinner-loader.css"
 import Loader from 'react-loader-spinner'
 import {CopyToClipboard} from 'react-copy-to-clipboard';
@@ -33,6 +34,7 @@ const Home = () => {
     const [encryptedSecret, setEncryptedSecret] = useState('');
     const [timeInSeconds, setTimeInSeconds] = useState();
     const [logoutInErrorPopup, showLogoutInErrorPopup] = useState(false);
+    const [checkEnrollmentStatus, setCheckEnrollmentStatus] = useState();
     const SHOW_ENCRYPTED_KEY = false;
     const logout = async () => {
         // sessionStorage.removeItem('config');
@@ -40,24 +42,44 @@ const Home = () => {
         // await oktaAuth.revokeAccessToken();
         await oktaAuth.signOut('/login');
     };
+
     if (oktaAuth && config) {
         const onClose = async () => setError('');
         const oktaTokenStorage = JSON.parse(localStorage.getItem('okta-token-storage'));
         const authorizeTokenType = config.AUTHORIZE_TOKEN_TYPE
         const addButtonStatus = config.SHOW_ADD_SECRET_BUTTON
         const deleteIconStatus = config.SHOW_DELETE_ICON
+        const copyIconStatus = config.COPY_TO_CLIPBOARD_BUTTON
         let transition, authorizeToken;
-        if (oktaTokenStorage && oktaTokenStorage[authorizeTokenType] && oktaTokenStorage['accessToken'] && userEmail === undefined) {
-            oktaAuth.getUser().then((info) => {
-                if (info && info.email) {
-                    setUserEmail(info.email);
-                }
-                if (!randomOtp) {
-                    getOtp()
-                }
-            }).catch(err => {
-                console.log(err);
-            });
+        if (oktaTokenStorage && oktaTokenStorage[authorizeTokenType] && oktaTokenStorage['accessToken']) {
+            if(userEmail === undefined) {
+                oktaAuth.getUser().then((info) => {
+                    if (info && info.email) {
+                        setUserEmail(info.email);
+                    }
+                    if (!randomOtp) {
+                        fetch(`${config.BACK_END_URL}/api/v1/establishConnection`, {
+                            "method": GET,
+                            "headers": {
+                                TOKEN: oktaTokenStorage[authorizeTokenType][authorizeTokenType]
+                            }
+                        })
+                            .then(response => response.json())
+                            .then(response => {
+                                getOtp()
+                                console.log(response);
+                            })
+                            .catch(err => {
+                                console.error(err);
+                            });
+                    }
+                    if(!checkEnrollmentStatus) {
+                        autoEnroll()
+                    }
+                }).catch(err => {
+                    console.log(err);
+                });
+            }
         }
 
         const version = require('../../../package.json').version;
@@ -174,9 +196,52 @@ const Home = () => {
             }
         }
 
+        const autoEnroll = () => {
+            if (oktaTokenStorage && oktaTokenStorage[authorizeTokenType] && oktaTokenStorage[authorizeTokenType][authorizeTokenType]) {
+                fetch(`${config.BACK_END_URL}/api/v1/autoEnroll`, {
+                    "method": GET,
+                    "headers": {
+                        TOKEN: oktaTokenStorage[authorizeTokenType][authorizeTokenType]
+                    }
+                })
+                    .then(response => response.json())
+                    .then(response => {
+                        setCheckEnrollmentStatus(response);
+                        console.log(response);
+                    })
+                    .catch(err => {
+                        console.error(err);
+                    });
+            } else {
+                setError(`Token Error : No token found with key (${authorizeTokenType}).`);
+                showLogoutInErrorPopup(true);
+            }
+        }
+        const closeConnection = () => {
+            console.log('destroy connection')
+            if (oktaTokenStorage && oktaTokenStorage[authorizeTokenType] && oktaTokenStorage[authorizeTokenType][authorizeTokenType]) {
+                fetch(`${config.BACK_END_URL}/api/v1/destroyConnection`, {
+                    "method": GET,
+                    "headers": {
+                        TOKEN: oktaTokenStorage[authorizeTokenType][authorizeTokenType]
+                    }
+                })
+                    .then(response => response.json())
+                    .then(response => {
+                        logout();
+                        console.log(response);
+                    })
+                    .catch(err => {
+                        console.error(err);
+                    });
+            } else {
+                setError(`Token Error : No token found with key (${authorizeTokenType}).`);
+                showLogoutInErrorPopup(true);
+            }
+        }
+
         const deleteByPassCode = () => {
             setRandomOtp(null)
-
             const myHeaders = new Headers();
             myHeaders.append(TOKEN, oktaTokenStorage[authorizeTokenType][authorizeTokenType]);
             const requestOptions = {
@@ -224,17 +289,19 @@ const Home = () => {
                 setSuccessMessage('');
             }
         }
+        const alertOnOtpCopyingToClipboard = (otp) => {
+            alert('Otp ' + otp + ' copied to clipboard');
+        }
 
         if (oktaTokenStorage && oktaTokenStorage[authorizeTokenType]) {
             const expiresAt = oktaTokenStorage[authorizeTokenType].expiresAt;
             authorizeToken = oktaTokenStorage[authorizeTokenType][authorizeTokenType];
-
             setTimeout(() => {
                 setSeconds(convertHMS((expiresAt) - (new Date().getTime() / 1000)));
             }, 1000);
             if (expiresIn < 100) {
                 // authService._oktaAuth.session.close();
-                logout();
+                closeConnection();
             }
 
             const currentTimeSeconds = getSeconds(new Date().getTime() / 1000);
@@ -252,7 +319,7 @@ const Home = () => {
             authState.isAuthenticated
                 ?
                 <div className={"container"}>
-                    <Navbar userEmail={userEmail} mainHeader={config.MAIN_HEADER}/>
+                    <Navbar userEmail={userEmail} mainHeader={config.MAIN_HEADER} closeConnection={closeConnection}/>
                     <div>
                         <div className={'instructions'}>
                             <h3 className={'sub-heading'}>Instructions</h3>
@@ -320,6 +387,16 @@ const Home = () => {
                                                     </div>
                                                     <div style={{display: 'flex'}}>
                                                         <h2 className="random-otp" style={{marginTop: '7px', letterSpacing: '3px'}}>{code.otp}</h2>
+                                                        {
+                                                            copyIconStatus ?
+                                                                <CopyToClipboard title={'copy to clipboard'} text={code.otp}
+                                                                                 onCopy={() => {
+                                                                                     alertOnOtpCopyingToClipboard(code.otp)
+                                                                                 }}>
+                                                                    <button className={'copy-icon'} title={'copy to clipboard'}>
+                                                                    </button>
+                                                                </CopyToClipboard> : ''
+                                                        }
                                                         <p className='time-details'>{secretUpdatedAt}</p>
                                                     </div>
                                                 </li>

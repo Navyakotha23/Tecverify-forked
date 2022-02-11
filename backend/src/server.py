@@ -5,7 +5,6 @@ from logging.config import dictConfig
 from crypto import Crypto
 from adminSecret import AdminSecret
 from totp import TOTP
-from hotp import HOTP ###
 from oktaOperations import OktaOperations
 
 import pyotp
@@ -24,6 +23,17 @@ CORS(app)
 
 # Get config values from file and assign
 ISSUER = app.config['ISSUER']
+
+MS_SQL_SERVER = app.config['MS_SQL_SERVER']
+MS_SQL_USERNAME = app.config['MS_SQL_USERNAME']
+MS_SQL_PASSWORD = app.config['MS_SQL_PASSWORD']
+DATABASE_NAME = app.config['DATABASE_NAME']
+TABLE_NAME = app.config['TABLE_NAME']
+
+TECVERIFY_API_KEY = app.config['TECVERIFY_API_KEY']
+
+SHOW_LOGS = app.config['SHOW_LOGS']
+
 CLIENT_ID = app.config['CLIENT_ID']
 SECRETS_FILE = app.config['SECRETS_FILE']
 AUTHORIZING_TOKEN = app.config['AUTHORIZING_TOKEN']
@@ -33,10 +43,10 @@ WHITELISTED_IPS = app.config['WHITELISTED_IPS']
 SALT = app.config['SALT']
 
 crypt_obj = Crypto(SALT)
-admin_secret = AdminSecret(SECRETS_FILE, crypt_obj)
-totp = TOTP(crypt_obj)
-hotp = HOTP(crypt_obj) ###
-okta = OktaOperations(CLIENT_ID, ISSUER, AUTHORIZING_TOKEN, AUTHORIZE_CLAIM_NAME)
+# admin_secret = AdminSecret(SECRETS_FILE, crypt_obj)
+admin_secret = AdminSecret(SECRETS_FILE, crypt_obj, MS_SQL_SERVER, MS_SQL_USERNAME, MS_SQL_PASSWORD, DATABASE_NAME, TABLE_NAME, SHOW_LOGS)
+totp = TOTP(crypt_obj, SHOW_LOGS)
+okta = OktaOperations(CLIENT_ID, ISSUER, AUTHORIZING_TOKEN, AUTHORIZE_CLAIM_NAME, TECVERIFY_API_KEY, SHOW_LOGS)
 
 # Begin Rate Limiter
 def construct_rate_limit():
@@ -113,6 +123,7 @@ AUD = 'aud'
 OPTIONS = 'OPTIONS'
 SECRET = 'secret'
 ID_LENGTH = 12
+CONNECTION_OBJECT = admin_secret.establish_db_connection()
 
 
 # Middlewares
@@ -121,49 +132,42 @@ ID_LENGTH = 12
 def check_token_header():
     print("\n\n\nSTART-----START-----START-----START-----START-----START-----START-----START-----START-----START")
     # app.logger.info("---before_request middleware---")
-    print("11111111111111111111- In before_request middleware in check_token_header() -11111111111111111111")
+    print("SHOW_LOGS: ", SHOW_LOGS)
+    if SHOW_LOGS: print("11111111111111111111- In before_request middleware in check_token_header() -11111111111111111111")
     if request.method == OPTIONS:
         return {}, 200
     if SWAGGER_URL not in request.url:
-        # print("request")
-        # print(request)
-        # print("request.method")
-        # print(request.method)
-        # print("request.url")
-        # print(request.url)
-        # print("request.headers")
-        # print(request.headers)
+        # if SHOW_LOGS: print("request: ", request)
+        # if SHOW_LOGS: print("request.method: ", request.method)
+        # if SHOW_LOGS: print("request.url: ", request.url)
+        # if SHOW_LOGS: print("request.headers: ", request.headers)
         #
-        # print("request.headers[TOKEN]: ")
-        # print(request.headers[TOKEN])
+        # if SHOW_LOGS: print("request.headers[TOKEN]: ", request.headers[TOKEN])
         if TOKEN not in request.headers:
-            print("TOKEN not in request.headers")
+            if SHOW_LOGS: print("TOKEN not in request.headers")
             g.tokenHeaderMissing = True
             # return {'error': 'Required Headers missing.'}, 400
         elif request.headers[TOKEN] == '':
-            print("TOKEN parameter is empty")
+            if SHOW_LOGS: print("TOKEN parameter is empty")
             return {'error': "The 'token' parameter can't be empty"}, 400
         elif request.headers[TOKEN]:
             is_token_valid, token_info = okta.introspect_token(request.headers[TOKEN])
-            # print("token_info: ")
-            # print(token_info)
-            print("Okta UserID in token_info: ")
-            print(token_info['sub'])
-            # print("Token Status: ")
-            # print(is_token_valid)
+            # if SHOW_LOGS: print("token_info: ", token_info)
+            if SHOW_LOGS: print("Okta UserID in token_info: ", token_info['sub'])
+            # if SHOW_LOGS: print("Token Status: ", is_token_valid)
             if not is_token_valid:
-                print("Token is not valid")
+                if SHOW_LOGS: print("Token is not valid")
                 return {'error': 'Invalid Token', 'info': token_info}, 403
             else:
-                print("Token is valid")
+                if SHOW_LOGS: print("Token is valid")
             g.user = token_info
-    print("11111111111111111111- Out of before_request middleware in check_token_header() -11111111111111111111")
+    if SHOW_LOGS: print("11111111111111111111- Out of before_request middleware in check_token_header() -11111111111111111111")
     
 
 @app.after_request
 def logging_after_request(response):
     # app.logger.info("---after_request middleware---")
-    print("\n33333333333333333333- In after_request middleware in logging_after_request(response) -33333333333333333333")
+    if SHOW_LOGS: print("\n33333333333333333333- In after_request middleware in logging_after_request(response) -33333333333333333333")
     app.logger.info(
         "%s %s %s %s %s %s %s %s",
         request.remote_addr,
@@ -176,7 +180,7 @@ def logging_after_request(response):
         request.user_agent,
     )
     app.logger.info("____________________________________")
-    print("33333333333333333333- Out of after_request middleware in logging_after_request(response) -33333333333333333333")
+    if SHOW_LOGS: print("33333333333333333333- Out of after_request middleware in logging_after_request(response) -33333333333333333333")
     print("END-----END-----END-----END-----END-----END-----END-----END-----END-----END-----END-----END\n\n\n")
     return response
 
@@ -185,18 +189,19 @@ def logging_after_request(response):
 @app.route('/api/v1/secret', methods=['POST'])
 @limiter.limit(RATE_LIMIT)
 def save_secret():
-    print("\n22222222222222222222- In Save Secret API in save_secret() -22222222222222222222")
+    if SHOW_LOGS: print("\n22222222222222222222- In Save Secret API in save_secret() -22222222222222222222")
 
+    print("Save Secret API")
     tokenMissing = g.get('tokenHeaderMissing')
     if tokenMissing:
-        print("token header is missing so need to check if formdata contains Okta User ID")
+        if SHOW_LOGS: print("token header is missing so need to check if formdata contains Okta User ID")
         form_data = admin_secret.parse_form_data_for_okta_userid(request)
         okta_user_id_in_form_data = form_data['oktaUserId']
-        print("okta_user_id_in_form_data: " + okta_user_id_in_form_data)
+        if SHOW_LOGS: print("okta_user_id_in_form_data: " + okta_user_id_in_form_data)
         if form_data[SECRET] and form_data['oktaUserId']:
             if totp.is_secret_valid(form_data[SECRET]):
-                if admin_secret.update_secret(form_data, okta_user_id_in_form_data):
-                    print("22222222222222222222- Out of Save Secret API in save_secret() -22222222222222222222")
+                if admin_secret.update_secret(form_data, okta_user_id_in_form_data, CONNECTION_OBJECT):
+                    if SHOW_LOGS: print("22222222222222222222- Out of Save Secret API in save_secret() -22222222222222222222")
                     return {"updated": True}, 200
                 else:
                     return {"updated": False, "error": "Update Failed !!!"}, 500
@@ -208,12 +213,12 @@ def save_secret():
         form_data = admin_secret.parse_form_data(request)
         token_info = g.get('user')
         logged_in_Okta_user_id = token_info['sub']
-        print("logged_in_Okta_user_id: " + logged_in_Okta_user_id)
+        if SHOW_LOGS: print("logged_in_Okta_user_id: " + logged_in_Okta_user_id)
         # if AUTHORIZE_CLAIM_NAME in token_info and token_info[AUTHORIZE_CLAIM_NAME] and form_data[SECRET]:
         if form_data[SECRET]:
             if totp.is_secret_valid(form_data[SECRET]):
-                if admin_secret.update_secret(form_data, logged_in_Okta_user_id):
-                    print("22222222222222222222- Out of Save Secret API in save_secret() -22222222222222222222")
+                if admin_secret.update_secret(form_data, logged_in_Okta_user_id, CONNECTION_OBJECT):
+                    if SHOW_LOGS: print("22222222222222222222- Out of Save Secret API in save_secret() -22222222222222222222")
                     return {"updated": True}, 200
                 else:
                     return {"updated": False, "error": "Update Failed !!!"}, 500
@@ -228,12 +233,13 @@ def save_secret():
 @app.route('/api/v1/secret', methods=['GET'])
 @limiter.limit(RATE_LIMIT)
 def generate_random_secret():
-    print("\n22222222222222222222- In Generate Secret API in generate_random_secret() -22222222222222222222")
+    if SHOW_LOGS: print("\n22222222222222222222- In Generate Secret API in generate_random_secret() -22222222222222222222")
+    print("Generate Secret API")
     token_info = g.get('user')
     # if AUTHORIZE_CLAIM_NAME in token_info and token_info[AUTHORIZE_CLAIM_NAME]:
     if True:
         admin_secret = pyotp.random_base32(32)
-        print("22222222222222222222- Out of Generate Secret API in generate_random_secret() -22222222222222222222")
+        if SHOW_LOGS: print("22222222222222222222- Out of Generate Secret API in generate_random_secret() -22222222222222222222")
         return {"adminSecret": admin_secret}, 200
     else:
         return {'error': 'UnAuthorized !!!'}, 403
@@ -242,16 +248,20 @@ def generate_random_secret():
 @app.route('/api/v1/secret/<secret_id>', methods=['DELETE'])
 @limiter.limit(RATE_LIMIT)
 def delete_secret(secret_id):
-    print("\n22222222222222222222- In Delete Secret API in delete_secret(secret_id) -22222222222222222222")
+    if SHOW_LOGS: print("\n22222222222222222222- In Delete Secret API in delete_secret(secret_id) -22222222222222222222")
+    print("Delete Secret API")
     token_info = g.get('user')
     # if AUTHORIZE_CLAIM_NAME in token_info and token_info[AUTHORIZE_CLAIM_NAME]:
     if True:
-        secrets_list = admin_secret.read()
+        secrets_list = admin_secret.read(CONNECTION_OBJECT)
         for secret in secrets_list:
             if secret_id in secret.values():
-                secrets_list.remove(secret)
-                admin_secret.write(secrets_list)
-                print("22222222222222222222- Out of Delete Secret API in delete_secret(secret_id) -22222222222222222222")
+                # secrets_list.remove(secret)
+                # admin_secret.write(secrets_list)
+
+                admin_secret.delete_secret(secret_id, CONNECTION_OBJECT)
+
+                if SHOW_LOGS: print("22222222222222222222- Out of Delete Secret API in delete_secret(secret_id) -22222222222222222222")
                 return {'Deleted': True}, 200
     else:
         return {'error': 'UnAuthorized !!!'}, 403
@@ -260,37 +270,83 @@ def delete_secret(secret_id):
 @app.route('/api/v1/totp', methods=['GET'])
 @limiter.limit(RATE_LIMIT)
 def get_totp():
-    print("\n22222222222222222222- In TOTP API in get_totp() -22222222222222222222")
+    if SHOW_LOGS: print("\n22222222222222222222- In TOTP API in get_totp() -22222222222222222222")
+    print("TOTP API")
     token_info = g.get('user')
-    # print("token_info: ")
-    # print(token_info)
+    # if SHOW_LOGS: print("token_info: ", token_info)
     logged_in_Okta_user_id = token_info['sub']
-    print("logged_in_Okta_user_id: " + logged_in_Okta_user_id)
+    if SHOW_LOGS: print("logged_in_Okta_user_id: " + logged_in_Okta_user_id)
     # if AUTHORIZE_CLAIM_NAME in token_info:
     if True:
-        secrets_list = admin_secret.read()
+        secrets_list = admin_secret.read(CONNECTION_OBJECT)
         totp_list = totp.generate_totp_for_all_secrets(secrets_list, logged_in_Okta_user_id)
-        print("22222222222222222222- Out of TOTP API in get_totp() -22222222222222222222")
+        if SHOW_LOGS: print("22222222222222222222- Out of TOTP API in get_totp() -22222222222222222222")
         return jsonify(totp_list), 200
     else:
-        print("AUTHORIZE_CLAIM_NAME is not in token_info")
-        print("So, I need to send accessToken to userinfo API call to get AUTHORIZE_CLAIM_NAME")
-        print("22222222222222222222- Out of TOTP API in get_totp() -22222222222222222222")
+        if SHOW_LOGS: print("AUTHORIZE_CLAIM_NAME is not in token_info")
+        if SHOW_LOGS: print("So, I need to send accessToken to userinfo API call to get AUTHORIZE_CLAIM_NAME")
+        if SHOW_LOGS: print("22222222222222222222- Out of TOTP API in get_totp() -22222222222222222222")
         return {'error': 'UnAuthorized !!!'}, 403
 
-############
-@app.route('/api/v1/hotp/<int:counterParam>', methods=['GET'])
+
+################################################
+@app.route('/api/v1/autoEnroll', methods=['GET'])
 @limiter.limit(RATE_LIMIT)
-def get_hotp(counterParam):
-    print(counterParam)
+def enrollToTecVerify():
+    print("\n22222222222222222222- In autoEnroll API in enrollToTecVerify() -22222222222222222222")
     token_info = g.get('user')
-    if AUTHORIZE_CLAIM_NAME in token_info:
-        secrets_list = admin_secret.read()
-        hotp_list = hotp.generate_hotp_for_all_secrets(secrets_list, counterParam)
-        return jsonify(hotp_list), 200
+    print("token_info: ", token_info)
+    logged_in_Okta_user_id = token_info['sub']
+    enroll_response = okta.enroll_okta_verify_TOTP_factor(logged_in_Okta_user_id)
+    print("enroll_response: ", enroll_response)
+    print("enroll_response.json(): ", enroll_response.json())
+    enroll_info = enroll_response.json()
+    if enroll_response.status_code == 200:
+        oktaFactorID = enroll_info['id']
+        print("oktaFactorID: ", oktaFactorID)
+        oktaSharedSecret = enroll_info['_embedded']['activation']['sharedSecret']
+        print("oktaSharedSecret: ", oktaSharedSecret)
+        generatedOTP = totp.generate_totp(oktaSharedSecret)
+        admin_secret.auto_save_secret(oktaSharedSecret, logged_in_Okta_user_id, CONNECTION_OBJECT) # For saving secret in TecVerify
+        print("generatedOTP: ", generatedOTP)
+        is_enroll = okta.activate_TOTP_factor(logged_in_Okta_user_id, oktaFactorID, generatedOTP)
+        if is_enroll: 
+            print("22222222222222222222- Out autoEnroll API in enrollToTecVerify() -22222222222222222222\n")
+            return {"enrolled": True}, 200
+        else:
+            print("22222222222222222222- Out autoEnroll API in enrollToTecVerify() -22222222222222222222\n")
+            return {"enrolled": False}, 400
+    elif enroll_response.status_code == 400:
+        if enroll_info['errorCode'] == "E0000001":
+            print("A factor of this type is already set up.")
+            print("22222222222222222222- Out autoEnroll API in enrollToTecVerify() -22222222222222222222\n")
+        return {"errorSummary": "A factor of this type is already set up."}
+
+
+@app.route('/api/v1/establishConnection', methods=['GET'])
+@limiter.limit(RATE_LIMIT)
+def openConnection():
+    print("\n22222222222222222222- In establishConnection API in openConnection() -22222222222222222222")
+    CONNECTION_OBJECT = admin_secret.establish_db_connection()
+    print("CONNECTION_OBJECT: ", CONNECTION_OBJECT)
+    print("22222222222222222222- Out establishConnection API in openConnection() -22222222222222222222\n")
+    return {"ConnectionStatus": True}
+
+
+@app.route('/api/v1/destroyConnection', methods=['GET'])
+@limiter.limit(RATE_LIMIT)
+def closeConnection():
+    print("\n22222222222222222222- In destroyConnection API in closeConnection() -22222222222222222222")
+    print("CONNECTION_OBJECT: ", CONNECTION_OBJECT)
+    is_closed = admin_secret.destroy_db_connection(CONNECTION_OBJECT)
+    if is_closed:
+        print("22222222222222222222- Out destroyConnection API in closeConnection() -22222222222222222222\n")
+        return {"ConnectionClosed": True}
     else:
-        return {'error': 'UnAuthorized !!!'}, 403
-############
+        print("22222222222222222222- Out destroyConnection API in closeConnection() -22222222222222222222\n")
+        return {"ConnectionClosed": False}
+################################################
+
 
 if __name__ == '__main__':
     app.run(host="0.0.0.0")
