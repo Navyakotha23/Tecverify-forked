@@ -58,20 +58,22 @@ const Home = () => {
                         setUserEmail(info.email);
                     }
                     if (!randomOtp) {
-                        fetch(`${config.BACK_END_URL}/api/v1/establishConnection`, {
-                            "method": GET,
-                            "headers": {
-                                TOKEN: oktaTokenStorage[authorizeTokenType][authorizeTokenType]
-                            }
-                        })
-                            .then(response => response.json())
-                            .then(response => {
-                                getOtp()
-                                console.log(response);
-                            })
-                            .catch(err => {
-                                console.error(err);
-                            });
+                        getOtp()
+
+                        // fetch(`${config.BACK_END_URL}/api/v1/establishConnection`, {
+                        //     "method": GET,
+                        //     "headers": {
+                        //         TOKEN: oktaTokenStorage[authorizeTokenType][authorizeTokenType]
+                        //     }
+                        // })
+                        //     .then(response => response.json())
+                        //     .then(response => {
+                        //         getOtp()
+                        //         console.log(response);
+                        //     })
+                        //     .catch(err => {
+                        //         console.error(err);
+                        //     });
                     }
                     if(!checkEnrollmentStatus) {
                         autoEnroll()
@@ -217,28 +219,28 @@ const Home = () => {
                 showLogoutInErrorPopup(true);
             }
         }
-        const closeConnection = () => {
-            console.log('destroy connection')
-            if (oktaTokenStorage && oktaTokenStorage[authorizeTokenType] && oktaTokenStorage[authorizeTokenType][authorizeTokenType]) {
-                fetch(`${config.BACK_END_URL}/api/v1/destroyConnection`, {
-                    "method": GET,
-                    "headers": {
-                        TOKEN: oktaTokenStorage[authorizeTokenType][authorizeTokenType]
-                    }
-                })
-                    .then(response => response.json())
-                    .then(response => {
-                        logout();
-                        console.log(response);
-                    })
-                    .catch(err => {
-                        console.error(err);
-                    });
-            } else {
-                setError(`Token Error : No token found with key (${authorizeTokenType}).`);
-                showLogoutInErrorPopup(true);
-            }
-        }
+        // const closeConnection = () => {
+        //     console.log('destroy connection')
+        //     if (oktaTokenStorage && oktaTokenStorage[authorizeTokenType] && oktaTokenStorage[authorizeTokenType][authorizeTokenType]) {
+        //         fetch(`${config.BACK_END_URL}/api/v1/destroyConnection`, {
+        //             "method": GET,
+        //             "headers": {
+        //                 TOKEN: oktaTokenStorage[authorizeTokenType][authorizeTokenType]
+        //             }
+        //         })
+        //             .then(response => response.json())
+        //             .then(response => {
+        //                 logout();
+        //                 console.log(response);
+        //             })
+        //             .catch(err => {
+        //                 console.error(err);
+        //             });
+        //     } else {
+        //         setError(`Token Error : No token found with key (${authorizeTokenType}).`);
+        //         showLogoutInErrorPopup(true);
+        //     }
+        // }
 
         const deleteByPassCode = () => {
             setRandomOtp(null)
@@ -301,7 +303,9 @@ const Home = () => {
             }, 1000);
             if (expiresIn < 100) {
                 // authService._oktaAuth.session.close();
-                closeConnection();
+                
+                // closeConnection();
+                logout();
             }
 
             const currentTimeSeconds = getSeconds(new Date().getTime() / 1000);
@@ -319,7 +323,8 @@ const Home = () => {
             authState.isAuthenticated
                 ?
                 <div className={"container"}>
-                    <Navbar userEmail={userEmail} mainHeader={config.MAIN_HEADER} closeConnection={closeConnection}/>
+                    {/* <Navbar userEmail={userEmail} mainHeader={config.MAIN_HEADER} closeConnection={closeConnection}/> */}
+                    <Navbar userEmail={userEmail} mainHeader={config.MAIN_HEADER}/>
                     <div>
                         <div className={'instructions'}>
                             <h3 className={'sub-heading'}>Instructions</h3>

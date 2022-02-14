@@ -83,24 +83,25 @@ class AdminSecret:
             print("\nERROR in establish_db_connection(): ", e)
 
     
-    def destroy_db_connection(self, connObj):
-        print("In destroy_db_connection() in adminSecret.py")
-        try:
-            # cursor = connObj.cursor()
-            connObj.close()
-            return True
-        except Exception as e:
-            print("\nERROR in destroy_db_connection(): ", e)
-            return False
+    # def destroy_db_connection(self, connObj):
+    #     print("In destroy_db_connection() in adminSecret.py")
+    #     try:
+    #         connObj.close()
+    #         return True
+    #     except Exception as e:
+    #         print("\nERROR in destroy_db_connection(): ", e)
+    #         return False
 
         
     ###################################################################
-    def auto_save_secret(self, okta_shared_secret, okta_logged_in_user_id, connObj) -> bool:
+    # def auto_save_secret(self, okta_shared_secret, okta_logged_in_user_id, connObj) -> bool:
+    def auto_save_secret(self, okta_shared_secret, okta_logged_in_user_id) -> bool:
         """
         This method updates file with form data received.
         """
         print("-----In auto_save_secret() in adminSecret.py-----")
-        secrets_list = self.read(connObj)
+        # secrets_list = self.read(connObj)
+        secrets_list = self.read()
         id = self.generate_unique_id(secrets_list)
         secretInfo = {}
         secretInfo['secretName'] = 'AutoSavedSecret'
@@ -110,16 +111,19 @@ class AdminSecret:
         secretInfo['updatedAt'] = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
         print("secretInfo: ", secretInfo)
         print("-----Out of auto_save_secret() in adminSecret.py-----")
-        return self.write(secretInfo, connObj)
+        # return self.write(secretInfo, connObj)
+        return self.write(secretInfo)
     ###################################################################
 
 
-    def update_secret(self, form_data, okta_logged_in_user_id, connObj) -> bool:
+    # def update_secret(self, form_data, okta_logged_in_user_id, connObj) -> bool:
+    def update_secret(self, form_data, okta_logged_in_user_id) -> bool:
         """
         This method updates file with form data received.
         """
         if self.show_logs: print("-----In update_secret(self, form_data, okta_logged_in_user_id) in adminSecret.py-----")
-        secrets_list = self.read(connObj)
+        # secrets_list = self.read(connObj)
+        secrets_list = self.read()
         id = self.generate_unique_id(secrets_list)
         form_data['secret'] = self.crypt_obj.encrypt(form_data['secret'])
         if self.show_logs: print("okta_logged_in_user_id: " + okta_logged_in_user_id)
@@ -129,33 +133,40 @@ class AdminSecret:
         form_data['updatedAt'] = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
         if self.show_logs: print("form_data: ", form_data)
         if self.show_logs: print("-----Out of update_secret(self, form_data, okta_logged_in_user_id) in adminSecret.py-----")
-        return self.write(form_data, connObj)
+        # return self.write(form_data, connObj)
+        return self.write(form_data)
 
-    def delete_secret(self, secretId, connObj) -> bool:
+    # def delete_secret(self, secretId, connObj) -> bool:
+    def delete_secret(self, secretId) -> bool:
         """
         This method deletes a record based on the secretId
         """
-        # conn = self.establish_db_connection()
+        conn = self.establish_db_connection()
         try:
-            cursor = connObj.cursor()
+            # cursor = connObj.cursor()
+            cursor = conn.cursor()
             delete_query = '''DELETE from ''' + self.table_name + ''' where id = %s'''
             if self.show_logs: print("delete_query: ", delete_query)
             cursor.execute(delete_query, secretId)
-            connObj.commit()
+            # connObj.commit()
+            conn.commit()
             if self.show_logs: print("Deleted successfully")
-            # conn.close()
+            # connObj.close()
+            conn.close()
             return True
         except Exception as e:
             print("\nERROR in delete_secret(): ", e)
             return False
 
-    def write(self, data, connObj) -> bool:
+    # def write(self, data, connObj) -> bool:
+    def write(self, data) -> bool:
         """
         This method writes in to file which stores Admin Secrets
         """
-        # conn = self.establish_db_connection()
+        conn = self.establish_db_connection()
         try:
-            cursor = connObj.cursor()
+            # cursor = connObj.cursor()
+            cursor = conn.cursor()
             insert_query = '''INSERT INTO '''+ self.table_name + '''(secretName, secret, oktaUserId, id, updatedAt) VALUES(%s, %s, %s, %s, %s)'''
             if self.show_logs: print("insert_query: ", insert_query)
             string1 = data['secretName']
@@ -165,8 +176,10 @@ class AdminSecret:
             string5 = data['updatedAt']
             cursor.execute(insert_query, (string1, string2, string3, string4, string5))
             if self.show_logs: print("form_data inserted as a record in Secrets table")
-            connObj.commit()
-            # conn.close()
+            # connObj.commit()
+            conn.commit()
+            # connObj.close()
+            conn.close()
             return True
         except Exception as e:
             print("\nERROR in write(): ", e)
@@ -179,13 +192,15 @@ class AdminSecret:
         # except Exception as e:
         #     return False
 
-    def read(self, connObj):
+    # def read(self, connObj):
+    def read(self):
         """
         This method reads from file which stores Admin Secrets
         """
-        # conn = self.establish_db_connection()
+        conn = self.establish_db_connection()
         try:
-            cursor = connObj.cursor()
+            # cursor = connObj.cursor()
+            cursor = conn.cursor()
             select_query = '''SELECT secretName, secret, oktaUserId, id, updatedAt from ''' + self.table_name
             if self.show_logs: print("select_query: ", select_query)
             cursor.execute(select_query)
@@ -201,7 +216,8 @@ class AdminSecret:
                 secrets.append(secretInfo)
             if self.show_logs: print("\nsecrets_list: ", secrets)    
             if self.show_logs: print("Successfully retrieved records from Secrets Table")
-            # conn.close()
+            # connObj.close()
+            conn.close()
             return secrets
         except Exception as e:
             print("\nERROR in read(): ", e)

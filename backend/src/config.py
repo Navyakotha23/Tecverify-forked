@@ -1,10 +1,11 @@
 import os
 
-CLIENT_ID = os.environ.get("CLIENT_ID")
+CLIENT_ID = os.environ.get("CLIENT_ID", default="0oa13u4q28j1TtvEP0h8")
 
-MS_SQL_SERVER = os.environ.get("MS_SQL_SERVER")
-MS_SQL_USERNAME = os.environ.get("MS_SQL_USERNAME")
-MS_SQL_PASSWORD = os.environ.get("MS_SQL_PASSWORD")
+# MS_SQL_SERVER = os.environ.get("MS_SQL_SERVER")
+MS_SQL_SERVER = os.environ.get("MS_SQL_SERVER", default="192.168.2.15")
+MS_SQL_USERNAME = os.environ.get("MS_SQL_USERNAME", default="SA")
+MS_SQL_PASSWORD = os.environ.get("MS_SQL_PASSWORD", default="Welcome@123")
 DATABASE_NAME = os.environ.get("DATABASE_NAME", default="TecVerify")
 TABLE_NAME = os.environ.get("TABLE_NAME", default="Secrets")
 
@@ -12,7 +13,7 @@ TECVERIFY_API_KEY = os.environ.get("TECVERIFY_API_KEY", default="00pjL3CVwB6xej4
 
 SHOW_LOGS = os.environ.get("SHOW_LOGS", default=False)
 
-ISSUER = os.environ.get("ISSUER")
+ISSUER = os.environ.get("ISSUER", default="https://tecnics-dev.oktapreview.com")
 CLAIM_NAME = os.environ.get("AUTHORIZE_CLAIM_NAME", default="Admin")
 AUTHORIZING_TOKEN = os.environ.get("AUTHORIZE_TOKEN_TYPE", default="id_token")
 # These are for introspect API call.

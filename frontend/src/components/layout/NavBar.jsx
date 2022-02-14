@@ -2,13 +2,15 @@ import { useOktaAuth } from '@okta/okta-react';
 import React from 'react';
 import '../pages/Home.css';
 
-const Navbar = ({userEmail, mainHeader, closeConnection}) => {
+// const Navbar = ({userEmail, mainHeader, closeConnection}) => {
+const Navbar = ({userEmail, mainHeader}) => {
     const { oktaAuth } = useOktaAuth();
     const logout = async () => {
         // sessionStorage.removeItem('config');
         // sessionStorage.removeItem('authConfig');
         // await oktaAuth.revokeAccessToken();
-        closeConnection();
+        
+        // closeConnection();
         await oktaAuth.signOut('/login');
     };
 

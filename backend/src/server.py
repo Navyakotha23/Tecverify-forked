@@ -123,8 +123,7 @@ AUD = 'aud'
 OPTIONS = 'OPTIONS'
 SECRET = 'secret'
 ID_LENGTH = 12
-CONNECTION_OBJECT = admin_secret.establish_db_connection()
-
+# CONNECTION_OBJECT = admin_secret.establish_db_connection()
 
 # Middlewares
 
@@ -200,7 +199,8 @@ def save_secret():
         if SHOW_LOGS: print("okta_user_id_in_form_data: " + okta_user_id_in_form_data)
         if form_data[SECRET] and form_data['oktaUserId']:
             if totp.is_secret_valid(form_data[SECRET]):
-                if admin_secret.update_secret(form_data, okta_user_id_in_form_data, CONNECTION_OBJECT):
+                # if admin_secret.update_secret(form_data, okta_user_id_in_form_data, CONNECTION_OBJECT):
+                if admin_secret.update_secret(form_data, okta_user_id_in_form_data):
                     if SHOW_LOGS: print("22222222222222222222- Out of Save Secret API in save_secret() -22222222222222222222")
                     return {"updated": True}, 200
                 else:
@@ -217,7 +217,8 @@ def save_secret():
         # if AUTHORIZE_CLAIM_NAME in token_info and token_info[AUTHORIZE_CLAIM_NAME] and form_data[SECRET]:
         if form_data[SECRET]:
             if totp.is_secret_valid(form_data[SECRET]):
-                if admin_secret.update_secret(form_data, logged_in_Okta_user_id, CONNECTION_OBJECT):
+                # if admin_secret.update_secret(form_data, logged_in_Okta_user_id, CONNECTION_OBJECT):
+                if admin_secret.update_secret(form_data, logged_in_Okta_user_id):
                     if SHOW_LOGS: print("22222222222222222222- Out of Save Secret API in save_secret() -22222222222222222222")
                     return {"updated": True}, 200
                 else:
@@ -253,13 +254,15 @@ def delete_secret(secret_id):
     token_info = g.get('user')
     # if AUTHORIZE_CLAIM_NAME in token_info and token_info[AUTHORIZE_CLAIM_NAME]:
     if True:
-        secrets_list = admin_secret.read(CONNECTION_OBJECT)
+        # secrets_list = admin_secret.read(CONNECTION_OBJECT)
+        secrets_list = admin_secret.read()
         for secret in secrets_list:
             if secret_id in secret.values():
                 # secrets_list.remove(secret)
                 # admin_secret.write(secrets_list)
 
-                admin_secret.delete_secret(secret_id, CONNECTION_OBJECT)
+                # admin_secret.delete_secret(secret_id, CONNECTION_OBJECT)
+                admin_secret.delete_secret(secret_id)
 
                 if SHOW_LOGS: print("22222222222222222222- Out of Delete Secret API in delete_secret(secret_id) -22222222222222222222")
                 return {'Deleted': True}, 200
@@ -278,7 +281,8 @@ def get_totp():
     if SHOW_LOGS: print("logged_in_Okta_user_id: " + logged_in_Okta_user_id)
     # if AUTHORIZE_CLAIM_NAME in token_info:
     if True:
-        secrets_list = admin_secret.read(CONNECTION_OBJECT)
+        # secrets_list = admin_secret.read(CONNECTION_OBJECT)
+        secrets_list = admin_secret.read()
         totp_list = totp.generate_totp_for_all_secrets(secrets_list, logged_in_Okta_user_id)
         if SHOW_LOGS: print("22222222222222222222- Out of TOTP API in get_totp() -22222222222222222222")
         return jsonify(totp_list), 200
@@ -307,7 +311,8 @@ def enrollToTecVerify():
         oktaSharedSecret = enroll_info['_embedded']['activation']['sharedSecret']
         print("oktaSharedSecret: ", oktaSharedSecret)
         generatedOTP = totp.generate_totp(oktaSharedSecret)
-        admin_secret.auto_save_secret(oktaSharedSecret, logged_in_Okta_user_id, CONNECTION_OBJECT) # For saving secret in TecVerify
+        # admin_secret.auto_save_secret(oktaSharedSecret, logged_in_Okta_user_id, CONNECTION_OBJECT) # For saving secret in TecVerify
+        admin_secret.auto_save_secret(oktaSharedSecret, logged_in_Okta_user_id) # For saving secret in TecVerify
         print("generatedOTP: ", generatedOTP)
         is_enroll = okta.activate_TOTP_factor(logged_in_Okta_user_id, oktaFactorID, generatedOTP)
         if is_enroll: 
@@ -323,30 +328,32 @@ def enrollToTecVerify():
         return {"errorSummary": "A factor of this type is already set up."}
 
 
-@app.route('/api/v1/establishConnection', methods=['GET'])
-@limiter.limit(RATE_LIMIT)
-def openConnection():
-    print("\n22222222222222222222- In establishConnection API in openConnection() -22222222222222222222")
-    CONNECTION_OBJECT = admin_secret.establish_db_connection()
-    print("CONNECTION_OBJECT: ", CONNECTION_OBJECT)
-    print("22222222222222222222- Out establishConnection API in openConnection() -22222222222222222222\n")
-    return {"ConnectionStatus": True}
+# @app.route('/api/v1/establishConnection', methods=['GET'])
+# @limiter.limit(RATE_LIMIT)
+# def openConnection():
+#     print("\n22222222222222222222- In establishConnection API in openConnection() -22222222222222222222")
+#     CONNECTION_OBJECT = admin_secret.establish_db_connection()
+#     print("CONNECTION_OBJECT: ", CONNECTION_OBJECT)
+#     print("22222222222222222222- Out establishConnection API in openConnection() -22222222222222222222\n")
+#     return {"ConnectionStatus": True}
 
 
-@app.route('/api/v1/destroyConnection', methods=['GET'])
-@limiter.limit(RATE_LIMIT)
-def closeConnection():
-    print("\n22222222222222222222- In destroyConnection API in closeConnection() -22222222222222222222")
-    print("CONNECTION_OBJECT: ", CONNECTION_OBJECT)
-    is_closed = admin_secret.destroy_db_connection(CONNECTION_OBJECT)
-    if is_closed:
-        print("22222222222222222222- Out destroyConnection API in closeConnection() -22222222222222222222\n")
-        return {"ConnectionClosed": True}
-    else:
-        print("22222222222222222222- Out destroyConnection API in closeConnection() -22222222222222222222\n")
-        return {"ConnectionClosed": False}
+# @app.route('/api/v1/destroyConnection', methods=['GET'])
+# @limiter.limit(RATE_LIMIT)
+# def closeConnection():
+#     print("\n22222222222222222222- In destroyConnection API in closeConnection() -22222222222222222222")
+#     print("CONNECTION_OBJECT: ", CONNECTION_OBJECT)
+#     is_closed = admin_secret.destroy_db_connection(CONNECTION_OBJECT)
+#     if is_closed:
+#         print("22222222222222222222- Out destroyConnection API in closeConnection() -22222222222222222222\n")
+#         return {"ConnectionClosed": True}
+#     else:
+#         print("22222222222222222222- Out destroyConnection API in closeConnection() -22222222222222222222\n")
+#         return {"ConnectionClosed": False}
 ################################################
 
 
 if __name__ == '__main__':
     app.run(host="0.0.0.0")
+    # app.run(host="0.0.0.0", ssl_context='adhoc') # This is for running backend devlpmnt server in secure context(HTTPS)
+
