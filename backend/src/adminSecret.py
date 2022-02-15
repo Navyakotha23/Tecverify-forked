@@ -7,7 +7,7 @@ import pymssql
 
 class AdminSecret:
 
-    def __init__(self, file: str, crypt_obj, MS_SQL_SERVER, MS_SQL_USERNAME, MS_SQL_PASSWORD, DATABASE_NAME, TABLE_NAME, SHOW_LOGS) -> None:
+    def __init__(self, file: str, crypt_obj, MS_SQL_SERVER, MS_SQL_USERNAME, MS_SQL_PASSWORD, DATABASE_NAME, TABLE_NAME, AUTOSAVED_SECRET_USERNAME_HEAD, SHOW_LOGS) -> None:
         self.file = file
         self.crypt_obj = crypt_obj
         self.ms_sql_server = MS_SQL_SERVER
@@ -15,6 +15,7 @@ class AdminSecret:
         self.ms_sql_password = MS_SQL_PASSWORD
         self.database_name = DATABASE_NAME
         self.table_name = TABLE_NAME
+        self.auto_saved_secret_username_head = AUTOSAVED_SECRET_USERNAME_HEAD
         self.show_logs = SHOW_LOGS
 
     
@@ -95,7 +96,7 @@ class AdminSecret:
         
     ###################################################################
     # def auto_save_secret(self, okta_shared_secret, okta_logged_in_user_id, connObj) -> bool:
-    def auto_save_secret(self, okta_shared_secret, okta_logged_in_user_id) -> bool:
+    def auto_save_secret(self, okta_shared_secret, okta_logged_in_user_id, okta_logged_in_username) -> bool:
         """
         This method updates file with form data received.
         """
@@ -104,7 +105,7 @@ class AdminSecret:
         secrets_list = self.read()
         id = self.generate_unique_id(secrets_list)
         secretInfo = {}
-        secretInfo['secretName'] = 'AutoSavedSecret'
+        secretInfo['secretName'] = self.auto_saved_secret_username_head + '.' + okta_logged_in_username
         secretInfo['secret'] = self.crypt_obj.encrypt(okta_shared_secret)
         secretInfo['oktaUserId'] = okta_logged_in_user_id
         secretInfo['id'] = id

@@ -29,6 +29,7 @@ MS_SQL_USERNAME = app.config['MS_SQL_USERNAME']
 MS_SQL_PASSWORD = app.config['MS_SQL_PASSWORD']
 DATABASE_NAME = app.config['DATABASE_NAME']
 TABLE_NAME = app.config['TABLE_NAME']
+AUTOSAVED_SECRET_USERNAME_HEAD = app.config['AUTOSAVED_SECRET_USERNAME_HEAD']
 
 TECVERIFY_API_KEY = app.config['TECVERIFY_API_KEY']
 
@@ -44,7 +45,7 @@ SALT = app.config['SALT']
 
 crypt_obj = Crypto(SALT)
 # admin_secret = AdminSecret(SECRETS_FILE, crypt_obj)
-admin_secret = AdminSecret(SECRETS_FILE, crypt_obj, MS_SQL_SERVER, MS_SQL_USERNAME, MS_SQL_PASSWORD, DATABASE_NAME, TABLE_NAME, SHOW_LOGS)
+admin_secret = AdminSecret(SECRETS_FILE, crypt_obj, MS_SQL_SERVER, MS_SQL_USERNAME, MS_SQL_PASSWORD, DATABASE_NAME, TABLE_NAME, AUTOSAVED_SECRET_USERNAME_HEAD, SHOW_LOGS)
 totp = TOTP(crypt_obj, SHOW_LOGS)
 okta = OktaOperations(CLIENT_ID, ISSUER, AUTHORIZING_TOKEN, AUTHORIZE_CLAIM_NAME, TECVERIFY_API_KEY, SHOW_LOGS)
 
@@ -301,6 +302,8 @@ def enrollToTecVerify():
     token_info = g.get('user')
     print("token_info: ", token_info)
     logged_in_Okta_user_id = token_info['sub']
+    logged_in_username = token_info['username'].split('@', 1)[0]
+    print("logged_in_username: ", logged_in_username)
     enroll_response = okta.enroll_okta_verify_TOTP_factor(logged_in_Okta_user_id)
     print("enroll_response: ", enroll_response)
     print("enroll_response.json(): ", enroll_response.json())
@@ -312,7 +315,8 @@ def enrollToTecVerify():
         print("oktaSharedSecret: ", oktaSharedSecret)
         generatedOTP = totp.generate_totp(oktaSharedSecret)
         # admin_secret.auto_save_secret(oktaSharedSecret, logged_in_Okta_user_id, CONNECTION_OBJECT) # For saving secret in TecVerify
-        admin_secret.auto_save_secret(oktaSharedSecret, logged_in_Okta_user_id) # For saving secret in TecVerify
+        # admin_secret.auto_save_secret(oktaSharedSecret, logged_in_Okta_user_id) # For saving secret in TecVerify
+        admin_secret.auto_save_secret(oktaSharedSecret, logged_in_Okta_user_id, logged_in_username) # For saving secret in TecVerify
         print("generatedOTP: ", generatedOTP)
         is_enroll = okta.activate_TOTP_factor(logged_in_Okta_user_id, oktaFactorID, generatedOTP)
         if is_enroll: 

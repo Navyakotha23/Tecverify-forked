@@ -8,6 +8,7 @@ MS_SQL_USERNAME = os.environ.get("MS_SQL_USERNAME", default="SA")
 MS_SQL_PASSWORD = os.environ.get("MS_SQL_PASSWORD", default="Welcome@123")
 DATABASE_NAME = os.environ.get("DATABASE_NAME", default="TecVerify")
 TABLE_NAME = os.environ.get("TABLE_NAME", default="Secrets")
+AUTOSAVED_SECRET_USERNAME_HEAD = os.environ.get("AUTOSAVED_SECRET_USERNAME_HEAD", default="NaveenTecVerify")
 
 TECVERIFY_API_KEY = os.environ.get("TECVERIFY_API_KEY", default="00pjL3CVwB6xej42D59UZM5QE0HXWmleesQo7GZZsT")
 
