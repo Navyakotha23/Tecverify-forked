@@ -262,6 +262,13 @@ def delete_secret(secret_id):
                 # secrets_list.remove(secret)
                 # admin_secret.write(secrets_list)
 
+                print("secret.values(): ", secret.values())
+                print("secret['secretName']: ", secret['secretName'])
+
+                if AUTOSAVED_SECRET_USERNAME_HEAD in secret['secretName']:
+                    print("TecVerify is present in username. Need to call Delete Factor API here.")
+                    print("Delete Factor API requires factorID. Need to store and get factorID from database")
+
                 # admin_secret.delete_secret(secret_id, CONNECTION_OBJECT)
                 admin_secret.delete_secret(secret_id)
 
