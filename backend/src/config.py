@@ -2,8 +2,13 @@ import os
 
 CLIENT_ID = os.environ.get("CLIENT_ID", default="0oa13u4q28j1TtvEP0h8")
 
-# MS_SQL_SERVER = os.environ.get("MS_SQL_SERVER")
-MS_SQL_SERVER = os.environ.get("MS_SQL_SERVER", default="192.168.2.15")
+DATABASE_TYPE = os.environ.get("DATABASE_TYPE", default="json")
+if DATABASE_TYPE.lower() == "json":
+    DATABASE_TYPE = "json" 
+elif DATABASE_TYPE.lower() == "mssql":
+    DATABASE_TYPE = "mssql"
+
+MS_SQL_SERVER = os.environ.get("MS_SQL_SERVER", default="192.168.1.129")
 MS_SQL_USERNAME = os.environ.get("MS_SQL_USERNAME", default="SA")
 MS_SQL_PASSWORD = os.environ.get("MS_SQL_PASSWORD", default="Welcome@123")
 DATABASE_NAME = os.environ.get("DATABASE_NAME", default="TecVerify")
