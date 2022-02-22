@@ -12,18 +12,33 @@
     "UPDATE_CHECK_TEXT": "check",
     "PKCE": true,
     "COPY_TO_CLIPBOARD_BUTTON": true,
+    "TITLE": "TecVerify",
+    "LOGO": "https://f.hubspotusercontent40.net/hubfs/9205548/__hs-marketplace__/Okta_Logo_BrightBlue_Medium-2-1.png",
+    "BYPASS_CODES_HEADER": "Bypass Codes",
+    "CONFIRMATION_POPUP_FOR_BYPASS_CODE_FOR_DELETING": {
+        "HEADER": "Confirm",
+        "QUESTION": "Are you sure you want to delete ByPass code "
+    },
     "SCOPES": [
         "openid",
         "email",
-	    "groups",
-	    "profile"
+        "groups",
+        "profile"
     ],
-    "INSTRUCTIONS_IN_BYPASS_CODE_GENERATOR": [
-        "Inform user to click option try another way to open form for entering admin bypass code",
-        "Provide the given admin bypass code as generated on the left for respective system"
-    ]
-    ,
-    "INSTRUCTIONS_IN_ADMIN_SECRET": [
-        "Inform user to click option try another way to open form for entering admin bypass code."
-    ]
+    "INSTRUCTIONS_AND_HEADER_IN_BYPASS_CODE_GENERATOR": {
+        "HEADER": "Instructions",
+        "INSTRUCTIONS": [
+            "Inform user to click option try another way to open form for entering admin bypass code",
+            "Provide the given admin bypass code as generated on the left for respective system"
+        ]
+    },
+    "ENROLLMENT_FACTOR_POPUP": {
+        "HEADER": "Add secret key",
+        "INSTRUCTIONS": {
+            "HEADER": "Instructions",
+            "INSTRUCTIONS_LIST": [
+                "Inform user to click option try another way to open form for entering admin bypass code."
+            ]}
+    }
+
 }
