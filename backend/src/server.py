@@ -124,7 +124,7 @@ ISS = 'iss'
 UID = 'uid'
 AUD = 'aud'
 OPTIONS = 'OPTIONS'
-SECRET = 'secret'
+SECRET = 'secretKey'
 ID_LENGTH = 12
 # CONNECTION_OBJECT = admin_secret.establish_db_connection()
 
@@ -227,26 +227,29 @@ def delete_secret(secret_id):
     if True:
         # secrets_list = admin_secret.read(CONNECTION_OBJECT)
         secrets_list = admin_secret.read()
-        for secret in secrets_list:
-            if secret_id in secret.values():
-                if DATABASE_TYPE == "json":
-                    secrets_list.remove(secret)
-                    admin_secret.write(secrets_list)
-                    # print("secret.values(): ", secret.values())
-                    # print("secret['secretName']: ", secret['secretName'])
-                    # if AUTOSAVED_SECRET_USERNAME_HEAD in secret['secretName']:
-                    #     print("TecVerify is present in username. Need to call Delete Factor API here.")
-                    #     print("Delete Factor API requires factorID. Need to store and get factorID from database")
-                    return {'Deleted': True}, 200
-                elif DATABASE_TYPE == "mssql":
-                    # admin_secret.delete_secret(secret_id, CONNECTION_OBJECT)
-                    admin_secret.delete_secret(secret_id)
-                    # print("secret.values(): ", secret.values())
-                    # print("secret['secretName']: ", secret['secretName'])
-                    # if AUTOSAVED_SECRET_USERNAME_HEAD in secret['secretName']:
-                    #     print("TecVerify is present in username. Need to call Delete Factor API here.")
-                    #     print("Delete Factor API requires factorID. Need to store and get factorID from database")
-                    return {'Deleted': True}, 200
+        if not secrets_list:
+            print("No secret in secrets_list")
+            return {"ERROR": "Secret List is Empty"}, 400
+        else:     
+            for secret in secrets_list:
+                if secret_id in secret.values():
+                    if DATABASE_TYPE == "json":
+                        print("secret['oktaFactorId']: ", secret['oktaFactorId'])
+                        secrets_list.remove(secret)
+                        admin_secret.write(secrets_list)
+                    elif DATABASE_TYPE == "mssql":
+                        # admin_secret.delete_secret(secret_id, CONNECTION_OBJECT)
+                        admin_secret.delete_secret(secret_id)
+                        
+                    if secret['oktaFactorId'] == "":
+                            print("Manually Saved Secret Deleted")
+                            return {'Deleted': True}, 200
+                    else:
+                        delete_factor_response = okta.call_delete_factor_API(secret['oktaUserId'], secret['oktaFactorId'])
+                        if delete_factor_response.status_code == 204:
+                            print("Auto Saved Secret Deleted and Okta TOTP Factor deleted")
+                            return {'Deleted both Secret and Okta TOTP factor': True}, 200
+            return {"ERROR": "Secret with given secretId is not found"}, 400
     else:
         return {'error': 'UnAuthorized !!!'}, 403
 
@@ -286,7 +289,8 @@ def enrollToTecVerify():
         generatedOTP = totp.generate_totp(oktaSharedSecret)
         # admin_secret.auto_save_secret(oktaSharedSecret, logged_in_Okta_user_id, CONNECTION_OBJECT) # For saving secret in TecVerify
         # admin_secret.auto_save_secret(oktaSharedSecret, logged_in_Okta_user_id) # For saving secret in TecVerify
-        admin_secret.auto_save_secret(oktaSharedSecret, logged_in_Okta_user_id, logged_in_username) # For saving secret in TecVerify
+        # admin_secret.auto_save_secret(oktaSharedSecret, logged_in_Okta_user_id, logged_in_username) # For saving secret in TecVerify with logged in username
+        admin_secret.auto_save_secret(oktaSharedSecret, logged_in_Okta_user_id, logged_in_username, oktaFactorID) # For saving secret in TecVerify with logged in username and oktaFactorID
         is_enroll = okta.activate_TOTP_factor(logged_in_Okta_user_id, oktaFactorID, generatedOTP)
         if is_enroll: 
             return {"enrolled": True}, 200
