@@ -9,6 +9,7 @@ import "react-loader-spinner/dist/loader/css/react-spinner-loader.css"
 import Loader from 'react-loader-spinner'
 import {CopyToClipboard} from 'react-copy-to-clipboard';
 import Navbar from "../layout/NavBar";
+import {version} from "../../../package.json";
 
 const TOKEN = 'token';
 const POST = 'POST';
@@ -34,7 +35,7 @@ const Home = () => {
     const [encryptedSecret, setEncryptedSecret] = useState('');
     const [timeInSeconds, setTimeInSeconds] = useState();
     const [logoutInErrorPopup, showLogoutInErrorPopup] = useState(false);
-    const [checkEnrollmentStatus, setCheckEnrollmentStatus] = useState();
+    const [checkEnrollmentStatus, setCheckEnrollmentStatus] = useState(false);
     const SHOW_ENCRYPTED_KEY = false;
     const logout = async () => {
         // sessionStorage.removeItem('config');
@@ -199,7 +200,8 @@ const Home = () => {
         }
 
         const autoEnroll = () => {
-            if (oktaTokenStorage && oktaTokenStorage[authorizeTokenType] && oktaTokenStorage[authorizeTokenType][authorizeTokenType]) {
+            if (oktaTokenStorage && oktaTokenStorage[authorizeTokenType] && oktaTokenStorage[authorizeTokenType][authorizeTokenType] && !checkEnrollmentStatus) {
+                setCheckEnrollmentStatus(true);
                 fetch(`${config.BACK_END_URL}/api/v1/autoEnroll`, {
                     "method": GET,
                     "headers": {
@@ -208,8 +210,7 @@ const Home = () => {
                 })
                     .then(response => response.json())
                     .then(response => {
-                        setCheckEnrollmentStatus(response);
-                        console.log(response);
+                        console.log(response, checkEnrollmentStatus);
                     })
                     .catch(err => {
                         console.error(err);
@@ -327,28 +328,24 @@ const Home = () => {
                     <Navbar userEmail={userEmail} mainHeader={config.MAIN_HEADER}/>
                     <div>
                         <div className={'instructions'}>
-                            <h3 className={'sub-heading'}>Instructions</h3>
-                            <ul style={{listStyleType: 'none', padding: '0'}}>
-                                {config.INSTRUCTIONS_IN_BYPASS_CODE_GENERATOR.map(function (content, index) {
-                                    return <li key={index}>
-                                        <p className={'list-cls'}>
-                                            {content}
-                                        </p>
-                                    </li>
-                                })}
-                            </ul>
-                            <footer style={{top: '60%', position: 'relative', borderTop: '1px solid silver'}}>
-                                    <span style={{float: 'left', marginRight: '20px', marginTop: '10px'}}>
-                                        version {version}
-                                    </span>
-                                <span style={{float: 'left', marginLeft: '100px', marginTop: '10px'}}>
-                                    {config.ISSUER.split('/')[2]}
-                                    </span>
-                            </footer>
+                            <h3 className={'sub-heading'}>{config.INSTRUCTIONS_AND_HEADER_IN_BYPASS_CODE_GENERATOR.HEADER}</h3>
+                            <div style={{height: '60%', overflowY: 'auto'}}>
+                                <ul style={{listStyleType: 'none', padding: '0'}}>
+                                    {config.INSTRUCTIONS_AND_HEADER_IN_BYPASS_CODE_GENERATOR.INSTRUCTIONS.map(function (content, index) {
+                                        return <li key={index}>
+                                            <p className={'list-cls'}>
+                                                {content}
+                                            </p>
+                                        </li>
+                                    })}
+                                </ul>
+                            </div>
+                            <div>
+                            </div>
                         </div>
                         <div style={{width: '33.3%'}}>
                             <div className="mobile">
-                                <span className="titlecls">Bypass Codes</span>
+                                <span className="titlecls">{config.BYPASS_CODES_HEADER}</span>
                                 {
                                     addButtonStatus ?
                                         <button
@@ -364,7 +361,7 @@ const Home = () => {
                                     }}>
                                     </div>
                                 </div>
-                                <hr className={'divider'} style={{borderColor: '#d6d6d6', marginTop:'4px', marginBottom: '0', marginLeft: '19px'}}/>
+                                <hr className={'divider'} style={{borderColor: '#d6d6d6', marginTop:'4px', marginBottom: '0', marginLeft: '15px'}}/>
                                 <ul style={{
                                     listStyleType: 'none',
                                     marginLeft: '18px',
@@ -388,10 +385,10 @@ const Home = () => {
                                                                     showDeleteConfirmationPopup={showDeleteConfirmationPopup}
                                                                     code={code}/> : ''
                                                         }
-                                                        <p style={{padding: '10px 1px 1px 20px', fontSize: '18px'}}>{secretName}</p>
+                                                        <input className={'bypass-codes-names'} type={'readonly'} value={secretName}/>
                                                     </div>
                                                     <div style={{display: 'flex'}}>
-                                                        <h2 className="random-otp" style={{marginTop: '7px', letterSpacing: '3px'}}>{code.otp}</h2>
+                                                        <span className="random-otp" style={{marginTop: '7px', letterSpacing: '3px'}}>{code.otp}</span>
                                                         {
                                                             copyIconStatus ?
                                                                 <CopyToClipboard title={'copy to clipboard'} text={code.otp}
@@ -423,10 +420,11 @@ const Home = () => {
                     {
                         deleteConfirmationPopup ? (
                             <div className="popup-box">
-                                <div className="box" style={{width: '55%',minWidth: '300px', padding: '0'}}>
-                                    <h3 className="container-header">Confirm</h3>
-                                    <p style={{fontSize: "initial", margin: '30px 0px 20px 50px'}}>Are you sure you want to delete
-                                        ByPass code <b>{selectedSecretName}</b> ?</p>
+                                <div className="box" style={{width: '60%',minWidth: '300px', padding: '0'}}>
+                                    <h3 className="container-header">{config.CONFIRMATION_POPUP_FOR_BYPASS_CODE_FOR_DELETING.HEADER}</h3>
+                                    <p style={{fontSize: "initial", margin: '30px 0px 20px 50px'}}>
+                                        {config.CONFIRMATION_POPUP_FOR_BYPASS_CODE_FOR_DELETING.QUESTION}
+                                        <b>{selectedSecretName}</b> ?</p>
                                     <div style={{width: "100%"}}>
                                         <button className="button delete-button" onClick={() => {
                                             showDeleteConfirmationPopup('');
@@ -452,7 +450,7 @@ const Home = () => {
                         !showOtpDetails ? (
                             <div className="admin-popup-box">
                                 <div className="admin-box">
-                                    <h3 className={'container-header'}>Add Secret Key</h3>
+                                    <h3 className={'container-header'}>{config.ENROLLMENT_FACTOR_POPUP.HEADER}</h3>
                                     <button className={'close-button'}
                                             onClick={() => {
                                                 hideAdminSecretForm();
@@ -467,9 +465,9 @@ const Home = () => {
                                             :
                                             <div className={'admin-secret'}>
                                                 <div className={'instructions-admin-secret'}>
-                                                    <h3 className={'sub-heading'}>Instructions</h3>
+                                                    <h3 className={'sub-heading'}>{config.ENROLLMENT_FACTOR_POPUP.INSTRUCTIONS.HEADER}</h3>
                                                     <ul style={{listStyleType: 'none', padding: '0'}}>
-                                                        {config.INSTRUCTIONS_IN_ADMIN_SECRET.map(function (code, index) {
+                                                        {config.ENROLLMENT_FACTOR_POPUP.INSTRUCTIONS.INSTRUCTIONS_LIST.map(function (code, index) {
                                                             return  <li key={index}>
                                                                 <p className={'list-cls'}>
                                                                     {code}
@@ -482,12 +480,11 @@ const Home = () => {
                                                     <input
                                                         className={'admin-secret-input'}
                                                         type="text"
-                                                        maxLength={'15'}
+                                                        maxLength={'30'}
                                                         placeholder={"Secret Name"}
                                                         value={adminSecret.trimStart()}
                                                         onChange={e => setAdminSecret(e.target.value)}
                                                     />
-                                                    <br/>
                                                     <br/>
                                                     <br/>
                                                     <div>
@@ -502,7 +499,6 @@ const Home = () => {
                                                             }
                                                         </button>
                                                     </div>
-                                                    <br/>
                                                     <br/>
                                                     <div className={'shared-secret-div'}>
                                                         <input
@@ -522,23 +518,23 @@ const Home = () => {
                                                     </div>
                                                     <br/>
                                                     <br/>
-                                                    <div className={'shared-secret-div'}>
-                                                        <input
-                                                            style={SHOW_ENCRYPTED_KEY === 'true' ? {} : {display: "none"}}
-                                                            className={'shared-secret'}
-                                                            readOnly={true}
-                                                            placeholder={"Encrypted Key"}
-                                                            value={encryptedSecret}
-                                                            onChange={e => setEncryptedSecret(e.target.value)}
-                                                        />
-                                                        <CopyToClipboard text={encryptedSecret}
-                                                                         onCopy={() => {
-                                                                             setSuccessOrErrorMessage('Encrypted Key', encryptedSecret)
-                                                                         }}>
-                                                            <button  style={SHOW_ENCRYPTED_KEY === 'true' ? {} : {display: "none"}} type='button' className={'copy-button'}>Copy
-                                                            </button>
-                                                        </CopyToClipboard>
-                                                    </div>
+                                                    {/*<div className={'shared-secret-div'}>*/}
+                                                    {/*    <input*/}
+                                                    {/*        style={SHOW_ENCRYPTED_KEY === 'true' ? {} : {display: "none"}}*/}
+                                                    {/*        className={'shared-secret'}*/}
+                                                    {/*        readOnly={true}*/}
+                                                    {/*        placeholder={"Encrypted Key"}*/}
+                                                    {/*        value={encryptedSecret}*/}
+                                                    {/*        onChange={e => setEncryptedSecret(e.target.value)}*/}
+                                                    {/*    />*/}
+                                                    {/*    <CopyToClipboard text={encryptedSecret}*/}
+                                                    {/*                     onCopy={() => {*/}
+                                                    {/*                         setSuccessOrErrorMessage('Encrypted Key', encryptedSecret)*/}
+                                                    {/*                     }}>*/}
+                                                    {/*        <button  style={SHOW_ENCRYPTED_KEY === 'true' ? {} : {display: "none"}} type='button' className={'copy-button'}>Copy*/}
+                                                    {/*        </button>*/}
+                                                    {/*    </CopyToClipboard>*/}
+                                                    {/*</div>*/}
                                                     <div>
                                                         <button
                                                             style={{cursor: (!adminSecret || !sharedSecret) ? 'no-drop' : 'pointer'}}
@@ -571,6 +567,22 @@ const Home = () => {
                             </div>
                         ) : ''
                     }
+                    <div className={"footer"}>
+                        <footer style={{
+                            width: '56%',
+                            left: '12%',
+                            top: '-30%',
+                            position: 'absolute',
+                            borderTop: '1px solid silver'
+                        }}>
+                                    <span style={{float: 'left', marginRight: '20px', marginTop: '10px'}}>
+                                        version {version}
+                                    </span>
+                            <span style={{float: 'left', marginLeft: '100px', marginTop: '10px'}}>
+                                    {config.ISSUER.split('/')[2]}
+                                    </span>
+                        </footer>
+                    </div>
                 </div>
                 :
                 <Login/>

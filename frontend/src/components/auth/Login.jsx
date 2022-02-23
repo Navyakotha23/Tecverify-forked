@@ -13,7 +13,7 @@ const Login = () => {
       baseUrl: authConfig.issuer ? authConfig.issuer.split('/oauth2')[0] : '',
       clientId : authConfig.clientId,
       redirectUri : authConfig.redirectUri,
-      logo: '/logo.png',
+      logo: authConfig.logo,
       authParams: {
         pkce : authConfig.pkce,
         issuer : authConfig.issuer,

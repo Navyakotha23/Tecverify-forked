@@ -2,11 +2,10 @@ import React from 'react';
 import "../pages/Home.css";
 
 const DeleteSecretKey = ({setSelectedSecretId, setSelectedSecretName, showDeleteConfirmationPopup, code }) => {
-
     return (
             <button className={'trash-icon'} onClick={() => {
                 showDeleteConfirmationPopup(true);
-                setSelectedSecretName(code.secretname);
+                setSelectedSecretName(code.secretName);
                 setSelectedSecretId(code.id);
             }}>
                 <svg viewBox="0 0 512 512">

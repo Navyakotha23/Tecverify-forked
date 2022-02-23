@@ -14,6 +14,7 @@ const HasAccessToRouter = ({config}) => {
         disableHttpsCheck: config.DISABLE_HTTPS_CHECK,
         issuer: config.ISSUER,
         pkce: config.PKCE,
+        logo: config.LOGO,
         redirectUri: `${config.FRONT_END_URL}/implicit/callback`,
         authTokenType: config.AUTHORIZE_TOKEN_TYPE,
         scopes: config.SCOPES,
