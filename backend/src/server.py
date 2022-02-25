@@ -234,13 +234,12 @@ def delete_secret(secret_id):
             for secret in secrets_list:
                 if secret_id in secret.values():
                     if DATABASE_TYPE == "json":
-                        print("secret['oktaFactorId']: ", secret['oktaFactorId'])
                         secrets_list.remove(secret)
                         admin_secret.write(secrets_list)
                     elif DATABASE_TYPE == "mssql":
                         # admin_secret.delete_secret(secret_id, CONNECTION_OBJECT)
                         admin_secret.delete_secret(secret_id)
-                        
+
                     if secret['oktaFactorId'] == "":
                             print("Manually Saved Secret Deleted")
                             return {'Deleted': True}, 200

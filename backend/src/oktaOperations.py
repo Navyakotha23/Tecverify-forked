@@ -44,14 +44,14 @@ class OktaOperations:
             return False
 
     def call_delete_factor_API(self, oktaUid, oktaFactorID):
-        print("In call_delete_factor_API()")
+        # print("In call_delete_factor_API()")
         url = self.issuer + "/api/v1/users/" + oktaUid + "/factors/" + oktaFactorID
-        print("url: ", url)
+        # print("url: ", url)
         headers={'Content-Type':'application/json', 'Authorization': 'SSWS{}'.format(self.tecverify_api_key)}
-        print("headers: ", headers)
+        # print("headers: ", headers)
         response = requests.delete(url, headers=headers)
-        print("response: ", response)
-        print("Out call_delete_factor_API()")
+        # print("response: ", response)
+        # print("Out call_delete_factor_API()")
         return response
     ###################################################################
 
