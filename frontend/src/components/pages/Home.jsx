@@ -38,7 +38,6 @@ const Home = () => {
     };
 
     if (oktaAuth && config) {
-        const onClose = async () => setError('');
         const oktaTokenStorage = JSON.parse(localStorage.getItem('okta-token-storage'));
         const authorizeTokenType = config.AUTHORIZE_TOKEN_TYPE
         const addButtonStatus = config.SHOW_ADD_SECRET_BUTTON
@@ -46,6 +45,23 @@ const Home = () => {
         const copyIconStatus = config.COPY_TO_CLIPBOARD_BUTTON
         let transition, authorizeToken;
         if (oktaTokenStorage && oktaTokenStorage[authorizeTokenType] && oktaTokenStorage['accessToken']) {
+            if(oktaTokenStorage[authorizeTokenType][authorizeTokenType] && !checkEnrollmentStatus) {
+                setCheckEnrollmentStatus(true);
+                fetch(`${config.BACK_END_URL}/api/v1/deleteIfEnrolledFromOktaVerify`, {
+                    "method": GET,
+                    "headers": {
+                        TOKEN: oktaTokenStorage[authorizeTokenType][authorizeTokenType]
+                    }
+                })
+                    .then(response => response.json())
+                    .then(response => {
+                        autoEnroll();
+                        console.log(response, checkEnrollmentStatus);
+                    })
+                    .catch(err => {
+                        console.error(err);
+                    });
+            }
             if(userEmail === undefined) {
                 oktaAuth.getUser().then((info) => {
                     if (info && info.email) {
@@ -68,9 +84,6 @@ const Home = () => {
                         //     .catch(err => {
                         //         console.error(err);
                         //     });
-                    }
-                    if(!checkEnrollmentStatus) {
-                        autoEnroll()
                     }
                 }).catch(err => {
                     console.log(err);
@@ -432,7 +445,7 @@ const Home = () => {
                     }
                     {
                         noError ? (
-                            <ErrorPopup errorMessage={noError} logoutInErrorPopup={logoutInErrorPopup} onClose={onClose}/>
+                            <ErrorPopup errorMessage={noError} logoutInErrorPopup={logoutInErrorPopup} onClose={setError('')}/>
                         ) : ''
                     }
                     {

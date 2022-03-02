@@ -42,7 +42,7 @@ const Login = () => {
         }
       } catch (e) {}
     }
-  }, []);
+  }, [widget]);
   return (
       <div>
         <div id="sign-in-widget" style={{top: '50px', position: 'relative'}}/>
