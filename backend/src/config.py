@@ -12,7 +12,7 @@ elif DATABASE_TYPE.lower() == "mssql":
 
 MS_SQL_SERVER = os.environ.get("MS_SQL_SERVER", default="192.168.1.129")
 MS_SQL_USERNAME = os.environ.get("MS_SQL_USERNAME", default="SA")
-MS_SQL_PASSWORD = os.environ.get("MS_SQL_PASSWORD", default="Welcome@123")
+MS_SQL_PASSWORD = os.environ.get("MS_SQL_PASSWORD", default="Tecnics@123")
 DATABASE_NAME = os.environ.get("DATABASE_NAME", default="TecVerify")
 TABLE_NAME = os.environ.get("TABLE_NAME", default="Secrets")
 AUTOSAVED_SECRET_USERNAME_HEAD = os.environ.get("AUTOSAVED_SECRET_USERNAME_HEAD", default="TecVerify")

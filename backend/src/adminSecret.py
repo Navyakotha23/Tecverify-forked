@@ -54,10 +54,11 @@ class AdminSecret:
                                         CREATE TABLE ''' + self.table_name + '''
                                         (
                                             secretName    VARCHAR(50)     NOT NULL, 
-                                            secret     VARCHAR(300)    NOT NULL, 
+                                            secretKey     VARCHAR(300)    NOT NULL, 
                                             oktaUserId     VARCHAR(30)    NOT NULL,
-                                            id     VARCHAR(50)     NOT NULL, 
-                                            updatedAt      VARCHAR(30)    NOT NULL
+                                            secretId     VARCHAR(50)     NOT NULL, 
+                                            updatedAt      VARCHAR(30)    NOT NULL,
+                                            oktaFactorId    VARCHAR(30)
                                         )
                                     end
                                 '''
@@ -84,7 +85,8 @@ class AdminSecret:
         
     ###################################################################
     # def auto_save_secret(self, okta_shared_secret, okta_logged_in_user_id, connObj) -> bool:
-    def auto_save_secret(self, okta_shared_secret, okta_logged_in_user_id, okta_logged_in_username) -> bool:
+    # def auto_save_secret(self, okta_shared_secret, okta_logged_in_user_id, okta_logged_in_username) -> bool:
+    def auto_save_secret(self, okta_shared_secret, okta_logged_in_user_id, okta_logged_in_username, okta_factor_id) -> bool:
         """
         This method updates file with form data received.
         """
@@ -93,10 +95,11 @@ class AdminSecret:
         id = self.generate_unique_id(secrets_list)
         secretInfo = {}
         secretInfo['secretName'] = self.auto_saved_secret_username_head + '.' + okta_logged_in_username
-        secretInfo['secret'] = self.crypt_obj.encrypt(okta_shared_secret)
+        secretInfo['secretKey'] = self.crypt_obj.encrypt(okta_shared_secret)
         secretInfo['oktaUserId'] = okta_logged_in_user_id
-        secretInfo['id'] = id
+        secretInfo['secretId'] = id
         secretInfo['updatedAt'] = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+        secretInfo['oktaFactorId'] = okta_factor_id
         # return self.write(secretInfo, connObj)
         if self.database_type == "mssql":
             return self.write(secretInfo)
@@ -114,10 +117,11 @@ class AdminSecret:
         # secrets_list = self.read(connObj)
         secrets_list = self.read()
         id = self.generate_unique_id(secrets_list)
-        form_data['secret'] = self.crypt_obj.encrypt(form_data['secret'])
+        form_data['secretKey'] = self.crypt_obj.encrypt(form_data['secretKey'])
         form_data['oktaUserId'] = okta_logged_in_user_id
-        form_data['id'] = id
+        form_data['secretId'] = id
         form_data['updatedAt'] = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+        form_data['oktaFactorId'] = ""
         # return self.write(form_data, connObj)
         if self.database_type == "mssql":
             return self.write(form_data)
@@ -125,18 +129,18 @@ class AdminSecret:
             secrets_list.append(form_data)
             return self.write(secrets_list)
 
-    # def delete_secret(self, secretId, connObj) -> bool:
-    def delete_secret(self, secretId) -> bool:
+    # def delete_secret(self, secret_id, connObj) -> bool:
+    def delete_secret(self, secret_id) -> bool:
         """
-        This method deletes a record based on the secretId
+        This method deletes a record based on the secret_id
         """
         if self.database_type == "mssql":
             conn = self.establish_db_connection()
             try:
                 # cursor = connObj.cursor()
                 cursor = conn.cursor()
-                delete_query = '''DELETE from ''' + self.table_name + ''' where id = %s'''
-                cursor.execute(delete_query, secretId)
+                delete_query = '''DELETE from ''' + self.table_name + ''' where secretId = %s'''
+                cursor.execute(delete_query, secret_id)
                 # connObj.commit()
                 conn.commit()
                 # connObj.close()
@@ -157,13 +161,14 @@ class AdminSecret:
             try:
                 # cursor = connObj.cursor()
                 cursor = conn.cursor()
-                insert_query = '''INSERT INTO '''+ self.table_name + '''(secretName, secret, oktaUserId, id, updatedAt) VALUES(%s, %s, %s, %s, %s)'''
+                insert_query = '''INSERT INTO '''+ self.table_name + '''(secretName, secretKey, oktaUserId, secretId, updatedAt, oktaFactorId) VALUES(%s, %s, %s, %s, %s, %s)'''
                 string1 = data['secretName']
-                string2 = data['secret']
+                string2 = data['secretKey']
                 string3 = data['oktaUserId']
-                string4 = data['id']
+                string4 = data['secretId']
                 string5 = data['updatedAt']
-                cursor.execute(insert_query, (string1, string2, string3, string4, string5))
+                string6 = data['oktaFactorId']
+                cursor.execute(insert_query, (string1, string2, string3, string4, string5, string6))
                 # connObj.commit()
                 conn.commit()
                 # connObj.close()
@@ -192,16 +197,17 @@ class AdminSecret:
             try:
                 # cursor = connObj.cursor()
                 cursor = conn.cursor()
-                select_query = '''SELECT secretName, secret, oktaUserId, id, updatedAt from ''' + self.table_name
+                select_query = '''SELECT secretName, secretkey, oktaUserId, secretId, updatedAt, oktaFactorId from ''' + self.table_name
                 cursor.execute(select_query)
                 secrets = []
                 for row in cursor:
                     secretInfo = {}
                     secretInfo["secretName"] = row[0]
-                    secretInfo["secret"] = row[1]
+                    secretInfo["secretKey"] = row[1]
                     secretInfo["oktaUserId"] = row[2]
-                    secretInfo["id"] = row[3]
+                    secretInfo["secretId"] = row[3]
                     secretInfo["updatedAt"] = row[4]
+                    secretInfo["oktaFactorId"] = row[5]
                     secrets.append(secretInfo)
                 # connObj.close()
                 conn.close()
@@ -252,7 +258,7 @@ class AdminSecret:
         """
         This method returns boolean by checking whether Id is unique or not
         """
-        id_list = [secret['id'] for secret in secrets_list]
+        id_list = [secret['secretId'] for secret in secrets_list]
         if id not in id_list:
             return True
         else:
@@ -264,7 +270,7 @@ class AdminSecret:
         """
         secret_name = request.form['secretName'] if 'secretName' in request.form else None
         admin_secret = request.form['adminSecret'] if 'adminSecret' in request.form else None
-        return {'secretName': secret_name, 'secret': admin_secret}
+        return {'secretName': secret_name, 'secretKey': admin_secret}
 
     def parse_form_data_for_okta_userid(self, request):
         """
@@ -273,5 +279,5 @@ class AdminSecret:
         secret_name = request.form['secretName'] if 'secretName' in request.form else None
         admin_secret = request.form['adminSecret'] if 'adminSecret' in request.form else None
         okta_userid = request.form['oktaUserId'] if 'oktaUserId' in request.form else None
-        return {'secretName': secret_name, 'secret': admin_secret, 'oktaUserId': okta_userid}
+        return {'secretName': secret_name, 'secretKey': admin_secret, 'oktaUserId': okta_userid}
 

@@ -23,13 +23,13 @@ class TOTP:
         """
         secrets_with_totp = []
         for user in secrets_list:
-            secret = self.crypt_obj.decrypt(user['secret'])
+            secret = self.crypt_obj.decrypt(user['secretKey'])
             saved_secret_okta_user_id = user['oktaUserId']
             if okta_logged_in_user_id == saved_secret_okta_user_id :
                 # if self.show_logs: print("okta_logged_in_user_id and saved_secret_okta_user_id are same. So, generating OTPs")
                 totp = self.generate_totp(secret)
                 secrets_with_totp.append(
-                {'id': user['id'], 'otp': totp, 'secretName': user['secretName'], 'secretUpdatedAt': user['updatedAt']})
+                {'id': user['secretId'], 'otp': totp, 'secretName': user['secretName'], 'secretUpdatedAt': user['updatedAt']})
             # else:
             #     if self.show_logs: print("okta_logged_in_user_id and saved_secret_okta_user_id are NOT same")
         return secrets_with_totp

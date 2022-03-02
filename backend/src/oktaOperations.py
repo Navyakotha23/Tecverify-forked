@@ -42,6 +42,27 @@ class OktaOperations:
             return True
         else:
             return False
+
+    def call_delete_factor_API(self, oktaUid, oktaFactorID):
+        # print("In call_delete_factor_API()")
+        url = self.issuer + "/api/v1/users/" + oktaUid + "/factors/" + oktaFactorID
+        # print("url: ", url)
+        headers={'Content-Type':'application/json', 'Authorization': 'SSWS{}'.format(self.tecverify_api_key)}
+        # print("headers: ", headers)
+        response = requests.delete(url, headers=headers)
+        # print("response: ", response)
+        # print("Out call_delete_factor_API()")
+        return response
+
+    def call_list_factors_API(self, oktaUid):
+        print("In call_list_factors_API()")
+        url = self.issuer + "/api/v1/users/" + oktaUid + "/factors"
+        print("url: ", url)
+        headers={'Content-Type':'application/json', 'Authorization': 'SSWS {}'.format(self.tecverify_api_key)}
+        print("headers: ", headers)
+        response = requests.get(url, headers=headers)  
+        print("Out call_list_factors_API()")
+        return response
     ###################################################################
 
     def introspect_token(self, token):
