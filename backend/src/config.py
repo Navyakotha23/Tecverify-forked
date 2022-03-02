@@ -2,7 +2,7 @@ import os
 
 CLIENT_ID = os.environ.get("CLIENT_ID", default="0oa13u4q28j1TtvEP0h8")
 
-DATABASE_TYPE = os.environ.get("DATABASE_TYPE", default="mssql")
+DATABASE_TYPE = os.environ.get("DATABASE_TYPE", default="json")
 if DATABASE_TYPE.lower() == "json":
     DATABASE_TYPE = "json" 
 elif DATABASE_TYPE.lower() == "mssql":
