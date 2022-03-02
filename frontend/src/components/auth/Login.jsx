@@ -8,12 +8,32 @@ const Login = () => {
   const { oktaAuth } = useOktaAuth();
   let widget;
   useEffect(() => {
+    let firstUniqChar = function(s = 'statistics') {
+      const letterCounter = {}
+      for(const letter of s) {
+        console.log(letterCounter, letter, letterCounter[letter])
+        if(letterCounter[letter]) {
+          letterCounter[letter]++
+        }
+        else letterCounter[letter] = 1
+      }
+      for( let i = 0; i < s.length; i++) {
+        const stringLetter = s[i]
+        console.log(stringLetter)
+        if (letterCounter[stringLetter] === 1) {
+          return i+1
+        }
+      }
+      return -1
+    };
+    console.log(firstUniqChar());
     widget = new OktaSignIn({
       el: '#sign-in-widget',
       baseUrl: authConfig.issuer ? authConfig.issuer.split('/oauth2')[0] : '',
       clientId : authConfig.clientId,
       redirectUri : authConfig.redirectUri,
-      logo: authConfig.logo,
+      // logo: authConfig.logo,
+      logo: '/logo.png',
       authParams: {
         pkce : authConfig.pkce,
         issuer : authConfig.issuer,
@@ -41,7 +61,7 @@ const Login = () => {
         }
       } catch (e) {}
     }
-  }, []);
+  },[widget]);
   return (
       <div>
         <div id="sign-in-widget" style={{top: '50px', position: 'relative'}}/>
