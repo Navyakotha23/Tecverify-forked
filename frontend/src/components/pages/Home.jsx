@@ -57,9 +57,10 @@ const Home = () => {
             copyIconStatus = false;
         }
         if (oktaTokenStorage && oktaTokenStorage[authorizeTokenType] && oktaTokenStorage['accessToken']) {
+
             if(oktaTokenStorage[authorizeTokenType][authorizeTokenType] && !checkEnrollmentStatus) {
                 setCheckEnrollmentStatus(true);
-                fetch(`${config.BACK_END_URL}/api/v1/deleteIfEnrolledFromOktaVerify`, {
+                fetch(`${config.BACK_END_URL}/api/v1/deleteTOTPfactorIfEnrolledFromOktaVerify`, {
                     "method": GET,
                     "headers": {
                         TOKEN: oktaTokenStorage[authorizeTokenType][authorizeTokenType]
@@ -74,6 +75,7 @@ const Home = () => {
                         console.error(err);
                     });
             }
+
             if(userEmail === undefined) {
                 oktaAuth.getUser().then((info) => {
                     if (info && info.email) {
