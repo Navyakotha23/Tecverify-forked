@@ -40,10 +40,22 @@ const Home = () => {
     if (oktaAuth && config) {
         const oktaTokenStorage = JSON.parse(localStorage.getItem('okta-token-storage'));
         const authorizeTokenType = config.AUTHORIZE_TOKEN_TYPE
-        const addButtonStatus = config.SHOW_ADD_SECRET_BUTTON
-        const deleteIconStatus = config.SHOW_DELETE_ICON
-        const copyIconStatus = config.COPY_TO_CLIPBOARD_BUTTON
-        let transition, authorizeToken;
+        let transition, authorizeToken, addButtonStatus, deleteIconStatus, copyIconStatus;
+        if(config.SHOW_ADD_SECRET_BUTTON === undefined || config.SHOW_ADD_SECRET_BUTTON === true){
+            addButtonStatus = true;
+        } else {
+            addButtonStatus = false;
+        }
+        if(config.SHOW_DELETE_ICON === undefined || config.SHOW_DELETE_ICON === true){
+            deleteIconStatus = true;
+        } else {
+            deleteIconStatus = false;
+        }
+        if(config.COPY_TO_CLIPBOARD_BUTTON === undefined || config.COPY_TO_CLIPBOARD_BUTTON === true){
+            copyIconStatus = true;
+        } else {
+            copyIconStatus = false;
+        }
         if (oktaTokenStorage && oktaTokenStorage[authorizeTokenType] && oktaTokenStorage['accessToken']) {
             if(oktaTokenStorage[authorizeTokenType][authorizeTokenType] && !checkEnrollmentStatus) {
                 setCheckEnrollmentStatus(true);
