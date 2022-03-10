@@ -300,7 +300,7 @@ hr.divider {
 }
 .success-message {
     position: absolute;
-    top: 74%;
+    top: 90%;
     height: 30px;
     left: 10%;
     padding-top: 5px;
@@ -312,7 +312,7 @@ hr.divider {
 }
 .error-message {
     position: absolute;
-    top: 74%;
+    top: 90%;
     height: 30px;
     left: 10%;
     padding-top: 5px;

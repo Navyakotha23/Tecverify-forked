@@ -4,12 +4,10 @@ import "./Home.css";
 import Login from '../auth/Login';
 import ErrorPopup from '../layout/ErrorPopup'
 import DeleteSecretKey from '../layout/DeleteSecretKey'
-import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 import "react-loader-spinner/dist/loader/css/react-spinner-loader.css"
 import Loader from 'react-loader-spinner'
 import {CopyToClipboard} from 'react-copy-to-clipboard';
 import Navbar from "../layout/NavBar";
-import {version} from "../../../package.json";
 
 const TOKEN = 'token';
 const POST = 'POST';
@@ -32,28 +30,34 @@ const Home = () => {
     const [noError, setError] = useState('');
     const [adminSecret, setAdminSecret] = useState('');
     const [sharedSecret, setSharedSecret] = useState('');
-    const [encryptedSecret, setEncryptedSecret] = useState('');
     const [timeInSeconds, setTimeInSeconds] = useState();
     const [logoutInErrorPopup, showLogoutInErrorPopup] = useState(false);
     const [checkEnrollmentStatus, setCheckEnrollmentStatus] = useState(false);
-    const SHOW_ENCRYPTED_KEY = false;
     const logout = async () => {
-        // sessionStorage.removeItem('config');
-        // sessionStorage.removeItem('authConfig');
-        // await oktaAuth.revokeAccessToken();
         await oktaAuth.signOut('/login');
     };
 
     if (oktaAuth && config) {
-        const onClose = async () => setError('');
         const oktaTokenStorage = JSON.parse(localStorage.getItem('okta-token-storage'));
         const authorizeTokenType = config.AUTHORIZE_TOKEN_TYPE
-        const addButtonStatus = config.SHOW_ADD_SECRET_BUTTON
-        const deleteIconStatus = config.SHOW_DELETE_ICON
-        const copyIconStatus = config.COPY_TO_CLIPBOARD_BUTTON
-        let transition, authorizeToken;
+        let transition, authorizeToken, addButtonStatus, deleteIconStatus, copyIconStatus;
+        if(config.SHOW_ADD_SECRET_BUTTON === undefined || config.SHOW_ADD_SECRET_BUTTON === true){
+            addButtonStatus = true;
+        } else {
+            addButtonStatus = false;
+        }
+        if(config.SHOW_DELETE_ICON === undefined || config.SHOW_DELETE_ICON === true){
+            deleteIconStatus = true;
+        } else {
+            deleteIconStatus = false;
+        }
+        if(config.COPY_TO_CLIPBOARD_BUTTON === undefined || config.COPY_TO_CLIPBOARD_BUTTON === true){
+            copyIconStatus = true;
+        } else {
+            copyIconStatus = false;
+        }
         if (oktaTokenStorage && oktaTokenStorage[authorizeTokenType] && oktaTokenStorage['accessToken']) {
-            
+
             if(oktaTokenStorage[authorizeTokenType][authorizeTokenType] && !checkEnrollmentStatus) {
                 setCheckEnrollmentStatus(true);
                 fetch(`${config.BACK_END_URL}/api/v1/deleteTOTPfactorIfEnrolledFromOktaVerify`, {
@@ -94,9 +98,6 @@ const Home = () => {
                         //     .catch(err => {
                         //         console.error(err);
                         //     });
-                    }
-                    if(!checkEnrollmentStatus) {
-                        // autoEnroll()
                     }
                 }).catch(err => {
                     console.log(err);
@@ -322,9 +323,6 @@ const Home = () => {
                 setSeconds(convertHMS((expiresAt) - (new Date().getTime() / 1000)));
             }, 1000);
             if (expiresIn < 100) {
-                // authService._oktaAuth.session.close();
-                
-                // closeConnection();
                 logout();
             }
 
@@ -343,7 +341,6 @@ const Home = () => {
             authState.isAuthenticated
                 ?
                 <div className={"container"}>
-                    {/* <Navbar userEmail={userEmail} mainHeader={config.MAIN_HEADER} closeConnection={closeConnection}/> */}
                     <Navbar userEmail={userEmail} mainHeader={config.MAIN_HEADER}/>
                     <div>
                         <div className={'instructions'}>
@@ -439,7 +436,7 @@ const Home = () => {
                     {
                         deleteConfirmationPopup ? (
                             <div className="popup-box">
-                                <div className="box" style={{width: '60%',minWidth: '300px', padding: '0'}}>
+                                <div className="box" style={{width: '65%',minWidth: '300px', padding: '0'}}>
                                     <h3 className="container-header">{config.CONFIRMATION_POPUP_FOR_BYPASS_CODE_FOR_DELETING.HEADER}</h3>
                                     <p style={{fontSize: "initial", margin: '30px 0px 20px 50px'}}>
                                         {config.CONFIRMATION_POPUP_FOR_BYPASS_CODE_FOR_DELETING.QUESTION}
@@ -462,7 +459,7 @@ const Home = () => {
                     }
                     {
                         noError ? (
-                            <ErrorPopup errorMessage={noError} logoutInErrorPopup={logoutInErrorPopup} onClose={onClose}/>
+                            <ErrorPopup errorMessage={noError} logoutInErrorPopup={logoutInErrorPopup} onClose={setError('')}/>
                         ) : ''
                     }
                     {
