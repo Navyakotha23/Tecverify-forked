@@ -33,7 +33,8 @@ DATABASE_NAME = app.config['DATABASE_NAME']
 TABLE_NAME = app.config['TABLE_NAME']
 AUTOSAVED_SECRET_USERNAME_HEAD = app.config['AUTOSAVED_SECRET_USERNAME_HEAD']
 
-TECVERIFY_API_KEY = app.config['TECVERIFY_API_KEY']
+ENCRYPTED_API_KEY = app.config['ENCRYPTED_API_KEY']
+API_KEY_SALT = app.config['API_KEY_SALT']
 
 SHOW_LOGS = app.config['SHOW_LOGS']
 
@@ -47,9 +48,11 @@ SALT = app.config['SALT']
 
 crypt_obj = Crypto(SALT)
 # admin_secret = AdminSecret(SECRETS_FILE, crypt_obj)
+DECRYPTED_API_KEY = crypt_obj.decryptAPIkey(ENCRYPTED_API_KEY, API_KEY_SALT)
+# print("\nDECRYPTED_API_KEY: ", DECRYPTED_API_KEY, "\n")
 admin_secret = AdminSecret(SECRETS_FILE, crypt_obj, MS_SQL_SERVER, MS_SQL_USERNAME, MS_SQL_PASSWORD, DATABASE_NAME, TABLE_NAME, AUTOSAVED_SECRET_USERNAME_HEAD, DATABASE_TYPE, SHOW_LOGS)
 totp = TOTP(crypt_obj, SHOW_LOGS)
-okta = OktaOperations(CLIENT_ID, ISSUER, AUTHORIZING_TOKEN, AUTHORIZE_CLAIM_NAME, TECVERIFY_API_KEY, SHOW_LOGS)
+okta = OktaOperations(CLIENT_ID, ISSUER, AUTHORIZING_TOKEN, AUTHORIZE_CLAIM_NAME, DECRYPTED_API_KEY, SHOW_LOGS)
 
 # Begin Rate Limiter
 def construct_rate_limit():
@@ -127,6 +130,7 @@ OPTIONS = 'OPTIONS'
 SECRET = 'secretKey'
 ID_LENGTH = 12
 # CONNECTION_OBJECT = admin_secret.establish_db_connection()
+
 
 # Middlewares
 

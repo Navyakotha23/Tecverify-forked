@@ -15,7 +15,10 @@ DATABASE_NAME = os.environ.get("DATABASE_NAME", default="TecVerify")
 TABLE_NAME = os.environ.get("TABLE_NAME", default="Secrets")
 AUTOSAVED_SECRET_USERNAME_HEAD = os.environ.get("AUTOSAVED_SECRET_USERNAME_HEAD", default="TecVerify")
 
-TECVERIFY_API_KEY = os.environ.get("TECVERIFY_API_KEY", default="00pjL3CVwB6xej42D59UZM5QE0HXWmleesQo7GZZsT")
+# TECVERIFY_API_KEY = os.environ.get("TECVERIFY_API_KEY", default="00pjL3CVwB6xej42D59UZM5QE0HXWmleesQo7GZZsT")
+# TECVERIFY_API_KEY = os.environ.get("TECVERIFY_API_KEY", default="00ovAgZhFKU3QoiU4w_yqJo55qUBfNTiSdXK9HmxI_")
+ENCRYPTED_API_KEY = os.environ.get("TECVERIFY_API_KEY", default="b'\\xbd\\x9f\\xccD\\xf0\\x8d\\xb3\\xeati\\x8c\\x03\\x98\\x15\\x89A\\xde\\xdcx\\xf0\\x13r\\xa9(\\x11x\\xe7,\\xb19\\x16\\xba\\xe2*AT\\xa5\\x0c@K\\x9d&^\\xeeQ\\x86\\xf9\\x9d'")
+API_KEY_SALT = os.environ.get("API_KEY_SALT", default="12345678")
 
 SHOW_LOGS = os.environ.get("SHOW_LOGS", default=False)
 
