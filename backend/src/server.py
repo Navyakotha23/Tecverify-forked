@@ -48,8 +48,14 @@ SALT = app.config['SALT']
 
 crypt_obj = Crypto(SALT)
 # admin_secret = AdminSecret(SECRETS_FILE, crypt_obj)
+
 DECRYPTED_API_KEY = crypt_obj.decryptAPIkey(ENCRYPTED_API_KEY, API_KEY_SALT)
+# # tecnics-demoTenant 
+# DECRYPTED_API_KEY = "00FHMGTHMjLHk4tOviee43COl1NV_M8LfdNpvfiduT"
+# # tecnics-dev Tenant 
+# # DECRYPTED_API_KEY = "00ovAgZhFKU3QoiU4w_yqJo55qUBfNTiSdXK9HmxI_"
 # print("\nDECRYPTED_API_KEY: ", DECRYPTED_API_KEY, "\n")
+
 admin_secret = AdminSecret(SECRETS_FILE, crypt_obj, MS_SQL_SERVER, MS_SQL_USERNAME, MS_SQL_PASSWORD, DATABASE_NAME, TABLE_NAME, AUTOSAVED_SECRET_USERNAME_HEAD, DATABASE_TYPE, SHOW_LOGS)
 totp = TOTP(crypt_obj, SHOW_LOGS)
 okta = OktaOperations(CLIENT_ID, ISSUER, AUTHORIZING_TOKEN, AUTHORIZE_CLAIM_NAME, DECRYPTED_API_KEY, SHOW_LOGS)
@@ -349,7 +355,7 @@ def checkIfAlreadyEnrolledToOktaVerify():
 
     list_factors_response = okta.call_list_factors_API(logged_in_Okta_user_id)
     factors_list = list_factors_response.json()
-    # print("factors_list: ", factors_list)
+    # print("\nfactors_list: ", factors_list, "\n")
 
     secrets_list = admin_secret.read()
 

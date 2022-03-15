@@ -15,7 +15,8 @@ const HasAccessToRouter = ({config}) => {
         issuer: config.ISSUER,
         pkce: true,
         logo: config.LOGO,
-        redirectUri: `${config.FRONT_END_URL}/implicit/callback`,
+        // redirectUri: `${config.FRONT_END_URL}/implicit/callback`,
+        redirectUri: `${config.FRONT_END_URL}/login/callback`,
         authTokenType: config.AUTHORIZE_TOKEN_TYPE,
         scopes: config.SCOPES,
         updateCheckText: config.UPDATE_CHECK_TEXT
@@ -33,7 +34,8 @@ const HasAccessToRouter = ({config}) => {
             >
                 <Route path="/" exact component={Dashboard} />
                 <Route path="/home" exact component={Home} />
-                <Route path="/implicit/callback" component={LoginCallback} />
+                {/* <Route path="/implicit/callback" component={LoginCallback} /> */}
+                <Route path="/login/callback" component={LoginCallback} />
                 <Route path="/login" exact component={Login} />
             </Security>
         );
