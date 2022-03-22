@@ -51,7 +51,7 @@ crypt_obj = Crypto(SALT)
 
 DECRYPTED_API_KEY = crypt_obj.decryptAPIkey(ENCRYPTED_API_KEY, API_KEY_SALT)
 # # tecnics-demoTenant 
-# DECRYPTED_API_KEY = "00FHMGTHMjLHk4tOviee43COl1NV_M8LfdNpvfiduT"
+# DECRYPTED_API_KEY = "00Bh5ACdw92LhpfdoOlyzCIVIW0tpzeB8ylbNOvdZN"
 # # tecnics-dev Tenant 
 # # DECRYPTED_API_KEY = "00ovAgZhFKU3QoiU4w_yqJo55qUBfNTiSdXK9HmxI_"
 # print("\nDECRYPTED_API_KEY: ", DECRYPTED_API_KEY, "\n")
@@ -296,8 +296,7 @@ def get_totp():
     else:     
         for secret in secrets_list:
             # print("secret['oktaFactorId']: ", secret['oktaFactorId'])
-
-            if secret['oktaFactorId'] != "":
+            if secret['oktaUserId'] == logged_in_Okta_user_id and secret['oktaFactorId'] != "":
                 get_factor_response = okta.call_get_factor_API(logged_in_Okta_user_id, secret['oktaFactorId'])
                 # print("get_factor_response.json(): ", get_factor_response.json())
 
@@ -373,7 +372,7 @@ def checkIfAlreadyEnrolledToOktaVerify():
                 for secret in secrets_list:
                     # print("factor['id']: ", factor['id'])
                     # print("secret['oktaFactorId']: ", secret['oktaFactorId'])
-                    if secret['oktaFactorId'] != "":
+                    if secret['oktaUserId'] == logged_in_Okta_user_id and secret['oktaFactorId'] != "":
                         if factor['id'] in secret.values():
                             print("factor IDs matched. So, user is enrolled to TOTP factor from TecVerify.")
                             # print("factor['id']: ", factor['id'])
@@ -405,8 +404,7 @@ def deleteSecretIfTOTPfactorIsInactive():
     else:     
         for secret in secrets_list:
             # print("secret['oktaFactorId']: ", secret['oktaFactorId'])
-
-            if secret['oktaFactorId'] != "":
+            if secret['oktaUserId'] == logged_in_Okta_user_id and secret['oktaFactorId'] != "":
                 get_factor_response = okta.call_get_factor_API(logged_in_Okta_user_id, secret['oktaFactorId'])
                 # print("get_factor_response.json(): ", get_factor_response.json())
 
