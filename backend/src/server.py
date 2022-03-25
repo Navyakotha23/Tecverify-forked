@@ -402,8 +402,8 @@ def checkIfAlreadyEnrolledToOktaVerify():
 
 
 if __name__ == '__main__':
-    app.run(host="0.0.0.0")
-    # app.run(host="0.0.0.0", ssl_context='adhoc') # feb3: This is for running backend devlpmnt server in secure context(HTTPS)
+    # app.run(host="0.0.0.0")
+    app.run(host="0.0.0.0", ssl_context='adhoc') # feb3: This is for running backend devlpmnt server in secure context(HTTPS)
 
 
 ################## This is included in TOTP API ###############################################################
