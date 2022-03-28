@@ -388,7 +388,29 @@ def checkIfAlreadyEnrolledToOktaVerify():
                             print("factor IDs matched. So, user is enrolled to TOTP factor from TecVerify.")
                             # print("factor['id']: ", factor['id'])
                             # print("secret['oktaFactorId']: ", secret['oktaFactorId'])
-                            return {'User is already enrolled to Okta from TecVerify': True}, 200
+                            return {'User is already Auto Enrolled to Okta from TecVerify': True}, 200
+                        else: 
+                            print("factor IDs didn't match. So, user is enrolled to TOTP factor from other TecVerify Build or OktaVerify.")
+                            delete_factor_response = okta.call_delete_factor_API(logged_in_Okta_user_id, factor['id'])
+                            if delete_factor_response.status_code == 204:
+                                print("Okta TOTP Factor enrolled from other TecVerify Build or OktaVerify is deleted")
+                                return {'Deleted Okta TOTP Factor enrolled from other TecVerify Build or OktaVerify': True}, 200
+                        #     print("Offline scenario. User is logged out of TecVerify.")
+                        #     print("This issue occurs when we do Development and Production in the same tenant.")
+                        #     print("Because for Development and Production, secrets.json file is different.")
+                        #     print("factor IDs didn't match. So, user is enrolled to TOTP factor from other Build.")
+                        #     print("i.e. After Auto enrolling here, user logged out here and login to TecVerify from other build.")
+                        #     print("So, he is auto enrolled to TOTP factor from other TecVerify build.")
+                        #     print("When no auto enrollment is done in that build for that logged in user.")
+                        #     print("So, deleting TOTP factor auto enrolled from other TecVerify Build.")
+                        #     or
+                        #     print("factor IDs didn't match. So, user is enrolled to TOTP factor from other Build.")
+                        #     print("i.e. After auto enrolling here, user logged out from here and deleted TOTP factor in Okta and enrolled it from OktaVerify.")
+                        #     print("As the user is in offline, changes didn't reflect in json file.")
+                        #     print("So, while logging in again, TecVerify considers the user as an auto-enrolled user")
+                        #     print("So, deleting TOTP factor enrolled from OktaVerify.")
+                        # 
+                        #     Need to delete the previous auto-enrolled secret here itself. Instead of deleting inactive factor's secret in TOTP API.
                 
                 if usersAutoEnrolledFromTecVerify == usersAutoEnrolledFromTecVerify_excludingLoginUser:
                     print("No auto enrollment is done in TecVerify for this logged in user.")
