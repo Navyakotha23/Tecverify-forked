@@ -62,6 +62,7 @@ const Home = () => {
                 setCheckEnrollmentStatus(true);
                 fetch(`${config.BACK_END_URL}/api/v1/deleteTOTPfactorIfEnrolledFromOktaVerify`, {
                     "method": GET,
+                    // "method": 'DELETE',
                     "headers": {
                         TOKEN: oktaTokenStorage[authorizeTokenType][authorizeTokenType]
                     }
@@ -224,6 +225,7 @@ const Home = () => {
                 setCheckEnrollmentStatus(true);
                 fetch(`${config.BACK_END_URL}/api/v1/autoEnroll`, {
                     "method": GET,
+                    // "method": POST,
                     "headers": {
                         TOKEN: oktaTokenStorage[authorizeTokenType][authorizeTokenType]
                     }

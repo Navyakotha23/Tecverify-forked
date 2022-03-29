@@ -318,6 +318,7 @@ def get_totp():
 
 
 @app.route('/api/v1/autoEnroll', methods=['GET'])
+# @app.route('/api/v1/autoEnroll', methods=['POST'])
 @limiter.limit(RATE_LIMIT)
 def enrollToTecVerify():
     print("autoEnroll API")
@@ -347,6 +348,7 @@ def enrollToTecVerify():
 
 
 @app.route('/api/v1/deleteTOTPfactorIfEnrolledFromOktaVerify', methods=['GET'])
+# @app.route('/api/v1/deleteTOTPfactorIfEnrolledFromOktaVerify', methods=['DELETE'])
 @limiter.limit(RATE_LIMIT)
 def checkIfAlreadyEnrolledToOktaVerify():
     print("deleteTOTPfactorIfEnrolledFromOktaVerify API")
@@ -426,7 +428,6 @@ def checkIfAlreadyEnrolledToOktaVerify():
 if __name__ == '__main__':
     # app.run(host="0.0.0.0")
     app.run(host="0.0.0.0", ssl_context='adhoc') # feb3: This is for running backend devlpmnt server in secure context(HTTPS)
-
 
 ################## This is included in TOTP API ###############################################################
 @app.route('/api/v1/deleteSecretIfTOTPfactorIsDeletedInOkta', methods=['GET'])
