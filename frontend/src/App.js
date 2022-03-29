@@ -11,8 +11,7 @@ const HasAccessToRouter = ({config}) => {
     sessionStorage.setItem('config', JSON.stringify(config));
     const authConfig = {
         clientId: config.CLIENT_ID,
-        disableHttpsCheck: false,
-        // disableHttpsCheck: true, // No need to make this as true to run frontend server in secure context(HTTPS)
+        disableHttpsCheck: true,
         issuer: config.ISSUER,
         pkce: true,
         logo: config.LOGO,

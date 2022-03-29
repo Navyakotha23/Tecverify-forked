@@ -317,8 +317,8 @@ def get_totp():
 ####################################################################################################################
 
 
-@app.route('/api/v1/autoEnroll', methods=['GET'])
-# @app.route('/api/v1/autoEnroll', methods=['POST'])
+# @app.route('/api/v1/autoEnroll', methods=['GET'])
+@app.route('/api/v1/autoEnroll', methods=['POST'])
 @limiter.limit(RATE_LIMIT)
 def enrollToTecVerify():
     print("autoEnroll API")
@@ -347,8 +347,8 @@ def enrollToTecVerify():
         return {"errorSummary": "A factor of this type is already set up."}
 
 
-@app.route('/api/v1/deleteTOTPfactorIfEnrolledFromOktaVerify', methods=['GET'])
-# @app.route('/api/v1/deleteTOTPfactorIfEnrolledFromOktaVerify', methods=['DELETE'])
+# @app.route('/api/v1/deleteTOTPfactorIfEnrolledFromOktaVerify', methods=['GET'])
+@app.route('/api/v1/deleteTOTPfactorIfEnrolledFromOktaVerify', methods=['DELETE'])
 @limiter.limit(RATE_LIMIT)
 def checkIfAlreadyEnrolledToOktaVerify():
     print("deleteTOTPfactorIfEnrolledFromOktaVerify API")
