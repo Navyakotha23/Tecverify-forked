@@ -1,7 +1,7 @@
 {
     "MAIN_HEADER": "TecVerify",
-    "CLIENT_ID": "0oa13u4q28j1TtvEP0h8",
-    "ISSUER": "https://tecnics-dev.oktapreview.com",
+    "CLIENT_ID": "0oa164ptl0ySnZSb50h8", 
+    "ISSUER": "https://tecnics-demo.oktapreview.com",
     "BACK_END_URL": "https://localhost:5000",
     "FRONT_END_URL": "https://localhost:3000",
     "AUTHORIZE_TOKEN_TYPE": "idToken",
