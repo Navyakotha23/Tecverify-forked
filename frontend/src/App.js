@@ -11,7 +11,7 @@ const HasAccessToRouter = ({config}) => {
     sessionStorage.setItem('config', JSON.stringify(config));
     const authConfig = {
         clientId: config.CLIENT_ID,
-        disableHttpsCheck: false,
+        disableHttpsCheck: true,
         issuer: config.ISSUER,
         pkce: true,
         logo: config.LOGO,

@@ -33,7 +33,7 @@ DATABASE_NAME = app.config['DATABASE_NAME']
 TABLE_NAME = app.config['TABLE_NAME']
 AUTOSAVED_SECRET_USERNAME_HEAD = app.config['AUTOSAVED_SECRET_USERNAME_HEAD']
 
-ENCRYPTED_API_KEY = app.config['ENCRYPTED_API_KEY']
+# ENCRYPTED_API_KEY = app.config['ENCRYPTED_API_KEY']
 API_KEY_SALT = app.config['API_KEY_SALT']
 
 SHOW_LOGS = app.config['SHOW_LOGS']
@@ -49,11 +49,11 @@ SALT = app.config['SALT']
 crypt_obj = Crypto(SALT)
 # admin_secret = AdminSecret(SECRETS_FILE, crypt_obj)
 
-DECRYPTED_API_KEY = crypt_obj.decryptAPIkey(ENCRYPTED_API_KEY, API_KEY_SALT)
+# DECRYPTED_API_KEY = crypt_obj.decryptAPIkey(ENCRYPTED_API_KEY, API_KEY_SALT)
 # # tecnics-demoTenant 
 # DECRYPTED_API_KEY = "00FHMGTHMjLHk4tOviee43COl1NV_M8LfdNpvfiduT"
 # # tecnics-dev Tenant 
-# # DECRYPTED_API_KEY = "00ovAgZhFKU3QoiU4w_yqJo55qUBfNTiSdXK9HmxI_"
+DECRYPTED_API_KEY = "00ovAgZhFKU3QoiU4w_yqJo55qUBfNTiSdXK9HmxI_"
 # print("\nDECRYPTED_API_KEY: ", DECRYPTED_API_KEY, "\n")
 
 admin_secret = AdminSecret(SECRETS_FILE, crypt_obj, MS_SQL_SERVER, MS_SQL_USERNAME, MS_SQL_PASSWORD, DATABASE_NAME, TABLE_NAME, AUTOSAVED_SECRET_USERNAME_HEAD, DATABASE_TYPE, SHOW_LOGS)
@@ -318,7 +318,7 @@ def get_totp():
 ##########################################################################
 
 
-@app.route('/api/v1/autoEnroll', methods=['GET'])
+@app.route('/api/v1/autoEnroll', methods=['POST'])
 @limiter.limit(RATE_LIMIT)
 def enrollToTecVerify():
     print("autoEnroll API")
@@ -425,6 +425,6 @@ def deleteSecretIfTOTPfactorIsInactive():
 ###############################################################################
 
 if __name__ == '__main__':
-    app.run(host="0.0.0.0")
-    # app.run(host="0.0.0.0", ssl_context='adhoc') # This is for running backend devlpmnt server in secure context(HTTPS)
+#     app.run(host="0.0.0.0")
+    app.run(host="0.0.0.0", ssl_context='adhoc') # This is for running backend devlpmnt server in secure context(HTTPS)
 
