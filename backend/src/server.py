@@ -51,7 +51,7 @@ crypt_obj = Crypto(SALT)
 
 # DECRYPTED_API_KEY = crypt_obj.decryptAPIkey(ENCRYPTED_API_KEY, API_KEY_SALT)
 # # tecnics-demoTenant 
-DECRYPTED_API_KEY = "00Bh5ACdw92LhpfdoOlyzCIVIW0tpzeB8ylbNOvdZN"
+DECRYPTED_API_KEY = "00cyYJ6dovWjrfyiNSnrZiVMTz16Zff2mQT9DfGiRx"
 # # tecnics-dev Tenant 
 # # DECRYPTED_API_KEY = "00ovAgZhFKU3QoiU4w_yqJo55qUBfNTiSdXK9HmxI_"
 # print("\nDECRYPTED_API_KEY: ", DECRYPTED_API_KEY, "\n")
