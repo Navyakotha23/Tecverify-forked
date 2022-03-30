@@ -21,7 +21,6 @@ class AdminSecret:
 
     
     def establish_db_connection(self):
-        # print("\nIn establish_db_connection()\n")
         try:
             conn = pymssql.connect(self.ms_sql_server, self.ms_sql_username, self.ms_sql_password)
             
@@ -67,14 +66,12 @@ class AdminSecret:
 
             conn.autocommit(False)
             conn.commit()
-            # print("Out establish_db_connection()\n")
             return conn
         except Exception as e:
             print("\nERROR in establish_db_connection(): ", e)
 
     
     # def destroy_db_connection(self, connObj):
-    #     print("In destroy_db_connection() in adminSecret.py")
     #     try:
     #         connObj.close()
     #         return True
@@ -83,7 +80,7 @@ class AdminSecret:
     #         return False
 
         
-    ###################################################################
+    ###
     # def auto_save_secret(self, okta_shared_secret, okta_logged_in_user_id, connObj) -> bool:
     # def auto_save_secret(self, okta_shared_secret, okta_logged_in_user_id, okta_logged_in_username) -> bool:
     def auto_save_secret(self, okta_shared_secret, okta_logged_in_user_id, okta_logged_in_username, okta_factor_id) -> bool:
@@ -106,7 +103,7 @@ class AdminSecret:
         elif self.database_type == "json":
             secrets_list.append(secretInfo)
             return self.write(secrets_list)
-    ###################################################################
+    ###
 
 
     # def update_secret(self, form_data, okta_logged_in_user_id, connObj) -> bool:

@@ -50,11 +50,10 @@ crypt_obj = Crypto(SALT)
 # admin_secret = AdminSecret(SECRETS_FILE, crypt_obj)
 
 # DECRYPTED_API_KEY = crypt_obj.decryptAPIkey(ENCRYPTED_API_KEY, API_KEY_SALT)
-# # tecnics-demoTenant 
+# tecnics-demoTenant 
 DECRYPTED_API_KEY = "00cyYJ6dovWjrfyiNSnrZiVMTz16Zff2mQT9DfGiRx"
-# # tecnics-dev Tenant 
-# # DECRYPTED_API_KEY = "00ovAgZhFKU3QoiU4w_yqJo55qUBfNTiSdXK9HmxI_"
-# print("\nDECRYPTED_API_KEY: ", DECRYPTED_API_KEY, "\n")
+# tecnics-dev Tenant 
+# DECRYPTED_API_KEY = "00ovAgZhFKU3QoiU4w_yqJo55qUBfNTiSdXK9HmxI_"
 
 admin_secret = AdminSecret(SECRETS_FILE, crypt_obj, MS_SQL_SERVER, MS_SQL_USERNAME, MS_SQL_PASSWORD, DATABASE_NAME, TABLE_NAME, AUTOSAVED_SECRET_USERNAME_HEAD, DATABASE_TYPE, SHOW_LOGS)
 totp = TOTP(crypt_obj, SHOW_LOGS)
@@ -262,26 +261,6 @@ def delete_secret(secret_id):
     else:
         return {'error': 'UnAuthorized !!!'}, 403
 
-
-####################################################################################################################
-# @app.route('/api/v1/totp', methods=['GET'])
-# @limiter.limit(RATE_LIMIT)
-# def get_totp():
-#     print("TOTP API")
-#     token_info = g.get('user')
-#     logged_in_Okta_user_id = token_info['sub']
-#     # if AUTHORIZE_CLAIM_NAME in token_info:
-#     if True:
-#         # secrets_list = admin_secret.read(CONNECTION_OBJECT)
-#         secrets_list = admin_secret.read()
-#         totp_list = totp.generate_totp_for_all_secrets(secrets_list, logged_in_Okta_user_id)
-#         return jsonify(totp_list), 200
-#     else:
-#         if SHOW_LOGS: print("AUTHORIZE_CLAIM_NAME is not in token_info")
-#         if SHOW_LOGS: print("So, I need to send accessToken to userinfo API call to get AUTHORIZE_CLAIM_NAME")
-#         if SHOW_LOGS: print("22222222222222222222- Out of TOTP API in get_totp() -22222222222222222222")
-#         return {'error': 'UnAuthorized !!!'}, 403
-
 @app.route('/api/v1/totp', methods=['GET'])
 @limiter.limit(RATE_LIMIT)
 def get_totp():
@@ -295,11 +274,8 @@ def get_totp():
             print("No secret in secrets_list")
     else:     
         for secret in secrets_list:
-            # print("secret['oktaFactorId']: ", secret['oktaFactorId'])
             if secret['oktaUserId'] == logged_in_Okta_user_id and secret['oktaFactorId'] != "":
                 get_factor_response = okta.call_get_factor_API(logged_in_Okta_user_id, secret['oktaFactorId'])
-                # print("get_factor_response.json(): ", get_factor_response.json())
-
                 if get_factor_response.status_code == 200:
                     print("TOTP factor is Active. No need to delete the secret.")
                 elif get_factor_response.status_code == 404:
@@ -314,8 +290,6 @@ def get_totp():
     secrets_list1 = admin_secret.read()             
     totp_list = totp.generate_totp_for_all_secrets(secrets_list1, logged_in_Okta_user_id)
     return jsonify(totp_list), 200
-####################################################################################################################
-
 
 # @app.route('/api/v1/autoEnroll', methods=['GET'])
 @app.route('/api/v1/autoEnroll', methods=['POST'])
@@ -361,19 +335,14 @@ def checkIfAlreadyEnrolledToOktaVerify():
     for secret in secrets_list:
         if secret['oktaFactorId'] != "":
             usersAutoEnrolledFromTecVerify += 1
-            # print("Counting usersAutoEnrolledFromTecVerify: ", usersAutoEnrolledFromTecVerify)
         if secret['oktaFactorId'] != "" and secret['oktaUserId'] != logged_in_Okta_user_id:
             usersAutoEnrolledFromTecVerify_excludingLoginUser += 1
-            # print("Counting usersAutoEnrolledFromTecVerify_excludingLoginUser: ", usersAutoEnrolledFromTecVerify_excludingLoginUser)
     print("usersAutoEnrolledFromTecVerify: ", usersAutoEnrolledFromTecVerify)
     print("usersAutoEnrolledFromTecVerify_excludingLoginUser: ", usersAutoEnrolledFromTecVerify_excludingLoginUser)
 
     list_factors_response = okta.call_list_factors_API(logged_in_Okta_user_id)
     factors_list = list_factors_response.json()
-    # print("\nfactors_list: ", factors_list, "\n")
     for factor in factors_list:
-        # print("factor['id']: ", factor['id'])
-        # print("factor['factorType']: ", factor['factorType'])
         if factor['factorType'] == "token:software:totp":
             if not secrets_list:
                     print("No secret in secrets_list")
@@ -383,13 +352,9 @@ def checkIfAlreadyEnrolledToOktaVerify():
                         return {'Deleted Okta TOTP Factor enrolled from OktaVerify': True}, 200
             else:     
                 for secret in secrets_list:
-                    # print("factor['id']: ", factor['id'])
-                    # print("secret['oktaFactorId']: ", secret['oktaFactorId'])
                     if secret['oktaFactorId'] != "" and secret['oktaUserId'] == logged_in_Okta_user_id:
                         if factor['id'] == secret['oktaFactorId']:
                             print("factor IDs matched. So, user is enrolled to TOTP factor from TecVerify.")
-                            # print("factor['id']: ", factor['id'])
-                            # print("secret['oktaFactorId']: ", secret['oktaFactorId'])
                             return {'User is already Auto Enrolled to Okta from TecVerify': True}, 200
                         else:
                             print("factor IDs didn't match. So, user is enrolled to TOTP factor from other TecVerify Build or OktaVerify.")
@@ -397,22 +362,6 @@ def checkIfAlreadyEnrolledToOktaVerify():
                             if delete_factor_response.status_code == 204:
                                 print("Okta TOTP Factor enrolled from other TecVerify Build or OktaVerify is deleted")
                                 return {'Deleted Okta TOTP Factor enrolled from other TecVerify Build or OktaVerify': True}, 200
-                        #     print("Offline scenario. User is logged out of TecVerify.")
-                        #     print("This issue occurs when we do Development and Production in the same tenant.")
-                        #     print("Because for Development and Production, secrets.json file is different.")
-                        #     print("factor IDs didn't match. So, user is enrolled to TOTP factor from other Build.")
-                        #     print("i.e. After Auto enrolling here, user logged out here and login to TecVerify from other build.")
-                        #     print("So, he is auto enrolled to TOTP factor from other TecVerify build.")
-                        #     print("When no auto enrollment is done in that build for that logged in user.")
-                        #     print("So, deleting TOTP factor auto enrolled from other TecVerify Build.")
-                        #     or
-                        #     print("factor IDs didn't match. So, user is enrolled to TOTP factor from other Build.")
-                        #     print("i.e. After auto enrolling here, user logged out from here and deleted TOTP factor in Okta and enrolled it from OktaVerify.")
-                        #     print("As the user is in offline, changes didn't reflect in json file.")
-                        #     print("So, while logging in again, TecVerify considers the user as an auto-enrolled user")
-                        #     print("So, deleting TOTP factor enrolled from OktaVerify.")
-                        #
-                        #     Need to delete the previous auto-enrolled secret here itself. Instead of deleting inactive factor's secret in TOTP API.
 
                 if usersAutoEnrolledFromTecVerify == usersAutoEnrolledFromTecVerify_excludingLoginUser:
                     print("No auto enrollment is done in TecVerify for this logged in user.")
@@ -427,7 +376,7 @@ def checkIfAlreadyEnrolledToOktaVerify():
 
 if __name__ == '__main__':
     # app.run(host="0.0.0.0")
-    app.run(host="0.0.0.0", ssl_context='adhoc') # feb3: This is for running backend devlpmnt server in secure context(HTTPS)
+    app.run(host="0.0.0.0", ssl_context='adhoc') # This is for running backend devlpmnt server in secure context(HTTPS)
 
 ################## This is included in TOTP API ###############################################################
 @app.route('/api/v1/deleteSecretIfTOTPfactorIsDeletedInOkta', methods=['GET'])
@@ -444,11 +393,8 @@ def deleteSecretIfTOTPfactorIsInactive():
             return {"ERROR": "Secret List is Empty"}, 400
     else:     
         for secret in secrets_list:
-            # print("secret['oktaFactorId']: ", secret['oktaFactorId'])
             if secret['oktaUserId'] == logged_in_Okta_user_id and secret['oktaFactorId'] != "":
                 get_factor_response = okta.call_get_factor_API(logged_in_Okta_user_id, secret['oktaFactorId'])
-                # print("get_factor_response.json(): ", get_factor_response.json())
-
                 if get_factor_response.status_code == 200:
                     print("TOTP factor is Active. No need to delete the secret.")
                 elif get_factor_response.status_code == 404:
