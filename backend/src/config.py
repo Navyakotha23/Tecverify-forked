@@ -18,11 +18,9 @@ DATABASE_NAME = os.environ.get("DATABASE_NAME", default="TecVerify")
 TABLE_NAME = os.environ.get("TABLE_NAME", default="Secrets")
 AUTOSAVED_SECRET_USERNAME_HEAD = os.environ.get("AUTOSAVED_SECRET_USERNAME_HEAD", default="TecVerify")
 
-# tecnics-dev Tenant 
-# ENCRYPTED_API_KEY = os.environ.get("ENCRYPTED_API_KEY", default="b'\\xbd\\x9f\\xccD\\xf0\\x8d\\xb3\\xeati\\x8c\\x03\\x98\\x15\\x89A\\xde\\xdcx\\xf0\\x13r\\xa9(\\x11x\\xe7,\\xb19\\x16\\xba\\xe2*AT\\xa5\\x0c@K\\x9d&^\\xeeQ\\x86\\xf9\\x9d'")
-# tecnics-demo Tenant 
-# ENCRYPTED_API_KEY = os.environ.get("ENCRYPTED_API_KEY", default="b'\\x1c\\x9fX\\xd1\\xbean\\xe1\\xe3\\xb6}m\\xe1*\\xc0\\xf96\\xa7Nr\\x8e\\xae[\\xef<e\\x94\\xe1\\xa0\\x99\\x81\\x93\\xb7\\xc7\\x97\\x8a\\xce\\xa4\\x80\\x8d\\x82\\xc8\\x18o\\x1f1\\xa5'")
-ENCRYPTED_API_KEY = os.environ.get("ENCRYPTED_API_KEY", default="DummyAPIKey")
+
+ENCRYPTED_API_KEY = os.environ.get("ENCRYPTED_API_KEY")
+# ENCRYPTED_API_KEY = os.environ.get("ENCRYPTED_API_KEY", default="DummyAPIKey")
 API_KEY_SALT = os.environ.get("API_KEY_SALT", default="12345678")
 
 SHOW_LOGS = os.environ.get("SHOW_LOGS", default=False)

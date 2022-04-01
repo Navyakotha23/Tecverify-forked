@@ -49,11 +49,7 @@ SALT = app.config['SALT']
 crypt_obj = Crypto(SALT)
 # admin_secret = AdminSecret(SECRETS_FILE, crypt_obj)
 
-# DECRYPTED_API_KEY = crypt_obj.decryptAPIkey(ENCRYPTED_API_KEY, API_KEY_SALT)
-# tecnics-demoTenant 
-DECRYPTED_API_KEY = "00cyYJ6dovWjrfyiNSnrZiVMTz16Zff2mQT9DfGiRx"
-# tecnics-dev Tenant 
-# DECRYPTED_API_KEY = "00ovAgZhFKU3QoiU4w_yqJo55qUBfNTiSdXK9HmxI_"
+DECRYPTED_API_KEY = crypt_obj.decryptAPIkey(ENCRYPTED_API_KEY, API_KEY_SALT)
 
 admin_secret = AdminSecret(SECRETS_FILE, crypt_obj, MS_SQL_SERVER, MS_SQL_USERNAME, MS_SQL_PASSWORD, DATABASE_NAME, TABLE_NAME, AUTOSAVED_SECRET_USERNAME_HEAD, DATABASE_TYPE, SHOW_LOGS)
 totp = TOTP(crypt_obj, SHOW_LOGS)
