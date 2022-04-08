@@ -1,17 +1,16 @@
 import { useOktaAuth } from '@okta/okta-react';
 import React from 'react';
 import '../pages/Home.css';
+import { useHistory } from "react-router-dom";
 
-// const Navbar = ({userEmail, mainHeader, closeConnection}) => {
 const Navbar = ({userEmail, mainHeader}) => {
     const { oktaAuth } = useOktaAuth();
+    const history = useHistory();
+
     const logout = async () => {
-        // sessionStorage.removeItem('config');
-        // sessionStorage.removeItem('authConfig');
-        // await oktaAuth.revokeAccessToken();
-        
-        // closeConnection();
-        await oktaAuth.signOut('/login');
+        oktaAuth.signOut().then(() =>
+            history.push('/login')
+        );
     };
 
     return (

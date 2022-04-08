@@ -35,13 +35,9 @@ const HasAccessToRouter = ({config}) => {
                 oktaAuth={oktaAuth}
                 onAuthRequired={customAuthHandler}
             >
-                {/* <Route path="/" exact component={Dashboard} /> */}
-                {/* <Route path="/home" exact component={Home} /> */}
-                <Route path="/" exact component={Home} />
-
-                {/* <Route path="/implicit/callback" component={LoginCallback} /> */}
+                <Route path="/" exact component={Dashboard} />
+                <Route path="/home" exact component={Home} />
                 <Route path="/login/callback" component={LoginCallback} />
-
                 <Route path="/login" exact component={Login} />
             </Security>
         );
