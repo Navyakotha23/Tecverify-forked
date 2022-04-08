@@ -1,4 +1,4 @@
-import React from 'react';
+import React, {useEffect} from 'react';
 import { BrowserRouter as Router, Route, useHistory } from 'react-router-dom';
 import { Security, LoginCallback } from '@okta/okta-react';
 import Login from './components/auth/Login';
@@ -9,6 +9,7 @@ import Dashboard from './components/pages/dashboard';
 const HasAccessToRouter = ({config}) => {
     const history = useHistory();
     sessionStorage.setItem('config', JSON.stringify(config));
+    let oktaAuth, customAuthHandler;
     const authConfig = {
         clientId: config.CLIENT_ID,
         disableHttpsCheck: true,
@@ -22,19 +23,21 @@ const HasAccessToRouter = ({config}) => {
         updateCheckText: config.UPDATE_CHECK_TEXT
     };
     sessionStorage.setItem('authConfig', JSON.stringify(authConfig));
-    const oktaAuth = new OktaAuth(authConfig);
-    const customAuthHandler = () => {
-        history.push('/login');
-    };
+    oktaAuth = new OktaAuth(authConfig);
+    useEffect(() => {
+        customAuthHandler = () => {
+            history.push('/login');
+        };
+    })
     if(typeof authConfig === "object") {
         return (
             <Security
                 oktaAuth={oktaAuth}
                 onAuthRequired={customAuthHandler}
             >
-                <Route path="/" exact component={Dashboard} />
-                <Route path="/home" exact component={Home} />
+                {/*<Route path="/" exact component={Dashboard} />*/}
                 {/* <Route path="/implicit/callback" component={LoginCallback} /> */}
+                <Route path="/" exact component={Home} />
                 <Route path="/login/callback" component={LoginCallback} />
                 <Route path="/login" exact component={Login} />
             </Security>
