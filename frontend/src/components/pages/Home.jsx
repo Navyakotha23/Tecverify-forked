@@ -8,11 +8,13 @@ import "react-loader-spinner/dist/loader/css/react-spinner-loader.css"
 import Loader from 'react-loader-spinner'
 import {CopyToClipboard} from 'react-copy-to-clipboard';
 import Navbar from "../layout/NavBar";
+import {useHistory} from "react-router-dom";
 
 const TOKEN = 'token';
 const POST = 'POST';
 const GET = 'GET';
 const Home = () => {
+    const history = useHistory();
     const config = JSON.parse(sessionStorage.getItem('config'));
     const { oktaAuth, authState } = useOktaAuth();
     const [expiresIn, setSeconds] = useState();
@@ -219,6 +221,7 @@ const Home = () => {
                 })
                     .then(response => response.json())
                     .then(response => {
+                        getOtp();
                         console.log(response, checkEnrollmentStatus);
                     })
                     .catch(err => {
@@ -326,272 +329,287 @@ const Home = () => {
             transition = (100 - adjustTimerBar(new Date().getTime() / 1000) === 0 || 100 - adjustTimerBar(new Date().getTime() / 1000) < 4) ? '0s' : 'all 1s cubic-bezier(0.21, 0.19, 0.45, 0.55) 0s';
         }
 
-        return (
-            authState.isAuthenticated
-                ?
-                <div className={"container"}>
-                    <Navbar userEmail={userEmail} mainHeader={config.MAIN_HEADER}/>
+        const homePage = <div className={"container"}>
+            <Navbar userEmail={userEmail} mainHeader={config.MAIN_HEADER}/>
+            <div>
+                <div className={'instructions'}>
+                    <h3 className={'sub-heading'}>{config.INSTRUCTIONS_AND_HEADER_IN_BYPASS_CODE_GENERATOR.HEADER}</h3>
+                    <div style={{height: '60%', overflowY: 'auto'}}>
+                        <ul style={{listStyleType: 'none', padding: '0'}}>
+                            {config.INSTRUCTIONS_AND_HEADER_IN_BYPASS_CODE_GENERATOR.INSTRUCTIONS.map(function (content, index) {
+                                return <li key={index}>
+                                    <p className={'list-cls'}>
+                                        {content}
+                                    </p>
+                                </li>
+                            })}
+                        </ul>
+                    </div>
                     <div>
-                        <div className={'instructions'}>
-                            <h3 className={'sub-heading'}>{config.INSTRUCTIONS_AND_HEADER_IN_BYPASS_CODE_GENERATOR.HEADER}</h3>
-                            <div style={{height: '60%', overflowY: 'auto'}}>
-                                <ul style={{listStyleType: 'none', padding: '0'}}>
-                                    {config.INSTRUCTIONS_AND_HEADER_IN_BYPASS_CODE_GENERATOR.INSTRUCTIONS.map(function (content, index) {
-                                        return <li key={index}>
-                                            <p className={'list-cls'}>
-                                                {content}
-                                            </p>
-                                        </li>
-                                    })}
-                                </ul>
-                            </div>
-                            <div>
+                    </div>
+                </div>
+                <div style={{width: '33.3%'}}>
+                    <div className="mobile">
+                        <span className="titlecls">{config.BYPASS_CODES_HEADER}</span>
+                        {
+                            addButtonStatus ?
+                                <button
+                                    className={"admin-button"}
+                                    onClick={() => showAdminSecretForm()}>
+                                    +
+                                </button> : ''
+                        }
+                        <div className={'outer-progress-bar'}>
+                            <div className="progress-bar" style={{
+                                width: 100 - adjustTimerBar(new Date().getTime() / 1000) + "%",
+                                transition: transition,
+                            }}>
                             </div>
                         </div>
-                        <div style={{width: '33.3%'}}>
-                            <div className="mobile">
-                                <span className="titlecls">{config.BYPASS_CODES_HEADER}</span>
-                                {
-                                    addButtonStatus ?
-                                        <button
-                                            className={"admin-button"}
-                                            onClick={() => showAdminSecretForm()}>
-                                            +
-                                        </button> : ''
-                                }
-                                <div className={'outer-progress-bar'}>
-                                    <div className="progress-bar" style={{
-                                        width: 100 - adjustTimerBar(new Date().getTime() / 1000) + "%",
-                                        transition: transition,
-                                    }}>
-                                    </div>
-                                </div>
-                                <hr className={'divider'} style={{borderColor: '#d6d6d6', marginTop:'4px', marginBottom: '0', marginLeft: '15px'}}/>
-                                <ul style={{
-                                    listStyleType: 'none',
-                                    marginLeft: '18px',
-                                    marginRight: '17px',
-                                    overflow: 'auto',
-                                    marginTop: '5px',
-                                    maxHeight: '400px',
-                                    padding: '0'
-                                }}>
+                        <hr className={'divider'} style={{borderColor: '#d6d6d6', marginTop:'4px', marginBottom: '0', marginLeft: '15px'}}/>
+                        <ul style={{
+                            listStyleType: 'none',
+                            marginLeft: '18px',
+                            marginRight: '17px',
+                            overflow: 'auto',
+                            marginTop: '5px',
+                            maxHeight: '400px',
+                            padding: '0'
+                        }}>
+                            {
+                                (randomOtp && randomOtp.length > 0) ? randomOtp.map(function (code, index) {
+                                    const {secretName, secretUpdatedAt} = code;
+                                    return (
+                                        <li className='otp-list-cls' key={index}>
+                                            <div style={{display: 'flex'}}>
+                                                {
+                                                    deleteIconStatus ?
+                                                        <DeleteSecretKey
+                                                            setSelectedSecretName={setSelectedSecretName}
+                                                            setSelectedSecretId={setSelectedSecretId}
+                                                            showDeleteConfirmationPopup={showDeleteConfirmationPopup}
+                                                            code={code}/> : ''
+                                                }
+                                                <input className={'bypass-codes-names'} type={'readonly'} value={secretName}/>
+                                            </div>
+                                            <div style={{display: 'flex'}}>
+                                                <span className="random-otp" style={{marginTop: '7px', letterSpacing: '3px'}}>{code.otp}</span>
+                                                {
+                                                    copyIconStatus ?
+                                                        <CopyToClipboard title={'copy to clipboard'} text={code.otp}
+                                                                         onCopy={() => {
+                                                                             alertOnOtpCopyingToClipboard(code.otp)
+                                                                         }}>
+                                                            <button className={'copy-icon'} title={'copy to clipboard'}>
+                                                            </button>
+                                                        </CopyToClipboard> : ''
+                                                }
+                                                <p className='time-details'>{secretUpdatedAt}</p>
+                                            </div>
+                                        </li>
+                                    )}) :  <div>
                                     {
-                                        (randomOtp && randomOtp.length > 0) ? randomOtp.map(function (code, index) {
-                                            const {secretName, secretUpdatedAt} = code;
-                                            return (
-                                                <li className='otp-list-cls' key={index}>
-                                                    <div style={{display: 'flex'}}>
-                                                        {
-                                                            deleteIconStatus ?
-                                                                <DeleteSecretKey
-                                                                    setSelectedSecretName={setSelectedSecretName}
-                                                                    setSelectedSecretId={setSelectedSecretId}
-                                                                    showDeleteConfirmationPopup={showDeleteConfirmationPopup}
-                                                                    code={code}/> : ''
-                                                        }
-                                                        <input className={'bypass-codes-names'} type={'readonly'} value={secretName}/>
-                                                    </div>
-                                                    <div style={{display: 'flex'}}>
-                                                        <span className="random-otp" style={{marginTop: '7px', letterSpacing: '3px'}}>{code.otp}</span>
-                                                        {
-                                                            copyIconStatus ?
-                                                                <CopyToClipboard title={'copy to clipboard'} text={code.otp}
-                                                                                 onCopy={() => {
-                                                                                     alertOnOtpCopyingToClipboard(code.otp)
-                                                                                 }}>
-                                                                    <button className={'copy-icon'} title={'copy to clipboard'}>
-                                                                    </button>
-                                                                </CopyToClipboard> : ''
-                                                        }
-                                                        <p className='time-details'>{secretUpdatedAt}</p>
-                                                    </div>
-                                                </li>
-                                            )}) :  <div>
-                                            {
-                                                (randomOtp && randomOtp.length === 0) ?
-                                                    <p style={{margin: '20px'}}>No Names found with this user.</p>
-                                                    :
-                                                    <div style={{marginLeft: '42%', marginTop: '15%'}}>
-                                                        <Loader type="Oval" color="#007dc1" height={50} width={50}/>
-                                                    </div>
-                                            }
-                                        </div>
+                                        (randomOtp && randomOtp.length === 0) ?
+                                            <p style={{margin: '20px'}}>No Names found with this user.</p>
+                                            :
+                                            <div style={{marginLeft: '42%', marginTop: '15%'}}>
+                                                <Loader type="Oval" color="#007dc1" height={50} width={50}/>
+                                            </div>
                                     }
-                                </ul>
+                                </div>
+                            }
+                        </ul>
+                    </div>
+                </div>
+            </div>
+            {
+                deleteConfirmationPopup ? (
+                    <div className="popup-box">
+                        <div className="box" style={{width: '65%',minWidth: '300px', padding: '0'}}>
+                            <h3 className="container-header">{config.CONFIRMATION_POPUP_FOR_BYPASS_CODE_FOR_DELETING.HEADER}</h3>
+                            <p style={{fontSize: "initial", margin: '30px 0px 20px 50px'}}>
+                                {config.CONFIRMATION_POPUP_FOR_BYPASS_CODE_FOR_DELETING.QUESTION}
+                                <b>{selectedSecretName}</b> ?</p>
+                            <div style={{width: "100%"}}>
+                                <button className="button delete-button" onClick={() => {
+                                    showDeleteConfirmationPopup('');
+                                    deleteByPassCode()
+                                }}>
+                                    Confirm
+                                </button>
+                                <button className="button cancel-button"
+                                        onClick={() => showDeleteConfirmationPopup('')}>
+                                    cancel
+                                </button>
                             </div>
                         </div>
                     </div>
-                    {
-                        deleteConfirmationPopup ? (
-                            <div className="popup-box">
-                                <div className="box" style={{width: '65%',minWidth: '300px', padding: '0'}}>
-                                    <h3 className="container-header">{config.CONFIRMATION_POPUP_FOR_BYPASS_CODE_FOR_DELETING.HEADER}</h3>
-                                    <p style={{fontSize: "initial", margin: '30px 0px 20px 50px'}}>
-                                        {config.CONFIRMATION_POPUP_FOR_BYPASS_CODE_FOR_DELETING.QUESTION}
-                                        <b>{selectedSecretName}</b> ?</p>
-                                    <div style={{width: "100%"}}>
-                                        <button className="button delete-button" onClick={() => {
-                                            showDeleteConfirmationPopup('');
-                                            deleteByPassCode()
-                                        }}>
-                                            Confirm
-                                        </button>
-                                        <button className="button cancel-button"
-                                                onClick={() => showDeleteConfirmationPopup('')}>
-                                            cancel
-                                        </button>
+                ) : ''
+            }
+            {
+                noError ? (
+                    <ErrorPopup errorMessage={noError} logoutInErrorPopup={logoutInErrorPopup} onClose={setError('')}/>
+                ) : ''
+            }
+            {
+                !showOtpDetails ? (
+                    <div className="admin-popup-box">
+                        <div className="admin-box">
+                            <h3 className={'container-header'}>{config.ENROLLMENT_FACTOR_POPUP.HEADER}</h3>
+                            <button className={'close-button'}
+                                    onClick={() => {
+                                        hideAdminSecretForm();
+                                    }}>
+                                X
+                            </button>
+                            {
+                                showLoadingSpinnerInAdminSecretPopup ?
+                                    <div style={{marginLeft: '47%', marginTop: '20%'}}>
+                                        <Loader type="Oval" color="#007dc1" height={50} width={50}/>
                                     </div>
-                                </div>
-                            </div>
-                        ) : ''
-                    }
-                    {
-                        noError ? (
-                            <ErrorPopup errorMessage={noError} logoutInErrorPopup={logoutInErrorPopup} onClose={setError('')}/>
-                        ) : ''
-                    }
-                    {
-                        !showOtpDetails ? (
-                            <div className="admin-popup-box">
-                                <div className="admin-box">
-                                    <h3 className={'container-header'}>{config.ENROLLMENT_FACTOR_POPUP.HEADER}</h3>
-                                    <button className={'close-button'}
-                                            onClick={() => {
-                                                hideAdminSecretForm();
-                                            }}>
-                                        X
-                                    </button>
-                                    {
-                                        showLoadingSpinnerInAdminSecretPopup ?
-                                            <div style={{marginLeft: '47%', marginTop: '20%'}}>
-                                                <Loader type="Oval" color="#007dc1" height={50} width={50}/>
+                                    :
+                                    <div className={'admin-secret'}>
+                                        <div className={'instructions-admin-secret'}>
+                                            <h3 className={'sub-heading'}>{config.ENROLLMENT_FACTOR_POPUP.INSTRUCTIONS.HEADER}</h3>
+                                            <ul style={{listStyleType: 'none', padding: '0'}}>
+                                                {config.ENROLLMENT_FACTOR_POPUP.INSTRUCTIONS.INSTRUCTIONS_LIST.map(function (code, index) {
+                                                    return  <li key={index}>
+                                                        <p className={'list-cls'}>
+                                                            {code}
+                                                        </p>
+                                                    </li>
+                                                })}
+                                            </ul>
+                                        </div>
+                                        <div style={{width: "55%"}}>
+                                            <input
+                                                className={'admin-secret-input'}
+                                                type="text"
+                                                maxLength={'30'}
+                                                placeholder={"Secret Name"}
+                                                value={adminSecret.trimStart()}
+                                                onChange={e => setAdminSecret(e.target.value)}
+                                            />
+                                            <br/>
+                                            <br/>
+                                            <div>
+                                                <button disabled={(gettingAdminSecret)} type="button"
+                                                        className="generate-secret-button"
+                                                        onClick={() => getSecretKey()}>
+                                                    {
+                                                        !gettingAdminSecret ?
+                                                            'Generate Secret Key' :
+                                                            <Loader type="Oval" color="white" height={15}
+                                                                    width={15}/>
+                                                    }
+                                                </button>
                                             </div>
-                                            :
-                                            <div className={'admin-secret'}>
-                                                <div className={'instructions-admin-secret'}>
-                                                    <h3 className={'sub-heading'}>{config.ENROLLMENT_FACTOR_POPUP.INSTRUCTIONS.HEADER}</h3>
-                                                    <ul style={{listStyleType: 'none', padding: '0'}}>
-                                                        {config.ENROLLMENT_FACTOR_POPUP.INSTRUCTIONS.INSTRUCTIONS_LIST.map(function (code, index) {
-                                                            return  <li key={index}>
-                                                                <p className={'list-cls'}>
-                                                                    {code}
-                                                                </p>
-                                                            </li>
-                                                        })}
-                                                    </ul>
-                                                </div>
-                                                <div style={{width: "55%"}}>
-                                                    <input
-                                                        className={'admin-secret-input'}
-                                                        type="text"
-                                                        maxLength={'30'}
-                                                        placeholder={"Secret Name"}
-                                                        value={adminSecret.trimStart()}
-                                                        onChange={e => setAdminSecret(e.target.value)}
-                                                    />
-                                                    <br/>
-                                                    <br/>
-                                                    <div>
-                                                        <button disabled={(gettingAdminSecret)} type="button"
-                                                                className="generate-secret-button"
-                                                                onClick={() => getSecretKey()}>
-                                                            {
-                                                                !gettingAdminSecret ?
-                                                                    'Generate Secret Key' :
-                                                                    <Loader type="Oval" color="white" height={15}
-                                                                            width={15}/>
-                                                            }
-                                                        </button>
-                                                    </div>
-                                                    <br/>
-                                                    <div className={'shared-secret-div'}>
-                                                        <input
-                                                            className={'shared-secret'}
-                                                            readOnly={false}
-                                                            placeholder={"Secret Key"}
-                                                            value={sharedSecret}
-                                                            onChange={e => setSharedSecret(e.target.value)}
-                                                        />
-                                                        <CopyToClipboard text={sharedSecret}
-                                                                         onCopy={() => {
-                                                                             setSuccessOrErrorMessage('Secret Key', sharedSecret)
-                                                                         }}>
-                                                            <button type='button' className={'copy-button'}>Copy
-                                                            </button>
-                                                        </CopyToClipboard>
-                                                    </div>
-                                                    <br/>
-                                                    <br/>
-                                                    {/*<div className={'shared-secret-div'}>*/}
-                                                    {/*    <input*/}
-                                                    {/*        style={SHOW_ENCRYPTED_KEY === 'true' ? {} : {display: "none"}}*/}
-                                                    {/*        className={'shared-secret'}*/}
-                                                    {/*        readOnly={true}*/}
-                                                    {/*        placeholder={"Encrypted Key"}*/}
-                                                    {/*        value={encryptedSecret}*/}
-                                                    {/*        onChange={e => setEncryptedSecret(e.target.value)}*/}
-                                                    {/*    />*/}
-                                                    {/*    <CopyToClipboard text={encryptedSecret}*/}
-                                                    {/*                     onCopy={() => {*/}
-                                                    {/*                         setSuccessOrErrorMessage('Encrypted Key', encryptedSecret)*/}
-                                                    {/*                     }}>*/}
-                                                    {/*        <button  style={SHOW_ENCRYPTED_KEY === 'true' ? {} : {display: "none"}} type='button' className={'copy-button'}>Copy*/}
-                                                    {/*        </button>*/}
-                                                    {/*    </CopyToClipboard>*/}
-                                                    {/*</div>*/}
-                                                    <div>
-                                                        <button
-                                                            style={{cursor: (!adminSecret || !sharedSecret) ? 'no-drop' : 'pointer'}}
-                                                            className="save-button"
-                                                            disabled={(!adminSecret || !sharedSecret)}
-                                                            onClick={() => handleSubmit()}>
-                                                            Save
-                                                        </button>
-                                                    </div>
-                                                </div>
-                                                {
-                                                    successMessage ?
-                                                        <div>
-                                                            <span className={"success-message"}>{successMessage}</span>
-                                                        </div>
-                                                        :
-                                                        ''
-                                                }
-                                                {
-                                                    errorMessage ?
-                                                        <div>
-                                                            <span className={"error-message"}>{errorMessage}</span>
-                                                        </div>
-                                                        :
-                                                        ''
-                                                }
+                                            <br/>
+                                            <div className={'shared-secret-div'}>
+                                                <input
+                                                    className={'shared-secret'}
+                                                    readOnly={false}
+                                                    placeholder={"Secret Key"}
+                                                    value={sharedSecret}
+                                                    onChange={e => setSharedSecret(e.target.value)}
+                                                />
+                                                <CopyToClipboard text={sharedSecret}
+                                                                 onCopy={() => {
+                                                                     setSuccessOrErrorMessage('Secret Key', sharedSecret)
+                                                                 }}>
+                                                    <button type='button' className={'copy-button'}>Copy
+                                                    </button>
+                                                </CopyToClipboard>
                                             </div>
-                                    }
-                                </div>
-                            </div>
-                        ) : ''
-                    }
-                    <div className={"footer"}>
-                        <footer style={{
-                            width: '56%',
-                            left: '12%',
-                            top: '-30%',
-                            position: 'absolute',
-                            borderTop: '1px solid silver'
-                        }}>
+                                            <br/>
+                                            <br/>
+                                            {/*<div className={'shared-secret-div'}>*/}
+                                            {/*    <input*/}
+                                            {/*        style={SHOW_ENCRYPTED_KEY === 'true' ? {} : {display: "none"}}*/}
+                                            {/*        className={'shared-secret'}*/}
+                                            {/*        readOnly={true}*/}
+                                            {/*        placeholder={"Encrypted Key"}*/}
+                                            {/*        value={encryptedSecret}*/}
+                                            {/*        onChange={e => setEncryptedSecret(e.target.value)}*/}
+                                            {/*    />*/}
+                                            {/*    <CopyToClipboard text={encryptedSecret}*/}
+                                            {/*                     onCopy={() => {*/}
+                                            {/*                         setSuccessOrErrorMessage('Encrypted Key', encryptedSecret)*/}
+                                            {/*                     }}>*/}
+                                            {/*        <button  style={SHOW_ENCRYPTED_KEY === 'true' ? {} : {display: "none"}} type='button' className={'copy-button'}>Copy*/}
+                                            {/*        </button>*/}
+                                            {/*    </CopyToClipboard>*/}
+                                            {/*</div>*/}
+                                            <div>
+                                                <button
+                                                    style={{cursor: (!adminSecret || !sharedSecret) ? 'no-drop' : 'pointer'}}
+                                                    className="save-button"
+                                                    disabled={(!adminSecret || !sharedSecret)}
+                                                    onClick={() => handleSubmit()}>
+                                                    Save
+                                                </button>
+                                            </div>
+                                        </div>
+                                        {
+                                            successMessage ?
+                                                <div>
+                                                    <span className={"success-message"}>{successMessage}</span>
+                                                </div>
+                                                :
+                                                ''
+                                        }
+                                        {
+                                            errorMessage ?
+                                                <div>
+                                                    <span className={"error-message"}>{errorMessage}</span>
+                                                </div>
+                                                :
+                                                ''
+                                        }
+                                    </div>
+                            }
+                        </div>
+                    </div>
+                ) : ''
+            }
+            <div className={"footer"}>
+                <footer style={{
+                    width: '56%',
+                    left: '12%',
+                    top: '-30%',
+                    position: 'absolute',
+                    borderTop: '1px solid silver'
+                }}>
                                     <span style={{float: 'left', marginRight: '20px', marginTop: '10px'}}>
                                         version {version}
                                     </span>
-                            <span style={{float: 'left', marginLeft: '100px', marginTop: '10px'}}>
+                    <span style={{float: 'left', marginLeft: '100px', marginTop: '10px'}}>
                                     {config.ISSUER.split('/')[2]}
                                     </span>
-                        </footer>
+                </footer>
+            </div>
+        </div>
+
+        console.log('authState.isAuthenticated', authState.isAuthenticated);
+        if(authState.isAuthenticated) {
+            return homePage
+        } else {
+            return <div className="popup-box" style={{background: '#ffffff50'}}>
+                <div className="config-error-box">
+                    <div style={{background: '#ff4949', height: '50px', padding: '10px'}}>
+                        <h2>Alert</h2>
                     </div>
+                    <p style={{fontSize: 'initial', textAlign: 'center', marginTop: '40px'}}>Error : Session Expired! </p>
+                    <button
+                        className={'sign-in-btn'}
+                        type='button'
+                        onClick={() => { history.push('/login') }}
+                    >
+                        Login here
+                    </button>
                 </div>
-                :
-                <Login/>
-        )
+            </div>;
+        }
     } else {
         return '';
     }

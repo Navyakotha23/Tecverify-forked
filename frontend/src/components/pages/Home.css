@@ -257,7 +257,7 @@ hr.divider {
     width: 500px;
     margin: 0 auto;
     border: 1px solid silver;
-    height: 200px;
+    height: 225px;
     max-height: 70vh;
     margin-top: calc(115vh - 85vh - 20px);
     background: white;
@@ -470,3 +470,30 @@ hr.divider {
     top: 200px;
     float: right;
  }
+.sign-in-btn{
+    font-size: 15px;
+    line-height: 36px;
+    padding: 0 15px;
+    border: 1px solid;
+    border-radius: 3px;
+    box-sizing: border-box;
+    -webkit-appearance: none;
+    width: 50%;
+    margin-left: 25%;
+    height: 50px;
+    color: #fff;
+    background-color: #007dc1;
+    background: -o-linear-gradient(top,#007dc1 0,#0073b2 100%);
+    background: -ms-linear-gradient(top,#007dc1 0,#0073b2 100%);
+    background: -webkit-gradient(linear,left top,left bottom,from(#007dc1),to(#0073b2));
+    background: linear-gradient(#007dc1,#0073b2);
+    border-color: #004b75 #004b75 #00456a;
+}
+.sign-in-btn:hover {
+    background-color: #0087d0;
+    background-image: linear-gradient(#0087d0,#007dc1);
+    border-color: #003d5e #003d5e #003a59;
+    text-decoration: none;
+    cursor: pointer;
+    box-shadow: none;
+}
