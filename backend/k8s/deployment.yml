@@ -1,0 +1,45 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: tecverify-be
+  labels:
+    app: tecverify-be
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: tecverify-be
+  template:
+    metadata:
+      labels:
+        app: tecverify-be
+    spec:
+      containers:
+      - name: tecverify-be
+        image: kasilok/tecverify-be
+        ports:
+        - containerPort: 5000
+          protocol: TCP
+        resources:
+          limits:
+            memory: 64Mi
+            cpu: 150m
+          requests:
+            memory: 32Mi
+            cpu: 50m
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: tecverify-be
+  labels:
+    app: tecverify-be
+spec:
+  selector:
+    app: tecverify-be
+  type: LoadBalancer
+  ports:
+  - protocol: TCP
+    port: 5000
+    targetPort: 5000
+    nodePort: 31000

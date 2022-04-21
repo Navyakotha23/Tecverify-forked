@@ -1,0 +1,93 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: tecverify-be
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: tecverify-be
+  template:
+    metadata:
+      labels:
+        app: tecverify-be
+
+    spec:
+      containers:
+        - name: tecverify-be
+          image: naveenmasuna/backend_tecverify:version_2
+          imagePullPolicy: "Always"
+          resources:
+            limits:
+              memory: 64Mi
+              cpu: 150m
+            requests:
+              memory: 32Mi
+              cpu: 50m
+          # livenessProbe:
+          #   httpGet:
+          #     path: /health
+          #     port: 8000
+          #   initialDelaySeconds: 30
+          #   periodSeconds: 5
+          # readinessProbe:
+          #   httpGet:
+          #     path: /ready
+          #     port: 8000
+          #   initialDelaySeconds: 30
+          #   periodSeconds: 5
+          ports:
+            - containerPort: 5000
+          env:
+            - name: CLIENT_ID
+              value: 0oa2dxm3lbONcEqeb5d7
+            - name: ISSUER
+              value: https://dev-27926041.okta.com/oauth2/aus2dxnjsgiyARX8N5d7
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: tecverify-fe
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: tecverify-fe
+      
+  template:
+    metadata:
+      labels:
+        app: tecverify-fe
+    spec:
+      containers:
+        - name: tecverify-fe
+          image: naveenmasuna/frontend_tecverify:version_1
+          imagePullPolicy: "Always"
+          volumeMounts:
+            - name: fe-config-volume
+              mountPath: /usr/share/nginx/html/config/
+          resources:
+            limits:
+              cpu: 100m
+              memory: 128Mi
+            requests:
+              cpu: 50m
+              memory: 64Mi
+          # livenessProbe:
+          #   httpGet:
+          #     path: /health
+          #     port: 8080
+          #   initialDelaySeconds: 30
+          #   periodSeconds: 5
+          # readinessProbe:
+          #   httpGet:
+          #     path: /ready
+          #     port: 8080
+          #   initialDelaySeconds: 30
+          #   periodSeconds: 5
+          ports:
+            - containerPort: 80
+      volumes:
+        - name: fe-config-volume
+          configMap:
+            name: tecverify-fe-config

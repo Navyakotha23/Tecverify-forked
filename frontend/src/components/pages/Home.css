@@ -1,0 +1,499 @@
+.container{
+    width: 100%;
+    min-width: 1300px;
+    min-height: 850px;
+    height: 110%;
+    position : fixed;
+    background-image: url("../../assets/images/bg.jpg");
+    background-size: 100% 100%;
+    background-repeat: no-repeat;
+    overflow: auto;
+}
+.instructions{
+    position: absolute;
+    left: 33%;
+    top: 48%;
+    transform: translate(-50%, -50%);
+    width: 600px;
+    height: 75%;
+    overflow: auto;
+}
+.logout-button {
+    margin: 0;
+    padding: 0;
+    float: right;
+    background: none;
+    border: none;
+    color: white;
+    outline: none;
+    cursor: pointer;
+}
+.user-email {
+    margin: 0;
+    padding: 5px 0 5px 0;
+    float: right;
+    background: none;
+    border: none;
+    color: white;
+    outline: none;
+}
+.logout-button:hover {
+    text-decoration: underline;
+}
+.navBar{
+    background: none;
+    height: 60px;
+    display: flex;
+    width: 70%;
+    margin-left: 12%;
+}
+.header{
+    color: black;
+    margin-top: 20px;
+    width: 100%;
+    font-size: 29px;
+    font-weight: lighter;
+}
+.sub-heading{
+    font-size: 20px;
+    margin: 0 0 20px 0;
+    padding: 0 0 10px 0;
+    position: relative;
+}
+.sub-heading::before{
+    content: "";
+    position: absolute;
+    width: 100%;
+    height: 1.5px;
+    background-color: rgb(255, 0, 0);
+    bottom: 0;
+}
+/*.sub-heading::after{*/
+/*    content: "";*/
+/*    position: absolute;*/
+/*    width: 120px;*/
+/*    height: 3px;*/
+/*    background-color: rgb(255, 0, 0);*/
+/*    bottom: -0.5px;*/
+/*    left: 0;*/
+/*}*/
+.list-cls{
+    background: url("../../assets/images/list-bg.png") no-repeat left 7px;
+    padding: 0 0 15px 30px;
+    background-size: 15px;
+    font-size: 15px;
+    text-align: justify;
+}
+.otp-list-cls{
+    background: url("../../assets/images/list-bg.png") no-repeat left 32px;
+    background-size: 15px;
+    background-position: 3% 50%;
+    border-bottom: 1px solid #949494;
+}
+.titlecls{
+    font-size: 24px;
+    width: 65%;
+    color: #255062;
+    margin: 50px 0 25px 30px;
+    display: inline-block;
+}
+.mobile{
+    background: url("../../assets/images/mobile.png") no-repeat left top;
+    background-size: 100% 100%;
+    margin-top: 40px;
+    width: 300px;
+    height: 500px;
+    left: 176%;
+    position: relative;
+}
+.bypass-codes-names{
+    padding: 10px 0px 0px 15px;
+    font-size: 15px;
+    width: 75%;
+    outline: none;
+    border: 0px;
+    margin: 0px;
+    background: none;
+}
+.admin-button {
+    background-color: #0a8dad;
+    border: none;
+    width: 35px;
+    color: white;
+    height: 35px;
+    text-align: center;
+    text-decoration: none;
+    display: inline-block;
+    font-size: 16px;
+    cursor: pointer;
+    outline: none;
+    transition-duration: 0.4s;
+    border-radius: 20px;
+}
+
+.admin-button:hover {
+    box-shadow: 0 2px 5px 0 rgba(0,0,0,0.24), 0 5px 10px 0 rgba(0,0,0,0.19);
+    background: #026296;
+}
+
+.button {
+    background-color: #2fa2e0;
+    border: none;
+    color: white;
+    padding: 15px 32px;
+    text-align: center;
+    text-decoration: none;
+    display: inline-block;
+    font-size: 16px;
+    margin: 4px 2px;
+    cursor: pointer;
+    outline: none;
+    transition-duration: 0.2s;
+}
+.generate-secret-button {
+    background-color: #0083a2;
+    border: none;
+    color: white;
+    padding: 15px 30px;
+    text-align: center;
+    text-decoration: none;
+    display: inline-block;
+    font-size: 16px;
+    cursor: pointer;
+    outline: none;
+    transition-duration: 0.4s;
+    width: 80%;
+    border-radius: 5px;
+    margin-left: 10%;
+}
+.generate-secret-button:hover {
+    box-shadow: 0 2px 5px 0 rgba(0,0,0,0.24), 0 5px 10px 0 rgba(0,0,0,0.19);
+    background: #0099c3;
+}
+.button:hover {
+    box-shadow: 0 2px 5px 0 rgba(0,0,0,0.24), 0 5px 10px 0 rgba(0,0,0,0.19);
+}
+hr.divider {
+    width: 90%;
+    border-color: #d6d6d6;
+    border-bottom: 0;
+    border-left: 0;
+    position: absolute;
+    padding: 0;
+    border-right: 0;
+}
+.admin-secret-input{
+    margin-left: 10%;
+    border: 1px solid silver;
+    height: 35px;
+    outline: none;
+    border-radius: 6px;
+    padding-left: 12px;
+    margin-top: 5%;
+    width: 80%;
+}
+.close-button {
+    position: absolute;
+    border: none;
+    color: #8e8e8e;
+    top: 5%;
+    left: 94%;
+    background: none;
+    text-align: center;
+    text-decoration: none;
+    display: inline-block;
+    font-size: 30px;
+    float: right;
+    cursor: pointer;
+    outline: none;
+}
+
+.footer {
+    position: fixed;
+    left: 1%;
+    bottom: 0;
+    height: 5%;
+    width: 80%;
+    color: #626262;
+}
+.outer-progress-bar {
+    width: 90%;
+    height: 5px;
+    left: -3px;
+    position: absolute;
+    margin: 0 15px 0 18px;
+    border-bottom: 0;
+    border-left: 0;
+    border-right: 0;
+}
+.progress-bar {
+    background: #007dc1;
+    height: 5px;
+    transition: all 1s cubic-bezier(0.21, 0.19, 0.45, 0.55) 0s;
+}
+.popup-box {
+     position: fixed;
+     background: #00000050;
+     width: 100%;
+     height: 100vh;
+     top: 0;
+     left: 0;
+ }
+.box {
+    position: relative;
+    width: 400px;
+    margin: 0 auto;
+    border: 1px solid silver;
+    height: auto;
+    max-height: 70vh;
+    margin-top: calc(115vh - 85vh - 20px);
+    background: white;
+    border-radius: 4px;
+    padding: 20px;
+    overflow: auto;
+}
+.config-error-box {
+    position: relative;
+    width: 500px;
+    margin: 0 auto;
+    border: 1px solid silver;
+    height: 225px;
+    max-height: 70vh;
+    margin-top: calc(115vh - 85vh - 20px);
+    background: white;
+    border-radius: 4px;
+    overflow: auto;
+}
+.admin-popup-box {
+     position: fixed;
+     background: #00000050;
+     width: 100%;
+     height: 100vh;
+     top: 0;
+     left: 0;
+ }
+
+.admin-box {
+    background: white;
+    position: relative;
+    width: 80%;
+    margin: 7% auto;
+    height: 70%;
+    border-radius: 4px;
+    border: 1px solid #999;
+}
+
+.close-icon {
+    content: 'x';
+    cursor: pointer;
+    position: fixed;
+    right: calc(15% - 30px);
+    top: calc(100vh - 85vh - 33px);
+    background: #ededed;
+    width: 25px;
+    height: 25px;
+    border-radius: 50%;
+    line-height: 20px;
+    text-align: center;
+    border: 1px solid #999;
+    font-size: 20px;
+}
+.success-message {
+    position: absolute;
+    top: 90%;
+    height: 30px;
+    left: 10%;
+    padding-top: 5px;
+    text-align: center;
+    background: #d9ffd9;
+    width: 80%;
+    color: #145614;
+    border-radius: 5px;
+}
+.error-message {
+    position: absolute;
+    top: 90%;
+    height: 30px;
+    left: 10%;
+    padding-top: 5px;
+    text-align: center;
+    background: #ffd9d9;
+    width: 80%;
+    color: #9c0000;
+    border-radius: 5px;
+}
+.container-header {
+    height: 60px;
+    margin-left: 2%;
+    padding: 35px;
+    color: black;
+    font-size: 30px;
+    font-weight: 200;
+    background: none;
+}
+.instructions-admin-secret {
+    width: 45%;
+    text-align: justify;
+    height: 80%;
+    overflow-y: auto;
+    padding: 5px;
+}
+.admin-secret {
+    width: 95%;
+    margin: 0 2.5% 2.5% 2.5%;
+    display: inline-flex;
+    border: 0;
+    border-radius: 26px;
+    height: 91%;
+}
+.shared-secret {
+    height: 37px;
+    border: 1px solid silver;
+    width: 80%;
+    color: darkslategray;
+    border-radius: 5px 0 0 5px;
+    padding-left: 10px;
+    outline: none;
+}
+.shared-secret-div {
+    display: flex;
+    margin-left: 10%;
+    width: 85%;
+    height: 37px;
+    outline: none;
+    border-radius: 6px;
+}
+.copy-button {
+    cursor: pointer;
+    height: 100%;
+    color: white;
+    margin: 0 0 0 0;
+    border-radius: 0 5px 5px 0;
+    padding: 10px 10px 9px 10px;
+    background: #0083a2;
+    border: 1px solid rgb(32, 132, 186);
+    outline: none;
+}
+.save-button {
+    background-color: #0083a2;
+    border: none;
+    color: white;
+    padding: 15px;
+    font-size: 16px;
+    outline: none;
+    transition-duration: inherit;
+    width: 100px;
+    border-radius: 5px;
+    float: right;
+    margin-right: 10%;
+}
+.save-button:hover {
+    box-shadow: 0 2px 5px 0 rgba(0,0,0,0.24), 0 5px 10px 0 rgba(0,0,0,0.19);
+    background: #039dc6;
+}
+.trash-icon{
+    width: 20px;
+    height: 20px;
+    position: relative;
+    float: right;
+    left: 88%;
+    padding: 0;
+    top: 10px;
+    margin: 0;
+    background: none;
+    border: 0;
+    color: #818181;
+    outline: none;
+    cursor: pointer;
+}
+.copy-icon{
+    width: 25px;
+    height: 20px;
+    position: relative;
+    padding: 0;
+    top: 9px;
+    left: 15px;
+    margin: 0;
+    border: 0;
+    color: darkgrey;
+    outline: none;
+    cursor: pointer;
+    background: url("../../assets/images/copy.png") no-repeat left top;
+}
+.delete-button{
+     background-color: #007996;
+     border: none;
+     color: white;
+     text-align: center;
+     text-decoration: none;
+     display: inline-block;
+     font-size: 16px;
+     margin: 20px;
+     cursor: pointer;
+     outline: none;
+     transition-duration: 0.2s;
+     border-radius: 3px;
+     height: 40px;
+     padding-top: 10px;
+     top: 200px;
+     float: right;
+ }
+.random-otp{
+    margin-left: 35px;
+    margin-top: 7px;
+    margin-bottom: 5px;
+    font-size: 16px;
+    font-weight: 600;
+    color: rgb(5, 152, 187);
+}
+.time-details{
+    font-size: 11px;
+    margin-left: 10%;
+    margin-top: 4%;
+    color: #757575;
+}
+.cancel-button{
+    background-color: #ffffff;
+    border: 1px solid darkgrey;
+    color: #676767;
+    text-align: center;
+    text-decoration: none;
+    display: inline-block;
+    font-size: 16px;
+    margin: 20px 0 0 0;
+    cursor: pointer;
+    outline: none;
+    transition-duration: 0.2s;
+    border-radius: 3px;
+    height: 40px;
+    padding-top: 10px;
+    top: 200px;
+    float: right;
+ }
+.sign-in-btn{
+    font-size: 15px;
+    line-height: 36px;
+    padding: 0 15px;
+    border: 1px solid;
+    border-radius: 3px;
+    box-sizing: border-box;
+    -webkit-appearance: none;
+    width: 50%;
+    margin-left: 25%;
+    height: 50px;
+    color: #fff;
+    background-color: #007dc1;
+    background: -o-linear-gradient(top,#007dc1 0,#0073b2 100%);
+    background: -ms-linear-gradient(top,#007dc1 0,#0073b2 100%);
+    background: -webkit-gradient(linear,left top,left bottom,from(#007dc1),to(#0073b2));
+    background: linear-gradient(#007dc1,#0073b2);
+    border-color: #004b75 #004b75 #00456a;
+}
+.sign-in-btn:hover {
+    background-color: #0087d0;
+    background-image: linear-gradient(#0087d0,#007dc1);
+    border-color: #003d5e #003d5e #003a59;
+    text-decoration: none;
+    cursor: pointer;
+    box-shadow: none;
+}

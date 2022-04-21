@@ -1,0 +1,44 @@
+stages:
+  - build
+  - deploy
+
+docker-build-and-push:
+  image: docker:latest
+  stage: build
+  services:
+    - docker:dind
+  variables:
+    DOCKER_DRIVER: overlay2
+    DOCKER_TLS_CERTDIR: ""
+  before_script:
+    - docker login -u "$CI_REGISTRY_USER" -p "$CI_REGISTRY_PASSWORD" $CI_REGISTRY
+  script:
+    - docker build --pull -t "$CI_BE_REGISTRY_IMAGE" ./backend/
+    - docker build --pull -t "$CI_FE_REGISTRY_IMAGE" ./frontend/
+    - docker push "$CI_BE_REGISTRY_IMAGE"
+    - docker push "$CI_FE_REGISTRY_IMAGE"
+  only:
+    # - TestCI
+  
+deploy-to-digital-ocean:
+  image: 
+    name: bitnami/kubectl:latest
+    entrypoint: [""]
+  stage: deploy
+  before_script:
+    - kubectl version
+  script:
+    - kubectl apply -f ./k8s/config.yml
+    - kubectl apply -f ./k8s/service.yml
+    - kubectl apply -f ./k8s/deployment.yml
+  after_script:
+    - kubectl get svc tecverify-fe -o jsonpath='{.status.loadBalancer.ingress[0].ip}'
+  environment:
+    name: dev
+    # url: http://144.126.253.31:3000/home
+    url: https://tecverify-k8s-test.tecnics.com
+  only:
+    # - TestCI
+
+  # Test2 with updated IP
+

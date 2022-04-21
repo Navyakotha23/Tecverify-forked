@@ -1,0 +1,8 @@
+venv/
+*.log.*
+*.log
+secrets.json
+.idea
+__pycache__/
+
+venv_backend/

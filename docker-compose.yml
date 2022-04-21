@@ -1,0 +1,19 @@
+version: "3"
+services:
+    frontend:
+        container_name: tecverify-fe
+        build:
+            context: ./frontend
+            dockerfile: Dockerfile
+        ports:
+            [3000:80]
+    backend:
+        restart: always
+        container_name: tecverify-be
+        build:
+            context: ./backend
+            dockerfile: Dockerfile
+        env_file: 
+            - ./env-file.txt
+        ports:
+            [5000:5000]

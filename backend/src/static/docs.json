@@ -1,0 +1,179 @@
+{
+  "openapi": "3.0.0",
+  "info": {
+    "description": "<b>TecVERIFY</b> is a lightweight app that is used for 2-step verification \\n so you can verify your identity when you sign in to your <b>TecMFA</b> account \\n using Admin TOTP.<br><br>App Features<br>* Save Secret key. \\n <br>* Generate TOTP for all Secret keys saved.",
+      "version": "1.0.0",
+    "title": "TecVERIFY",
+    "contact": {
+      "email": "amit.g@tecnics.com"
+    },
+    "license": {
+      "name": "MIT",
+      "url": "https://opensource.org/licenses/MIT"
+    }
+  },
+  "components": {
+    "securitySchemes": {
+      "tokenAuth": {
+        "type": "apiKey",
+        "in": "header",
+        "name": "token"
+      }
+    },
+    "schemas": {
+      "secret": {
+        "properties": {
+          "Updated": {
+            "type": "boolean"
+          }
+        }
+      },
+      "generateSecret": {
+        "properties": {
+          "adminSecret": {
+            "type": "string"
+          }
+        }
+      },
+      "deleteSecret": {
+        "properties": {
+          "Deleted": {
+            "type": "boolean"
+          }
+        }
+      },
+      "totp": {
+        "type": "array",
+        "items": {
+          "type": "object",
+          "properties": {
+            "id": {
+              "type": "string"
+            },
+            "otp": {
+              "type": "string"
+            },
+            "secretName": {
+              "type": "string"
+            },
+            "secretUpdatedAt": {
+              "type": "string"
+            }
+          }
+        }
+      }
+    }
+  },
+  "security": [
+    {
+      "tokenAuth": []
+    }
+  ],
+  "servers": [
+    {
+      "url": "/api/v1/"
+    }
+  ],
+  "tags": [
+    {
+      "name": "AdminSecret",
+      "description": "Collection of Secret key APIs."
+    },
+    {
+      "name": "TOTP",
+      "description": "Collection of TOTP APIs."
+    }
+  ],
+  "paths": {
+    "/secret": {
+      "post": {
+        "tags": [
+          "AdminSecret"
+        ],
+        "summary": "Save a Secret key.",
+        "requestBody": {
+          "description": "Admin Secret",
+          "required": true,
+          "content": {
+            "application/x-www-form-urlencoded": {
+              "schema": {
+                "properties": {
+                  "adminSecret": {
+                    "type": "string"
+                  },
+                  "secretName": {
+                    "type": "string"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "$ref": "#/components/schemas/secret"
+            }
+          }
+        }
+      },
+      "get": {
+        "tags": [
+          "AdminSecret"
+        ],
+        "summary": "Get a Random Secret key.",
+        "responses": {
+          "200": {
+            "description": "Response of JSON with Secret key.",
+            "schema": {
+              "$ref": "#/components/schemas/generateSecret"
+            }
+          }
+        }
+      }
+    },
+    "/secret/{secret_id}": {
+      "delete": {
+        "tags": [
+          "AdminSecret"
+        ],
+        "summary": "Delete a Secret Key by secret id.",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "secret_id",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Response of JSON with Secret key.",
+            "schema": {
+              "$ref": "#/components/schemas/deleteSecret"
+            }
+          }
+        }
+      }
+    },
+    "/totp": {
+      "get": {
+        "tags": [
+          "TOTP"
+        ],
+        "summary": "Get TOTPs of all Secret keys.",
+        "responses": {
+          "200": {
+            "description": "Will get a TOTP in JSON with Key 'code'",
+            "schema": {
+              "$ref": "#/components/schemas/secret"
+            }
+          }
+        }
+      }
+    }
+  }
+}

@@ -1,0 +1,36 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: tecverify-fe-config
+data:
+  app.config.json: |-
+    {
+    "MAIN_HEADER": "TecVerify",
+    "CLIENT_ID": "0oa2mxe5a5X72jIvV5d7",
+    "ISSUER": "https://dev-75743556.okta.com/oauth2/aus2mxe8i8CyLHxHw5d7",
+    "BACK_END_URL": "https://tecverify-k8s-test.tecnics.com",
+    "FRONT_END_URL": "https://tecverify-k8s-test.tecnics.com",
+    "AUTHORIZE_TOKEN_TYPE": "idToken",
+    "AUTHORIZE_CLAIM_NAME": "Admin",
+    "SCOPES": [
+        "openid",
+        "email"
+    ],
+    "INSTRUCTIONS_IN_BYPASS_CODE_GENERATOR": [
+        "Inform user to click option try another way to open form for entering admin bypass code",
+        "Provide the given admin bypass code as generated on the left for respective system"
+    ]
+    ,
+    "INSTRUCTIONS_IN_ADMIN_SECRET": [
+        "Inform user to click option try another way to open form for entering admin bypass code."
+    ]
+    }
+
+---
+
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: tecverify-be-config
+data:
+  NAVEEN: masuna
