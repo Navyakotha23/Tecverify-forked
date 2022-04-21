@@ -40,5 +40,5 @@ deploy-to-digital-ocean:
   only:
     - TestCI
 
-  # Test by Rishitha
+  # Test by Rishitha 2
 
