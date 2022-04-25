@@ -15,7 +15,7 @@ spec:
     spec:
       containers:
         - name: tecverify-be
-          image: naveenmasuna/backend_tecverify:version_2
+          image: naveenmasuna/backend_tecverify:Dummy
           imagePullPolicy: "Always"
           resources:
             limits:
@@ -38,11 +38,11 @@ spec:
           #   periodSeconds: 5
           ports:
             - containerPort: 5000
-          env:
-            - name: CLIENT_ID
-              value: 0oa2dxm3lbONcEqeb5d7
-            - name: ISSUER
-              value: https://dev-27926041.okta.com/oauth2/aus2dxnjsgiyARX8N5d7
+          # env:
+          #   - name: CLIENT_ID
+          #     value: 0oa2dxm3lbONcEqeb5d7
+          #   - name: ISSUER
+          #     value: https://dev-27926041.okta.com/oauth2/aus2dxnjsgiyARX8N5d7
 ---
 apiVersion: apps/v1
 kind: Deployment
@@ -61,7 +61,7 @@ spec:
     spec:
       containers:
         - name: tecverify-fe
-          image: naveenmasuna/frontend_tecverify:version_1
+          image: naveenmasuna/frontend_tecverify:Dummy
           imagePullPolicy: "Always"
           volumeMounts:
             - name: fe-config-volume
