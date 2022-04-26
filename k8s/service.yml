@@ -7,7 +7,7 @@ spec:
   selector:
     app: tecverify-fe
   ports:
-    - protocol: UDP
+    - protocol: SCTP
       port: 443
       targetPort: https
 ---
