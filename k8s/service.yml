@@ -3,15 +3,17 @@ kind: Service
 metadata:
   name: tecverify-fe
 spec:
-  type: NodePort
+  type: LoadBalancer
+  loadBalancerIP: 64.225.86.154
   selector:
     app: tecverify-fe
   ports:
-    - port: 443
-      
+    - name: https
       protocol: TCP
       
-      name: https
+      port: 443
+      
+      targetPort: 443
       
       
 ---
