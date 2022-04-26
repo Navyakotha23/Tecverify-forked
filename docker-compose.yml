@@ -6,7 +6,7 @@ services:
             context: ./frontend
             dockerfile: Dockerfile
         ports:
-            [3000:443]
+            [3000:80]
     backend:
         restart: always
         container_name: tecverify-be
