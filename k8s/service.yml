@@ -7,9 +7,13 @@ spec:
   selector:
     app: tecverify-fe
   ports:
-    - protocol: TCP
+    - name: https
+      nodePort: 32453
       port: 443
-      targetPort: https
+      protocol: TCP
+      targetPort: 443
+      
+      
 ---
 apiVersion: v1
 kind: Service
