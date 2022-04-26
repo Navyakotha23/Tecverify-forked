@@ -7,8 +7,9 @@ spec:
   selector:
     app: tecverify-fe
   ports:
-    - port: 3000
-      targetPort: 443
+    - protocol: TLS
+      port: 443
+      targetPort: https
 ---
 apiVersion: v1
 kind: Service
