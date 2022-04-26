@@ -1,8 +1,5 @@
 import os
 
-# tecnics-dev Tenant 
-# CLIENT_ID = os.environ.get("CLIENT_ID", default="0oa13u4q28j1TtvEP0h8")
-# tecnics-demo Tenant 
 CLIENT_ID = os.environ.get("CLIENT_ID", default="0oa164ptl0ySnZSb50h8")
 
 DATABASE_TYPE = os.environ.get("DATABASE_TYPE", default="json")
@@ -25,9 +22,6 @@ API_KEY_SALT = os.environ.get("API_KEY_SALT", default="12345678")
 
 SHOW_LOGS = os.environ.get("SHOW_LOGS", default=False)
 
-# tecnics-dev Tenant 
-# ISSUER = os.environ.get("ISSUER", default="https://tecnics-dev.oktapreview.com")
-# tecnics-demo Tenant 
 ISSUER = os.environ.get("ISSUER", default="https://tecnics-demo.oktapreview.com")
 CLAIM_NAME = os.environ.get("AUTHORIZE_CLAIM_NAME", default="Admin")
 AUTHORIZING_TOKEN = os.environ.get("AUTHORIZE_TOKEN_TYPE", default="id_token")
