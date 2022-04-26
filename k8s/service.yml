@@ -8,9 +8,9 @@ spec:
     app: tecverify-fe
   ports:
     - name: https
-      nodePort: 32453
+      
       port: 443
-      protocol: TCP
+      
       targetPort: 443
       
       
