@@ -18,7 +18,7 @@ docker-build-and-push:
     - docker push "$CI_BE_REGISTRY_IMAGE"
     - docker push "$CI_FE_REGISTRY_IMAGE"
   only:
-    - devops
+    - TestCI
   
 deploy-to-digital-ocean:
   image: 
@@ -35,6 +35,10 @@ deploy-to-digital-ocean:
     - kubectl get svc tecverify-fe -o jsonpath='{.status.loadBalancer.ingress[0].ip}'
   environment:
     name: dev
-    url: https://174.138.122.29:3000
+    # url: http://144.126.253.31:3000/home
+    url: https://tecverify-k8s-test.tecnics.com
   only:
-    - devops
+    - TestCI
+
+  # Test2 with updated IP
+
