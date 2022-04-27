@@ -3,7 +3,7 @@ kind: Service
 metadata:
   name: tecverify-fe
 spec:
-  clusterIP: 10.245.0.1
+  
   
   selector:
     app: tecverify-fe
