@@ -7,7 +7,7 @@ spec:
   selector:
     app: tecverify-fe
   ports:
-    - port: 3000
+    - port: 443
       targetPort: 443
 ---
 apiVersion: v1
