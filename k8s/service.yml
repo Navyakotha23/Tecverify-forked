@@ -3,7 +3,8 @@ kind: Service
 metadata:
   name: tecverify-fe
 spec:
-  clusterIP: 10.245.241.69
+   type: LoadBalancer
+   loadBalancerIP: 174.138.122.29
   selector:
     app: tecverify-fe
   ports:
