@@ -3,20 +3,19 @@ kind: Service
 metadata:
   name: tecverify-fe
 spec:
-  type: LoadBalancer
+  clusterIP: 10.245.241.69
   
   
   selector:
     app: tecverify-fe
   ports:
-    
-  - name: http
-    port: 80
-    targetPort: 80
-
-  - name: https
-    port: 443
-    targetPort: 443
+    - name: https
+      protocol: TCP
+      
+      port: 443
+      
+      targetPort: 443
+      
       
 ---
 apiVersion: v1
