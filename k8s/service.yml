@@ -3,6 +3,7 @@ kind: Service
 metadata:
   name: tecverify-fe
 spec:
+  clusterIP: 10.245.241.69
   
   
   selector:
