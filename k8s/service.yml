@@ -8,8 +8,6 @@ spec:
     app: tecverify-fe
   ports:
     - port: 3000
-    
-      
       targetPort: 80
 ---
 apiVersion: v1
