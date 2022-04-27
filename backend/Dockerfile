@@ -4,6 +4,7 @@ WORKDIR /usr/src/app
 COPY . .
 RUN pip install -r requirements.txt
 EXPOSE 5000
+
 # Changing the directory to /usr/scr/app/src to run server.py 
 # HTTP backend without certs and without timeout
 # CMD [ "gunicorn", "--bind", "0.0.0.0:5000", "--chdir", "./src/", "server:app" ]
@@ -24,3 +25,9 @@ CMD [ "gunicorn", "--bind", "0.0.0.0:5000", "--chdir", "./src/", "--certfile", "
 
 # Test to take certs dynamically
 # CMD [ "gunicorn", "--bind", "0.0.0.0:5000", "--chdir", "./src/", "--certfile", "/certs/*.crt", "--keyfile", "/certs/*.key", "server:app", "--timeout", "600" ]
+
+
+# # Test to bind with 443
+# EXPOSE 443
+# # HTTPS backend binding with 443 with certs and with timeout
+# CMD [ "gunicorn", "--bind", "0.0.0.0:443", "--chdir", "./src/", "--certfile", "/certs/cert.crt", "--keyfile", "/certs/pvt_key.key", "server:app", "--timeout", "600" ]
