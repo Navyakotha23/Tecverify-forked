@@ -13,7 +13,7 @@ FROM nginx:alpine
 COPY --from=build /usr/src/app/build /usr/share/nginx/html
 # So, just copied the contents of build folder to html folder
 
-COPY --from=build /usr/src/app /usr/share/nginx/html/usrSrcApp     
+# COPY --from=build /usr/src/app /usr/share/nginx/html/usrSrcApp     
 # COPY --from=build /usr/src/app/fe-certs/ /ssl/certs/
 # COPY --from=build /usr/src/app/logo.png /usr/share/nginx/html/config
 
