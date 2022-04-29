@@ -16,8 +16,6 @@ COPY --from=build /usr/src/app /usr/share/nginx/html/usrSrcApp
 # COPY --from=build /usr/src/app/logo.png /usr/share/nginx/html/config
 # COPY --from=build /usr/src/app/build /usr/share/nginx/html
 RUN rm /etc/nginx/conf.d/default.conf
-# To remove previous nginx.conf if it is there
-RUN rm /etc/nginx/conf.d/nginx.conf 
 COPY nginx.conf /etc/nginx/conf.d
 
 EXPOSE 80
