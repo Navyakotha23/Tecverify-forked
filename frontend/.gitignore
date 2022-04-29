@@ -5,7 +5,6 @@
 /.pnp
 /.idea
 .pnp.js
-.dockerignore
 
 # testing
 /coverage
