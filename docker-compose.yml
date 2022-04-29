@@ -2,6 +2,8 @@ version: "3"
 services:
     frontend:
         container_name: tecverify-fe
+        volumes:
+            - ./fe-certs/:/ssl/certs/
         build:
             context: ./frontend
             dockerfile: Dockerfile
