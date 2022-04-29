@@ -61,7 +61,7 @@ spec:
     spec:
       containers:
         - name: tecverify-fe
-          image: naveenmasuna/frontend_tecverify:Dummy
+          image: naveenmasuna/frontend_tecverify:FE_Rishitha
           imagePullPolicy: "Always"
           volumeMounts:
             - name: fe-config-volume
