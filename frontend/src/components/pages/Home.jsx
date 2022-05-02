@@ -1,7 +1,6 @@
 import React, {useState} from 'react';
 import {useOktaAuth} from '@okta/okta-react';
 import "./Home.css";
-import Login from '../auth/Login';
 import ErrorPopup from '../layout/ErrorPopup'
 import DeleteSecretKey from '../layout/DeleteSecretKey'
 import "react-loader-spinner/dist/loader/css/react-spinner-loader.css"
@@ -19,6 +18,7 @@ const Home = () => {
     const { oktaAuth, authState } = useOktaAuth();
     const [expiresIn, setSeconds] = useState();
     const [randomOtp, setRandomOtp] = useState();
+    const [onDeletingOtp, setOnDeletingOtp] = useState(false);
     const [userEmail, setUserEmail] = useState();
     const [secretNames, setSecretNames] = useState([]);
     const [errorMessage, setErrorMessage] = useState();
@@ -59,7 +59,6 @@ const Home = () => {
                     .then(response => response.json())
                     .then(response => {
                         autoEnroll();
-                        console.log(response, checkEnrollmentStatus);
                     })
                     .catch(err => {
                         console.error(err);
@@ -222,7 +221,6 @@ const Home = () => {
                     .then(response => response.json())
                     .then(response => {
                         getOtp();
-                        console.log(response, checkEnrollmentStatus);
                     })
                     .catch(err => {
                         console.error(err);
@@ -268,7 +266,7 @@ const Home = () => {
             fetch(`${config.BACK_END_URL}/api/v1/secret/${selectedSecretId}`, requestOptions)
                 .then(response => response.text())
                 .then(result => {
-
+                    setOnDeletingOtp(true)
                     getOtp()
                     console.log(result, selectedSecretId)
                 })
@@ -409,7 +407,7 @@ const Home = () => {
                                         </li>
                                     )}) :  <div>
                                     {
-                                        (randomOtp && randomOtp.length === 0) ?
+                                        (randomOtp && randomOtp.length === 0 && onDeletingOtp) ?
                                             <p style={{margin: '20px'}}>No Names found with this user.</p>
                                             :
                                             <div style={{marginLeft: '42%', marginTop: '15%'}}>
@@ -590,7 +588,6 @@ const Home = () => {
             </div>
         </div>
 
-        console.log('authState.isAuthenticated', authState.isAuthenticated);
         if(authState.isAuthenticated) {
             return homePage
         } else {
