@@ -30,3 +30,5 @@ CMD ["nginx", "-g", "daemon off;"]
 
 # Image in deployment.yml and local docker image are same.
 
+# Changed redirect-urls in Okta.
+
