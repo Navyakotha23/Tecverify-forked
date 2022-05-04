@@ -2,23 +2,23 @@ stages:
   - build
   - deploy
 
-docker-build-and-push:
-  image: docker:latest
-  stage: build
-  services:
-    - docker:dind
-  variables:
-    DOCKER_DRIVER: overlay2
-    DOCKER_TLS_CERTDIR: ""
-  before_script:
-    - docker login -u "$CI_REGISTRY_USER" -p "$CI_REGISTRY_PASSWORD" $CI_REGISTRY
-  script:
-    - docker build --pull -t "$CI_BE_REGISTRY_IMAGE" ./backend/
-    - docker build --pull -t "$CI_FE_REGISTRY_IMAGE" ./frontend/
-    - docker push "$CI_BE_REGISTRY_IMAGE"
-    - docker push "$CI_FE_REGISTRY_IMAGE"
-  only:
-    - devops
+# docker-build-and-push:
+#   image: docker:latest
+#   stage: build
+#   services:
+#     - docker:dind
+#   variables:
+#     DOCKER_DRIVER: overlay2
+#     DOCKER_TLS_CERTDIR: ""
+#   before_script:
+#     - docker login -u "$CI_REGISTRY_USER" -p "$CI_REGISTRY_PASSWORD" $CI_REGISTRY
+#   script:
+#     - docker build --pull -t "$CI_BE_REGISTRY_IMAGE" ./backend/
+#     - docker build --pull -t "$CI_FE_REGISTRY_IMAGE" ./frontend/
+#     - docker push "$CI_BE_REGISTRY_IMAGE"
+#     - docker push "$CI_FE_REGISTRY_IMAGE"
+#   only:
+#     - devops
   
 deploy-to-digital-ocean:
   image: 
