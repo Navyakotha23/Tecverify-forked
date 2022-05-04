@@ -33,5 +33,10 @@ CMD ["nginx", "-g", "daemon off;"]
 
 # Changed redirect-urls in Okta.
 
-# Working with HTTPS after copying nginx.conf to default.conf and making changes to config for FE. Need to set env vars for BE.
+# Working with HTTPS after copying nginx.conf to default.conf 
+# but default.conf is not created, nginx.conf itself got created(Need to look into this).
+# made changes to config for FE. 
+# Need to set env vars for BE.
+
+
 
