@@ -48,15 +48,15 @@ spec:
             - name: LOGGING_LEVEL
               value: DEBUG
             - name: LOGGING_MAX_BYTES
-              value: 1048576
+              value: "1048576"
             - name: LOGGING_BACKUP_COUNT
-              value: 10
+              value: "10"
             - name: ENABLE_API_RATE_LIMITS
-              value: True
+              value: "True"
             - name: API_RATE_LIMITS_PER_HOUR
-              value: 300
+              value: "300"
             - name: API_RATE_LIMITS_PER_MINUTE
-              value: 30
+              value: "30"
             - name: WHITELISTED_IPS
               value: "127.0.0.1"
             - name: TZ
@@ -68,7 +68,7 @@ spec:
             - name: SECRETS_FILE
               value: secrets.json
             - name: MS_SQL_SERVER
-              value: 192.168.2.38
+              value: "192.168.2.38"
             - name: MS_SQL_USERNAME
               value: NaveenMasuna
             - name: MS_SQL_PASSWORD
