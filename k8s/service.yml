@@ -23,5 +23,7 @@ spec:
   selector:
     app: tecverify-be
   ports:
-    - port: 5000
-      targetPort: 5000
+    - name: https
+      port: 5000  
+      targetPort: 443
+    
