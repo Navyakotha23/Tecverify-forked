@@ -26,3 +26,5 @@ spec:
     - name: https
       port: 5000  
       targetPort: 443
+    - port: 5000
+      targetPort: 5000
