@@ -58,13 +58,25 @@ spec:
             - name: API_RATE_LIMITS_PER_MINUTE
               value: 30
             - name: WHITELISTED_IPS
-              value: ["127.0.0.1"]
+              value: "127.0.0.1"
             - name: TZ
               value: Asia/Kolkata
             - name: SALT
               value: MSHANKER
+            - name: DATABASE_TYPE
+              value: JSON
             - name: SECRETS_FILE
               value: secrets.json
+            - name: MS_SQL_SERVER
+              value: 192.168.2.38
+            - name: MS_SQL_USERNAME
+              value: NaveenMasuna
+            - name: MS_SQL_PASSWORD
+              value: Tecnics@123
+            - name: DATABASE_NAME
+              value: TecVerify
+            - name: TABLE_NAME
+              value: Secrets
             - name: AUTOSAVED_SECRET_USERNAME_HEAD
               value: TecVerify
             - name: ENCRYPTED_API_KEY
