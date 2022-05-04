@@ -5,26 +5,43 @@ metadata:
 data:
   app.config.json: |-
     {
-    "MAIN_HEADER": "TecVerify",
-    "CLIENT_ID": "0oa164ptl0ySnZSb50h8",
-    "ISSUER": "https://tecnics-demo.oktapreview.com",
-    "LOGO": "logo.png",
-    "BACK_END_URL": "https://146.190.8.122:5000",
-    "FRONT_END_URL": "https://146.190.8.122:3000",
-    "AUTHORIZE_TOKEN_TYPE": "idToken",
-    "AUTHORIZE_CLAIM_NAME": "Admin",
-    "SCOPES": [
+      "CLIENT_ID": "0oa164ptl0ySnZSb50h8", 
+      "ISSUER": "https://tecnics-demo.oktapreview.com",
+      "AUTHORIZE_TOKEN_TYPE": "idToken",
+      "BACK_END_URL": "https://146.190.8.122:5000",
+      "FRONT_END_URL": "https://146.190.8.122:3000",
+      "SCOPES": [
         "openid",
-        "email"
-    ],
-    "INSTRUCTIONS_IN_BYPASS_CODE_GENERATOR": [
-        "Inform user to click option try another way to open form for entering admin bypass code",
-        "Provide the given admin bypass code as generated on the left for respective system"
-    ]
-    ,
-    "INSTRUCTIONS_IN_ADMIN_SECRET": [
-        "Inform user to click option try another way to open form for entering admin bypass code."
-    ]
+        "email",
+        "groups",
+        "profile"
+          ],
+      "MAIN_HEADER": "TecVerify",
+      "INSTRUCTIONS_AND_HEADER_IN_BYPASS_CODE_GENERATOR": {
+          "HEADER": "Instructions",
+          "INSTRUCTIONS": [
+              "Inform user to click option try another way to open form for entering admin bypass code",
+              "Provide the given admin bypass code as generated on the left for respective system"
+          ]
+      },
+      "ENROLLMENT_FACTOR_POPUP": {
+          "HEADER": "Add secret key",
+          "INSTRUCTIONS": {
+              "HEADER": "Instructions",
+              "INSTRUCTIONS_LIST": [
+                  "Inform user to click option try another way to open form for entering admin bypass code."
+              ]}
+      },
+      "SHOW_ADD_SECRET_BUTTON": true,
+      "SHOW_DELETE_ICON": true,
+      "COPY_TO_CLIPBOARD_BUTTON": true,
+      "TITLE": "TecVerify",
+      "LOGO": "logo.png",
+      "BYPASS_CODES_HEADER": "Bypass Codes",
+      "CONFIRMATION_POPUP_FOR_BYPASS_CODE_FOR_DELETING": {
+          "HEADER": "Confirm",
+          "QUESTION": "Are you sure you want to delete ByPass code "
+      }
     }
 
 ---
