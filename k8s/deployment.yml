@@ -15,7 +15,7 @@ spec:
     spec:
       containers:
         - name: tecverify-be
-          image: naveenmasuna/backend_tecverify:Dummy
+          image: naveenmasuna/backend_tecverify:BE_Rishitha
           imagePullPolicy: "Always"
           resources:
             limits:
