@@ -38,11 +38,11 @@ spec:
           #   periodSeconds: 5
           ports:
             - containerPort: 443
-          # env:
-          #   - name: CLIENT_ID
-          #     value: 0oa164ptl0ySnZSb50h8
-          #   - name: ISSUER
-          #     value: https://tecnics-demo.oktapreview.com
+          env:
+            - name: CLIENT_ID
+              value: 0oa164ptl0ySnZSb50h8
+            - name: ISSUER
+              value: https://tecnics-demo.oktapreview.com
           #   - name: AUTHORIZE_TOKEN_TYPE
           #     value: idToken
           #   - name: LOGGING_LEVEL

@@ -16,4 +16,4 @@ services:
         env_file: 
             - ./env-file.txt
         ports:
-            [5000:443]
+            [5000:5000]
