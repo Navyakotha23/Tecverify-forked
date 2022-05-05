@@ -15,7 +15,7 @@ EXPOSE 5000
 # CMD [ "gunicorn", "--bind", "0.0.0.0:5000", "--chdir", "./src/", "server:app", "--timeout", "600" ] 
 
 # HTTPS backend with certs and with timeout
-# CMD [ "gunicorn", "--bind", "0.0.0.0:5000", "--chdir", "./src/", "--certfile", "/certs/cert.crt", "--keyfile", "/certs/pvt_key.key", "server:app", "--timeout", "600" ] 
+CMD [ "gunicorn", "--bind", "0.0.0.0:5000", "--chdir", "./src/", "--certfile", "/certs/cert.crt", "--keyfile", "/certs/pvt_key.key", "server:app", "--timeout", "600" ] 
 
 
 # Harcoded certs for BE. i.e. created a certs folder(be-certs) in BE and that folder will be copied to BE image.
