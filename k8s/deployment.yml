@@ -40,11 +40,11 @@ spec:
             - containerPort: 443
           env:
             - name: CLIENT_ID
-              value: 0oa2dxm3lbONcEqeb5d7
+              value: 0oa164ptl0ySnZSb50h8
             - name: ISSUER
-              value: https://dev-27926041.okta.com/oauth2/aus2dxnjsgiyARX8N5d7
-            # - name: AUTHORIZE_TOKEN_TYPE
-            #   value: idToken
+              value: https://tecnics-demo.oktapreview.com
+            - name: AUTHORIZE_TOKEN_TYPE
+              value: idToken
             # - name: LOGGING_LEVEL
             #   value: DEBUG
             # - name: LOGGING_MAX_BYTES

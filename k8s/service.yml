@@ -19,7 +19,7 @@ kind: Service
 metadata: 
   name: tecverify-be
 spec:
-  type: LoadBalancer
+  type: ClusterIP
   selector:
     app: tecverify-be
   ports:
