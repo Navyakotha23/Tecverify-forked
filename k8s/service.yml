@@ -19,11 +19,11 @@ kind: Service
 metadata: 
   name: tecverify-be
 spec:
-  type: ClusterIP
+  type: LoadBalancer
   selector:
     app: tecverify-be
   ports:
     - name: https
       port: 5000
-      targetPort: 80
+      targetPort: 443
     
