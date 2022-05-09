@@ -57,8 +57,8 @@ spec:
               value: "300"
             - name: API_RATE_LIMITS_PER_MINUTE
               value: "30"
-            - name: WHITELISTED_IPS
-              value: "127.0.0.1"
+            # - name: WHITELISTED_IPS
+            #   value: "127.0.0.1"
             - name: TZ
               value: Asia/Kolkata
             - name: SALT
