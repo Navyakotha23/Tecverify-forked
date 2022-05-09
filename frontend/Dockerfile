@@ -37,6 +37,7 @@ CMD ["nginx", "-g", "daemon off;"]
 # but default.conf is not created, nginx.conf itself got created(Need to look into this).
 # made changes to config for FE. 
 # Need to set env vars for BE.
+# Done with the Backend deployment.
 
 
 
