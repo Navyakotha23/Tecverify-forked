@@ -80,7 +80,7 @@ spec:
             - name: AUTOSAVED_SECRET_USERNAME_HEAD
               value: TecVerify
             - name: ENCRYPTED_API_KEY
-              value: b'C\xb5\x02M\x10N\x80\xd0O\xc8z\xabV>\x9aW\xb5\x17c&N\x95\x92\xb7&t@Y\xa9\xf5"]\xa0\xd4]\x9f\xc6\xfct\xb9\xefYWy\x86_^\xac'
+              value: 'b\'C\\xb5\\x02M\\x10N\\x80\\xd0O\\xc8z\\xabV>\\x9aW\\xb5\\x17c&N\\x95\\x92\\xb7&t@Y\\xa9\\xf5"]\\xa0\\xd4]\\x9f\\xc6\\xfct\\xb9\\xefYWy\\x86_^\\xac\''
 ---
 apiVersion: apps/v1
 kind: Deployment
