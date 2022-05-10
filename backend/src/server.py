@@ -253,6 +253,12 @@ def delete_secret(secret_id):
                         if delete_factor_response.status_code == 204:
                             print("Auto Saved Secret Deleted and Okta TOTP Factor deleted")
                             return {'Deleted both Secret and Okta TOTP factor': True}, 200
+                        #######################################################################################################################
+                        elif delete_factor_response.status_code == 401:
+                            if delete_factor_response.json()['errorCode'] == "E0000011":
+                                print("API token provided is invalid. So, cannot delete the Factor in Okta but can delete the secret.")
+                            return {"errorSummary": "Invalid token provided. So, cannot delete the Factor in Okta but can delete the secret."}
+                        #######################################################################################################################
             return {"ERROR": "Secret with given secretId is not found"}, 400
     else:
         return {'error': 'UnAuthorized !!!'}, 403
@@ -315,6 +321,12 @@ def enrollToTecVerify():
         if enroll_info['errorCode'] == "E0000001":
             print("A factor of this type is already set up.")
         return {"errorSummary": "A factor of this type is already set up."}
+    ########################################################################################
+    elif enroll_response.status_code == 401:
+        if enroll_response.json()['errorCode'] == "E0000011":
+            print("API token provided is invalid. So, cannot enroll the user.")
+        return {"errorSummary": "Invalid token provided. So, cannot enroll the user."}
+    ########################################################################################
 
 
 # @app.route('/api/v1/deleteTOTPfactorIfEnrolledFromOktaVerify', methods=['GET'])
@@ -337,6 +349,12 @@ def checkIfAlreadyEnrolledToOktaVerify():
     print("usersAutoEnrolledFromTecVerify_excludingLoginUser: ", usersAutoEnrolledFromTecVerify_excludingLoginUser)
 
     list_factors_response = okta.call_list_factors_API(logged_in_Okta_user_id)
+    ########################################################################################
+    if list_factors_response.status_code == 401:
+        if list_factors_response.json()['errorCode'] == "E0000011":
+            print("API token provided is invalid. So, cannot get factors list.")
+        return {"errorSummary": "Invalid token provided. So, cannot get factors list."}
+    ########################################################################################
     factors_list = list_factors_response.json()
     for factor in factors_list:
         if factor['factorType'] == "token:software:totp":
