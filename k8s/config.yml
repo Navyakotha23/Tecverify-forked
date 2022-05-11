@@ -8,7 +8,7 @@ data:
       "CLIENT_ID": "0oa164ptl0ySnZSb50h8", 
       "ISSUER": "https://tecnics-demo.oktapreview.com",
       "AUTHORIZE_TOKEN_TYPE": "idToken",
-      "BACK_END_URL": "https://10.245.241.207:5000",
+      "BACK_END_URL": "https://10.244.0.225:5000",
       "FRONT_END_URL": "https://146.190.8.122:3000",
       "SCOPES": [
         "openid",
