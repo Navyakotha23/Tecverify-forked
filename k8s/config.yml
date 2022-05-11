@@ -51,4 +51,27 @@ kind: ConfigMap
 metadata:
   name: tecverify-be-config
 data:
-  NAVEEN: masuna
+  env-file: |
+    CLIENT_ID=0oa164ptl0ySnZSb50h8
+    ISSUER=https://tecnics-demo.oktapreview.com
+    AUTHORIZE_TOKEN_TYPE=idToken
+    LOGGING_LEVEL=DEBUG
+    LOGGING_MAX_BYTES=1048576
+    LOGGING_BACKUP_COUNT=10
+    ENABLE_API_RATE_LIMITS=True
+    API_RATE_LIMITS_PER_HOUR=300
+    API_RATE_LIMITS_PER_MINUTE=30
+    TZ=Asia/Kolkata
+    SALT=MSHANKER
+    DATABASE_TYPE=JSON
+    SECRETS_FILE=secrets.json
+    MS_SQL_SERVER=192.168.1.202
+    MS_SQL_USERNAME=NaveenMasuna
+    MS_SQL_PASSWORD=Tecnics@123
+    DATABASE_NAME=TecVerify
+    TABLE_NAME=Secrets
+    AUTOSAVED_SECRET_USERNAME_HEAD=TecVerify
+    ENCRYPTED_API_KEY=b'C\xb5\x02M\x10N\x80\xd0O\xc8z\xabV>\x9aW\xb5\x17c&N\x95\x92\xb7&t@Y\xa9\xf5"]\xa0\xd4]\x9f\xc6\xfct\xb9\xefYWy\x86_^\xac'
+
+
+
