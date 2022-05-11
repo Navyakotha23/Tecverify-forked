@@ -33,7 +33,7 @@ deploy-to-digital-ocean:
     - kubectl apply -f ./k8s/deployment.yml
   after_script:
     - kubectl get svc tecverify-fe -o jsonpath='{.status.loadBalancer.ingress[0].ip}'
-    - kubectl get svc tecverify-be -o jsonpath='{.status.loadBalancer.ingress[0].ip}'
+    # - kubectl get svc tecverify-be -o jsonpath='{.status.loadBalancer.ingress[0].ip}'
   environment:
     name: dev
     url: https://146.190.8.122:3000
