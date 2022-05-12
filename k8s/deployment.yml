@@ -19,6 +19,7 @@ spec:
           imagePullPolicy: "Always"
           volumeMounts:
             - name: be-config-volume
+              mountPath: /usr/src/app/
           resources:
             limits:
               memory: 64Mi
