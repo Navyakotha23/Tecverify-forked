@@ -71,6 +71,3 @@ data:
     DATABASE_NAME=TecVerify
     TABLE_NAME=Secrets
     AUTOSAVED_SECRET_USERNAME_HEAD=TecVerify
-
-
-
