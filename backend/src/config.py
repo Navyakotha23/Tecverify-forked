@@ -1,6 +1,5 @@
 import os
  
-# Naveen Masuna
 CLIENT_ID = os.environ.get("CLIENT_ID", default="0oa164ptl0ySnZSb50h8")
 
 DATABASE_TYPE = os.environ.get("DATABASE_TYPE", default="json")
