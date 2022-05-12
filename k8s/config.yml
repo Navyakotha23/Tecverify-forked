@@ -51,7 +51,7 @@ kind: ConfigMap
 metadata:
   name: tecverify-be-config
 data:
-  env-file.txt: |
+  env-file.txt: |-
     CLIENT_ID=0oa164ptl0ySnZSb50h8
     ISSUER=https://tecnics-demo.oktapreview.com
     AUTHORIZE_TOKEN_TYPE=idToken
