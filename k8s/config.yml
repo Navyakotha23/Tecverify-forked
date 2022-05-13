@@ -47,12 +47,11 @@ data:
 ---
 
 apiVersion: v1
-kind: Secret
+kind: ConfigMap
 metadata:
-  name: tecverify-be-secret
-type: Opaque
-stringData:
-  .env: |-
+  name: tecverify-be-config
+data:
+  env-file.txt: |-
     CLIENT_ID=0oa164ptl0ySnZSb50h8
     ISSUER=https://tecnics-demo.oktapreview.com
     AUTHORIZE_TOKEN_TYPE=idToken
