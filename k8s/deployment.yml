@@ -3,7 +3,7 @@ kind: Deployment
 metadata:
   name: tecverify-be
 spec:
-  replicas: 1
+  replicas: 2
   selector:
     matchLabels:
       app: tecverify-be
@@ -98,7 +98,7 @@ kind: Deployment
 metadata:
   name: tecverify-fe
 spec:
-  replicas: 1
+  replicas: 2
   selector:
     matchLabels:
       app: tecverify-fe
@@ -117,11 +117,11 @@ spec:
               mountPath: /usr/share/nginx/html/config/
           resources:
             limits:
-              cpu: 100m
-              memory: 128Mi
-            requests:
-              cpu: 50m
               memory: 64Mi
+              cpu: 150m
+            requests:
+              memory: 32Mi
+              cpu: 50m
           # livenessProbe:
           #   httpGet:
           #     path: /health
