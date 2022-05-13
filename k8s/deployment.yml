@@ -41,6 +41,8 @@ spec:
           #   periodSeconds: 5
           ports:
             - containerPort: 5000
+          env_file: 
+            - /etc/mnk-config/env-file.txt
           # env:
           #   - name: CLIENT_ID
           #     value: 0oa164ptl0ySnZSb50h8
