@@ -16,7 +16,7 @@ TABLE_NAME = os.environ.get("TABLE_NAME", default="Secrets")
 AUTOSAVED_SECRET_USERNAME_HEAD = os.environ.get("AUTOSAVED_SECRET_USERNAME_HEAD", default="TecVerify")
 
 
-ENCRYPTED_API_KEY = os.environ.get("ENCRYPTED_API_KEY")
+# ENCRYPTED_API_KEY = os.environ.get("ENCRYPTED_API_KEY")
 # ENCRYPTED_API_KEY = os.environ.get("ENCRYPTED_API_KEY", default="DummyAPIKey")
 API_KEY_SALT = os.environ.get("API_KEY_SALT", default="12345678")
 

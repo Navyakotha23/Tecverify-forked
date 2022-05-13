@@ -15,11 +15,11 @@ spec:
     spec:
       containers:
         - name: tecverify-be
-          image: naveenmasuna/backend_tecverify:BE_Rishitha
+          image: naveenmasuna/backend_tecverify:BE_Rishitha_HardcodedAPIkey
           imagePullPolicy: "Always"
           volumeMounts:
             - name: be-config-volume
-              mountPath: /etc/be-config/
+              mountPath: /etc/mnk-config/
           resources:
             limits:
               memory: 64Mi
