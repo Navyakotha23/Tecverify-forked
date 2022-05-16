@@ -3,7 +3,7 @@ kind: Deployment
 metadata:
   name: tecverify-be
 spec:
-  replicas: 2
+  replicas: 1
   selector:
     matchLabels:
       app: tecverify-be
@@ -70,15 +70,15 @@ spec:
             - name: SALT
               value: MSHANKER
             - name: DATABASE_TYPE
-              value: JSON
+              value: MSSQL
             - name: SECRETS_FILE
               value: secrets.json
             - name: MS_SQL_SERVER
-              value: "192.168.2.38"
+              value: "139.59.5.130"
             - name: MS_SQL_USERNAME
-              value: NaveenMasuna
+              value: SA
             - name: MS_SQL_PASSWORD
-              value: Tecnics@123
+              value: Welcome@123
             - name: DATABASE_NAME
               value: TecVerify
             - name: TABLE_NAME
