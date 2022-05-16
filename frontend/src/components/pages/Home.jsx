@@ -12,6 +12,9 @@ import {useHistory} from "react-router-dom";
 const TOKEN = 'token';
 const POST = 'POST';
 const GET = 'GET';
+let popupError = false;
+let popupErrorMessage = '';
+
 const Home = () => {
     const history = useHistory();
     const config = JSON.parse(sessionStorage.getItem('config'));
@@ -49,20 +52,31 @@ const Home = () => {
         if (oktaTokenStorage && oktaTokenStorage[authorizeTokenType] && oktaTokenStorage['accessToken']) {
             if(oktaTokenStorage[authorizeTokenType][authorizeTokenType] && !checkEnrollmentStatus) {
                 setCheckEnrollmentStatus(true);
-                fetch(`${config.BACK_END_URL}/api/v1/deleteTOTPfactorIfEnrolledFromOktaVerify`, {
-                    // "method": GET,
-                    "method": 'DELETE',
-                    "headers": {
-                        TOKEN: oktaTokenStorage[authorizeTokenType][authorizeTokenType]
+
+                const func = async () => {
+                    try {
+                        const response = await  fetch(`${config.BACK_END_URL}/api/v1/deleteTOTPfactorIfEnrolledFromOktaVerify`, {
+                            "method": 'DELETE',
+                            "headers": {
+                                TOKEN: oktaTokenStorage[authorizeTokenType][authorizeTokenType]
+                            }
+                        })
+                            .then(response => response.json())
+                            .then(response => {
+                                console.log(response);
+                                if(response.errorSummary) {
+                                    popupError = true;
+                                    popupErrorMessage = response.errorSummary;
+                                }
+                                autoEnroll();
+                            });
+                    } catch(err)  {
+                        popupError = true;
+                        popupErrorMessage = 'CONNECTION ERROR : Failed to fetch.';
+                        console.log(err);
                     }
-                })
-                    .then(response => response.json())
-                    .then(response => {
-                        autoEnroll();
-                    })
-                    .catch(err => {
-                        console.error(err);
-                    });
+                }
+                func().then(r => console.log(r));
             }
 
             if(userEmail === undefined) {
@@ -72,21 +86,6 @@ const Home = () => {
                     }
                     if (!randomOtp) {
                         getOtp()
-
-                        // fetch(`${config.BACK_END_URL}/api/v1/establishConnection`, {
-                        //     "method": GET,
-                        //     "headers": {
-                        //         TOKEN: oktaTokenStorage[authorizeTokenType][authorizeTokenType]
-                        //     }
-                        // })
-                        //     .then(response => response.json())
-                        //     .then(response => {
-                        //         getOtp()
-                        //         console.log(response);
-                        //     })
-                        //     .catch(err => {
-                        //         console.error(err);
-                        //     });
                     }
                 }).catch(err => {
                     console.log(err);
@@ -230,28 +229,6 @@ const Home = () => {
                 showLogoutInErrorPopup(true);
             }
         }
-        // const closeConnection = () => {
-        //     console.log('destroy connection')
-        //     if (oktaTokenStorage && oktaTokenStorage[authorizeTokenType] && oktaTokenStorage[authorizeTokenType][authorizeTokenType]) {
-        //         fetch(`${config.BACK_END_URL}/api/v1/destroyConnection`, {
-        //             "method": GET,
-        //             "headers": {
-        //                 TOKEN: oktaTokenStorage[authorizeTokenType][authorizeTokenType]
-        //             }
-        //         })
-        //             .then(response => response.json())
-        //             .then(response => {
-        //                 logout();
-        //                 console.log(response);
-        //             })
-        //             .catch(err => {
-        //                 console.error(err);
-        //             });
-        //     } else {
-        //         setError(`Token Error : No token found with key (${authorizeTokenType}).`);
-        //         showLogoutInErrorPopup(true);
-        //     }
-        // }
 
         const deleteByPassCode = () => {
             setRandomOtp(null)
@@ -271,7 +248,6 @@ const Home = () => {
                     console.log(result, selectedSecretId)
                 })
                 .catch(error => {
-
                     console.error('error', error)
                 });
         }
@@ -447,6 +423,20 @@ const Home = () => {
             {
                 noError ? (
                     <ErrorPopup errorMessage={noError} logoutInErrorPopup={logoutInErrorPopup} onClose={setError('')}/>
+                ) : ''
+            }
+            {
+                popupError ? (
+                    <div className="popup-box">
+                        <div className="box">
+                            <p style={{fontSize: "initial"}}>{popupErrorMessage}</p>
+                            <div style={{width: "100%"}}>
+                                <button className="button logout-button" onClick={() => popupError = false}>
+                                    Ok
+                                </button>
+                            </div>
+                        </div>
+                    </div>
                 ) : ''
             }
             {
