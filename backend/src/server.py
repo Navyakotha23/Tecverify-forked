@@ -257,7 +257,7 @@ def delete_secret(secret_id):
                         elif delete_factor_response.status_code == 401:
                             if delete_factor_response.json()['errorCode'] == "E0000011":
                                 print("API token provided is invalid. So, cannot delete the Factor in Okta but can delete the secret.")
-                            return {"errorSummary": "Invalid token provided. So, cannot delete the Factor in Okta but can delete the secret."},400
+                            return {"errorSummary": "Invalid API token provided. So, cannot delete the Factor in Okta but can delete the secret."},400
                         ############################################################################################################################
             return {"ERROR": "Secret with given secretId is not found"}, 400
     else:
@@ -292,7 +292,7 @@ def get_totp():
                 elif get_factor_response.status_code == 401:
                     if get_factor_response.json()['errorCode'] == "E0000011":
                         print("API token provided is invalid. So, cannot get the Factor.")
-                    return {"errorSummary": "Invalid token provided. So, cannot get the Factor."}, 400
+                    return {"errorSummary": "Invalid API token provided. So, cannot get the Factor."}, 400
                 #######################################################################################
     
     secrets_list1 = admin_secret.read()             
@@ -331,7 +331,7 @@ def enrollToTecVerify():
     elif enroll_response.status_code == 401:
         if enroll_response.json()['errorCode'] == "E0000011":
             print("API token provided is invalid. So, cannot enroll the user.")
-        return {"errorSummary": "Invalid token provided. So, cannot enroll the user."}, 400
+        return {"errorSummary": "Invalid API token provided. So, cannot enroll the user."}, 400
     ########################################################################################
 
 
@@ -359,7 +359,7 @@ def checkIfAlreadyEnrolledToOktaVerify():
     if list_factors_response.status_code == 401:
         if list_factors_response.json()['errorCode'] == "E0000011":
             print("API token provided is invalid. So, cannot get factors list.")
-        return {"errorSummary": "Invalid token provided. So, cannot get factors list."}, 400
+        return {"errorSummary": "Invalid API token provided. So, cannot get factors list."}, 400
     #########################################################################################
     factors_list = list_factors_response.json()
     for factor in factors_list:
