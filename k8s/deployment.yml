@@ -30,8 +30,8 @@ spec:
               cpu: 50m
           ports:
           - containerPort: 5000
-           name: healthz
-           protocol: TCP    
+            name: healthz
+            protocol: TCP    
           livenessProbe:
             httpGet:
               path: /healthz
@@ -44,8 +44,6 @@ spec:
               port: readyz
             initialDelaySeconds: 30
             periodSeconds: 5
-          ports:
-            - containerPort: 5000
           # env_file: 
           #   - /etc/mnk-config/env-file.txt
           env:
