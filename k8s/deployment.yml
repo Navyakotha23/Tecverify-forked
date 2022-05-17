@@ -29,7 +29,7 @@ spec:
               memory: 32Mi
               cpu: 50m
           ports:
-         - containerPort: 5000
+          - containerPort: 5000
            name: healthz
            protocol: TCP    
           livenessProbe:
