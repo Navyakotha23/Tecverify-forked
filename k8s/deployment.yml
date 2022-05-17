@@ -28,18 +28,18 @@ spec:
             requests:
               memory: 32Mi
               cpu: 50m
-          livenessProbe:
-            httpGet:
-              path: /livez
-              port: 5000
-            initialDelaySeconds: 30
-            periodSeconds: 5
-          readinessProbe:
-            httpGet:
-              path: /readyz
-              port: 5000
-            initialDelaySeconds: 30
-            periodSeconds: 5
+          # livenessProbe:
+          #   httpGet:
+          #     path: /livez
+          #     port: 5000
+          #   initialDelaySeconds: 30
+          #   periodSeconds: 5
+          # readinessProbe:
+          #   httpGet:
+          #     path: /readyz
+          #     port: 5000
+          #   initialDelaySeconds: 30
+          #   periodSeconds: 5
           ports:
             - containerPort: 5000
           # env_file: 
@@ -122,18 +122,18 @@ spec:
             requests:
               cpu: 50m
               memory: 64Mi
-          livenessProbe:
-            httpGet:
-              path: /livez
-              port: 3000
-            initialDelaySeconds: 30
-            periodSeconds: 5
-          readinessProbe:
-            httpGet:
-              path: /readyz
-              port: 3000
-            initialDelaySeconds: 30
-            periodSeconds: 5
+          # livenessProbe:
+          #   httpGet:
+          #     path: /livez
+          #     port: 3000
+          #   initialDelaySeconds: 30
+          #   periodSeconds: 5
+          # readinessProbe:
+          #   httpGet:
+          #     path: /readyz
+          #     port: 3000
+          #   initialDelaySeconds: 30
+          #   periodSeconds: 5
           ports:
             - containerPort: 443
       volumes:
