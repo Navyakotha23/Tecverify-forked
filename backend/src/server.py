@@ -359,7 +359,8 @@ def checkIfAlreadyEnrolledToOktaVerify():
     if list_factors_response.status_code == 401:
         if list_factors_response.json()['errorCode'] == "E0000011":
             print("API token provided is invalid. So, cannot get factors list.")
-        return {"errorSummary": "Invalid API token provided. So, cannot get factors list."}, 400
+        # return {"errorSummary": "Invalid API token provided. So, cannot get factors list."}, 400
+        return {"errorSummary": "Invalid API token provided."}, 400
     #########################################################################################
     factors_list = list_factors_response.json()
     for factor in factors_list:
