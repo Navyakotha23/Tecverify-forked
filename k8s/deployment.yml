@@ -28,18 +28,22 @@ spec:
             requests:
               memory: 32Mi
               cpu: 50m
-          # livenessProbe:
-          #   httpGet:
-          #     path: /livez
-          #     port: 5000
-          #   initialDelaySeconds: 30
-          #   periodSeconds: 5
-          # readinessProbe:
-          #   httpGet:
-          #     path: /readyz
-          #     port: 5000
-          #   initialDelaySeconds: 30
-          #   periodSeconds: 5
+          ports:
+         - containerPort: 5000
+           name: healthz
+           protocol: TCP    
+          livenessProbe:
+            httpGet:
+              path: /healthz
+              port: healthz
+            initialDelaySeconds: 30
+            periodSeconds: 5
+          readinessProbe:
+            httpGet:
+              path: /readyz
+              port: readyz
+            initialDelaySeconds: 30
+            periodSeconds: 5
           ports:
             - containerPort: 5000
           # env_file: 
