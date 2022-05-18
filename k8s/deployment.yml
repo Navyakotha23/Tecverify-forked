@@ -124,18 +124,22 @@ spec:
             requests:
               cpu: 50m
               memory: 64Mi
-          # livenessProbe:
-          #   httpGet:
-          #     path: /livez
-          #     port: 3000
-          #   initialDelaySeconds: 30
-          #   periodSeconds: 5
-          # readinessProbe:
-          #   httpGet:
-          #     path: /readyz
-          #     port: 3000
-          #   initialDelaySeconds: 30
-          #   periodSeconds: 5
+          ports:
+          - containerPort: 5000
+            name: healthz
+            protocol: TCP    
+          livenessProbe:
+            httpGet:
+              path: /healthz
+              port: 3000
+            initialDelaySeconds: 30
+            periodSeconds: 5
+          readinessProbe:
+            httpGet:
+              path: /healthz
+              port: 3000
+            initialDelaySeconds: 30
+            periodSeconds: 5
           ports:
             - containerPort: 443
       volumes:
