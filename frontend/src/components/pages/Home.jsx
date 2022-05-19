@@ -72,7 +72,7 @@ const Home = () => {
                             });
                     } catch(err)  {
                         popupError = true;
-                        popupErrorMessage = 'CONNECTION ERROR : Failed to fetch.';
+                        popupErrorMessage = 'Failed to fetch.';
                         console.log(err);
                     }
                 }

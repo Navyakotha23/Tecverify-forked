@@ -253,12 +253,16 @@ def delete_secret(secret_id):
                         if delete_factor_response.status_code == 204:
                             print("Auto Saved Secret Deleted and Okta TOTP Factor deleted")
                             return {'Deleted both Secret and Okta TOTP factor': True}, 200
-                        ############################################################################################################################
+                        #############################################################################################################################################################
                         elif delete_factor_response.status_code == 401:
                             if delete_factor_response.json()['errorCode'] == "E0000011":
                                 print("API token provided is invalid. So, cannot delete the Factor in Okta but can delete the secret.")
                             return {"errorSummary": "Invalid API token provided. So, cannot delete the Factor in Okta but can delete the secret."},400
-                        ############################################################################################################################
+                        elif delete_factor_response.status_code == 403:
+                            if delete_factor_response.json()['errorCode'] == "E0000006":
+                                print("This user is not in the group for which API token is generated. So, cannot delete the Factor in Okta but can delete the secret.")
+                            return {"errorSummary": "You do not have permission to perform the requested action. So, cannot delete the Factor in Okta but can delete the secret."},400
+                        #############################################################################################################################################################
             return {"ERROR": "Secret with given secretId is not found"}, 400
     else:
         return {'error': 'UnAuthorized !!!'}, 403
@@ -288,12 +292,16 @@ def get_totp():
                     elif DATABASE_TYPE == "mssql":
                         # admin_secret.delete_secret(secret_id, CONNECTION_OBJECT)
                         admin_secret.delete_secret(secret['secretId'])
-                #######################################################################################
+                ############################################################################################################################
                 elif get_factor_response.status_code == 401:
                     if get_factor_response.json()['errorCode'] == "E0000011":
                         print("API token provided is invalid. So, cannot get the Factor.")
                     return {"errorSummary": "Invalid API token provided. So, cannot get the Factor."}, 400
-                #######################################################################################
+                elif get_factor_response.status_code == 403:
+                    if get_factor_response.json()['errorCode'] == "E0000006":
+                        print("This user is not in the group for which API token is generated. So, cannot get the Factor.")
+                    return {"errorSummary": "You do not have permission to perform the requested action. So, cannot get the Factor."},400
+                ############################################################################################################################
     
     secrets_list1 = admin_secret.read()             
     totp_list = totp.generate_totp_for_all_secrets(secrets_list1, logged_in_Okta_user_id)
@@ -327,12 +335,16 @@ def enrollToTecVerify():
         if enroll_info['errorCode'] == "E0000001":
             print("A factor of this type is already set up.")
         return {"errorSummary": "A factor of this type is already set up."}
-    ########################################################################################
+    ###########################################################################################################################
     elif enroll_response.status_code == 401:
         if enroll_response.json()['errorCode'] == "E0000011":
             print("API token provided is invalid. So, cannot enroll the user.")
         return {"errorSummary": "Invalid API token provided. So, cannot enroll the user."}, 400
-    ########################################################################################
+    elif enroll_response.status_code == 403:
+        if enroll_response.json()['errorCode'] == "E0000006":
+            print("This user is not in the group for which API token is generated. So, cannot enroll the user.")
+        return {"errorSummary": "You do not have permission to perform the requested action. So, cannot enroll the user."},400
+    ###########################################################################################################################
 
 
 # @app.route('/api/v1/deleteTOTPfactorIfEnrolledFromOktaVerify', methods=['GET'])
@@ -355,13 +367,17 @@ def checkIfAlreadyEnrolledToOktaVerify():
     print("usersAutoEnrolledFromTecVerify_excludingLoginUser: ", usersAutoEnrolledFromTecVerify_excludingLoginUser)
 
     list_factors_response = okta.call_list_factors_API(logged_in_Okta_user_id)
-    #########################################################################################
+    ###########################################################################################################################
     if list_factors_response.status_code == 401:
         if list_factors_response.json()['errorCode'] == "E0000011":
             print("API token provided is invalid. So, cannot get factors list.")
-        # return {"errorSummary": "Invalid API token provided. So, cannot get factors list."}, 400
-        return {"errorSummary": "Invalid API token provided."}, 400
-    #########################################################################################
+        return {"errorSummary": "Invalid API token provided. So, cannot get factors list."}, 400
+        # return {"errorSummary": "Invalid API token provided."}, 400
+    elif list_factors_response.status_code == 403:
+        if list_factors_response.json()['errorCode'] == "E0000006":
+            print("This user is not in the group for which API token is generated. So, cannot get factors list.")
+        return {"errorSummary": "You do not have permission to perform the requested action. So, cannot get factors list."},400
+    ###########################################################################################################################
     factors_list = list_factors_response.json()
     for factor in factors_list:
         if factor['factorType'] == "token:software:totp":
@@ -371,6 +387,13 @@ def checkIfAlreadyEnrolledToOktaVerify():
                     if delete_factor_response.status_code == 204:
                         print("Okta TOTP Factor enrolled from OktaVerify is deleted")
                         return {'Deleted Okta TOTP Factor enrolled from OktaVerify': True}, 200
+                    ###########################################################################################################################
+                    elif delete_factor_response.status_code == 403:
+                        if delete_factor_response.json()['errorCode'] == "E0000006":
+                            print("Either this user is not in the group for which API token is generated or this user is the super admin user.")
+                            print("So, cannot delete the factor of super admin with group admin API token.")
+                        return {"errorSummary": "You do not have permission to perform the requested action. So, cannot delete the Factor in Okta."},400
+                    ###########################################################################################################################
             else:     
                 for secret in secrets_list:
                     if secret['oktaFactorId'] != "" and secret['oktaUserId'] == logged_in_Okta_user_id:
@@ -383,6 +406,13 @@ def checkIfAlreadyEnrolledToOktaVerify():
                             if delete_factor_response.status_code == 204:
                                 print("Okta TOTP Factor enrolled from other TecVerify Build or OktaVerify is deleted")
                                 return {'Deleted Okta TOTP Factor enrolled from other TecVerify Build or OktaVerify': True}, 200
+                            ###########################################################################################################################
+                            elif delete_factor_response.status_code == 403:
+                                if delete_factor_response.json()['errorCode'] == "E0000006":
+                                    print("Either this user is not in the group for which API token is generated or this user is the super admin user.")
+                                    print("So, cannot delete the factor of super admin with group admin API token.")
+                                return {"errorSummary": "You do not have permission to perform the requested action. So, cannot delete the Factor in Okta."},400
+                            ###########################################################################################################################
 
                 if usersAutoEnrolledFromTecVerify == usersAutoEnrolledFromTecVerify_excludingLoginUser:
                     print("No auto enrollment is done in TecVerify for this logged in user.")
@@ -390,6 +420,13 @@ def checkIfAlreadyEnrolledToOktaVerify():
                     if delete_factor_response.status_code == 204:
                         print("Okta TOTP Factor enrolled from OktaVerify is deleted")
                         return {'Deleted Okta TOTP Factor enrolled from OktaVerify': True}, 200
+                    ###########################################################################################################################
+                    elif delete_factor_response.status_code == 403:
+                        if delete_factor_response.json()['errorCode'] == "E0000006":
+                            print("Either this user is not in the group for which API token is generated or this user is the super admin user.")
+                            print("So, cannot delete the factor of super admin with group admin API token.")
+                        return {"errorSummary": "You do not have permission to perform the requested action. So, cannot delete the Factor in Okta."},400
+                    ###########################################################################################################################
 
     print("This user is not enrolled to Okta TOTP factor")
     return {'Okta TOTP Factor is not enrolled for this user': True}, 200

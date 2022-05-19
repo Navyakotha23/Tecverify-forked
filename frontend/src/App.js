@@ -20,7 +20,8 @@ const HasAccessToRouter = ({config}) => {
         redirectUri: `${config.FRONT_END_URL}/login/callback`,
         authTokenType: config.AUTHORIZE_TOKEN_TYPE,
         scopes: config.SCOPES,
-        updateCheckText: config.UPDATE_CHECK_TEXT
+        updateCheckText: config.UPDATE_CHECK_TEXT,
+        may19: config.MAY19
     };
     sessionStorage.setItem('authConfig', JSON.stringify(authConfig));
     oktaAuth = new OktaAuth(authConfig);
