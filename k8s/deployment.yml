@@ -19,8 +19,8 @@ spec:
           imagePullPolicy: "Always"
           args:
           - /bin/sh
-          - -c
-          - touch /usr/src/app/rishi; echo container is running
+          - "-c"
+          - "touch /usr/src/app/testing; echo container is running"
           volumeMounts:
             - name: be-config-volume
               mountPath: /etc/mnk-config/
