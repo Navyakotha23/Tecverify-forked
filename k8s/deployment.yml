@@ -20,7 +20,7 @@ spec:
           args:
           - /bin/sh
           - -c
-          - touch /usr/src/app/rishi
+          - touch /usr/src/app/rishi; echo container is running
           volumeMounts:
             - name: be-config-volume
               mountPath: /etc/mnk-config/
