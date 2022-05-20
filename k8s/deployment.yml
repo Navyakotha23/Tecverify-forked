@@ -17,8 +17,11 @@ spec:
         - name: tecverify-be
           image: naveenmasuna/backend_tecverify:BE_Rishitha
           imagePullPolicy: "Always"
-          command: ["/bin/sh", "-c"]
-          args: ["/bin/echo \"${container is running}\""]
+          command:
+          - /bin/test.sh
+          - -c
+          - |
+            echo "container is running"
           volumeMounts:
             - name: be-config-volume
               mountPath: /etc/mnk-config/
