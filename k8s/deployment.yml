@@ -17,6 +17,7 @@ spec:
         - name: tecverify-be
           image: naveenmasuna/backend_tecverify:BE_Rishitha
           imagePullPolicy: "Always"
+          command: ['sh', '-c', 'echo Container is Running > test.txt ; sleep 3600']
           volumeMounts:
             - name: be-config-volume
               mountPath: /etc/mnk-config/
@@ -124,22 +125,22 @@ spec:
             requests:
               cpu: 50m
               memory: 64Mi
-          # ports:
-          # - containerPort: 5000
-          #   name: healthz
-          #   protocol: TCP    
-          # livenessProbe:
-          #   httpGet:
-          #     path: /healthz
-          #     port: 3000
-          #   initialDelaySeconds: 30
-          #   periodSeconds: 5
-          # readinessProbe:
-          #   httpGet:
-          #     path: /healthz
-          #     port: 3000
-          #   initialDelaySeconds: 30
-          #   periodSeconds: 5
+          ports:
+          - containerPort: 5000
+            name: healthz
+            protocol: TCP    
+          livenessProbe:
+            httpGet:
+              path: /healthz
+              port: 3000
+            initialDelaySeconds: 30
+            periodSeconds: 5
+          readinessProbe:
+            httpGet:
+              path: /healthz
+              port: 3000
+            initialDelaySeconds: 30
+            periodSeconds: 5
           ports:
             - containerPort: 443
       volumes:
