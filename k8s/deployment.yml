@@ -24,7 +24,6 @@ spec:
           volumeMounts:
             - name: be-config-volume
               mountPath: /etc/mnk-config/
-              
           resources:
             limits:
               memory: 64Mi
@@ -34,21 +33,20 @@ spec:
               cpu: 50m
           ports:
           - containerPort: 5000
-            # name: healthz
-            # protocol: TCP    
-          # livenessProbe:
-          #   httpGet:
-          #     path: /healthz
-          #     port: 5000
-          #   initialDelaySeconds: 10
-          #   periodSeconds: 5
-          # readinessProbe:
-          #   exec:
-          #     command:
-          #       - cat
-          #       - /tmp/rishitha
-          #   initialDelaySeconds: 30
-          #   periodSeconds: 5
+            name: healthz
+            protocol: TCP    
+          livenessProbe:
+            httpGet:
+              path: /healthz
+              port: 5000
+            initialDelaySeconds: 10
+            periodSeconds: 5
+          readinessProbe:
+            httpGet:
+              path: /healthz
+              port: 3000
+            initialDelaySeconds: 30
+            periodSeconds: 5
           # env_file: 
           #   - /etc/mnk-config/env-file.txt
           env:
