@@ -20,7 +20,7 @@ spec:
           command:
             - /bin/bash
             - -ec
-            - touch tmp/rishitha
+            - touch /tmp/rishitha
           volumeMounts:
             - name: be-config-volume
               mountPath: /etc/mnk-config/
@@ -34,18 +34,19 @@ spec:
               cpu: 50m
           ports:
           - containerPort: 5000
-            name: healthz
-            protocol: TCP    
-          livenessProbe:
-            httpGet:
-              path: /healthz
-              port: 5000
-            initialDelaySeconds: 10
-            periodSeconds: 5
+            # name: healthz
+            # protocol: TCP    
+          # livenessProbe:
+          #   httpGet:
+          #     path: /healthz
+          #     port: 5000
+          #   initialDelaySeconds: 10
+          #   periodSeconds: 5
           readinessProbe:
-            httpGet:
-              path: /healthz
-              port: 5000
+            exec:
+              command:
+                - cat
+                - /tmp/rishitha
             initialDelaySeconds: 30
             periodSeconds: 5
           # env_file: 
