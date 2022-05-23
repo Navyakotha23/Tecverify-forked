@@ -17,10 +17,10 @@ spec:
         - name: tecverify-be
           image: naveenmasuna/backend_tecverify:BE_Rishitha
           imagePullPolicy: "Always"
-          # args:
-          #   - /bin/sh
-          #   - '-c'
-          #   - touch /tmp/healthy; sleep 300; echo container is running > /tmp/healthy
+          args:
+            - /bin/sh
+            - '-c'
+            - echo hi > /tmp/output.txt
           volumeMounts:
             - name: be-config-volume
               mountPath: /etc/mnk-config/
@@ -35,11 +35,11 @@ spec:
           - containerPort: 5000
           #   name: healthz
           #   protocol: TCP    
-          # livenessProbe:
-          #   exec:
-          #     command:
-          #       - cat
-          #       - /tmp/healthy
+          livenessProbe:
+            exec:
+              command:
+                - cat
+                - /tmp/output.txt
           #     # path: /healthz
           #     # port: 5000
           #   initialDelaySeconds: 10
