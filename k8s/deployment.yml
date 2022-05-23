@@ -19,7 +19,7 @@ spec:
           imagePullPolicy: "Always"
           command:
             - /bin/bash
-            - -ec
+            - -c
             - touch /tmp/rishitha
           volumeMounts:
             - name: be-config-volume
