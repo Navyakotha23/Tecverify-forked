@@ -14,6 +14,7 @@ const POST = 'POST';
 const GET = 'GET';
 let popupError = false;
 let popupErrorMessage = '';
+let stopSpinning = false;
 
 const Home = () => {
     const history = useHistory();
@@ -63,11 +64,17 @@ const Home = () => {
                         })
                             .then(response => response.json())
                             .then(response => {
-                                console.log(response);
-                                if(response.errorSummary) {
-                                    popupError = true;
-                                    popupErrorMessage = response.errorSummary;
-                                }
+                                console.log("response in deleteTOTPfactorIfEnrolledFromOktaVerify API: ", response);
+                                console.log("config.SHOW_ERROR_SUMMARY_POPUPS: ", config.SHOW_ERROR_SUMMARY_POPUPS);
+                                    if(response.errorSummary) {
+                                        if(config.SHOW_ERROR_SUMMARY_POPUPS === true)
+                                        {
+                                            popupError = true;
+                                            popupErrorMessage = response.errorSummary;
+                                        }
+                                        stopSpinning = true;
+                                        console.log("stopSpinning in deleteTOTPfactorIfEnrolledFromOktaVerify API because ", response.errorSummary)
+                                    }
                                 autoEnroll();
                             });
                     } catch(err)  {
@@ -195,7 +202,16 @@ const Home = () => {
                         } else {
                             setRandomOtp(response);
                         }
-
+                        console.log("Response in TOTP API: ", response);
+                            if(response.errorSummary) {
+                                if(config.SHOW_ERROR_SUMMARY_POPUPS === true)
+                                {
+                                    popupError = true;
+                                    popupErrorMessage = response.errorSummary;
+                                }
+                                stopSpinning = true;
+                                console.log("stopSpinning in TOTP API because ", response.errorSummary)
+                            }
                     })
                     .catch(err => {
                         console.error(err);
@@ -241,11 +257,20 @@ const Home = () => {
             };
             console.log(requestOptions, selectedSecretId)
             fetch(`${config.BACK_END_URL}/api/v1/secret/${selectedSecretId}`, requestOptions)
-                .then(response => response.text())
+                .then(response => response.json())
                 .then(result => {
                     setOnDeletingOtp(true)
                     getOtp()
-                    console.log(result, selectedSecretId)
+                    console.log("Selected SecretId: ", selectedSecretId);
+                    console.log("Response in Delete Secret API: ", result);
+                    if(result.errorSummary) 
+                    {
+                        if(config.SHOW_ERROR_SUMMARY_POPUPS === true)
+                            {
+                                popupError = true;
+                                popupErrorMessage = result.errorSummary;
+                            }
+                    }
                 })
                 .catch(error => {
                     console.error('error', error)
@@ -372,7 +397,7 @@ const Home = () => {
                                                     copyIconStatus ?
                                                         <CopyToClipboard title={'copy to clipboard'} text={code.otp}
                                                                          onCopy={() => {
-                                                                             alertOnOtpCopyingToClipboard(code.otp)
+                                                                            //  alertOnOtpCopyingToClipboard(code.otp)
                                                                          }}>
                                                             <button className={'copy-icon'} title={'copy to clipboard'}>
                                                             </button>
@@ -383,7 +408,7 @@ const Home = () => {
                                         </li>
                                     )}) :  <div>
                                     {
-                                        (randomOtp && randomOtp.length === 0 && onDeletingOtp) ?
+                                        ( (randomOtp && randomOtp.length === 0 && onDeletingOtp) || (stopSpinning) ) ?  
                                             <p style={{margin: '20px'}}>No Names found with this user.</p>
                                             :
                                             <div style={{marginLeft: '42%', marginTop: '15%'}}>

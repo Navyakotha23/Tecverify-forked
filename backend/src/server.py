@@ -292,6 +292,7 @@ def get_totp():
                     elif DATABASE_TYPE == "mssql":
                         # admin_secret.delete_secret(secret_id, CONNECTION_OBJECT)
                         admin_secret.delete_secret(secret['secretId'])
+                    return {"errorSummary": "TOTP factor is Inactive. So, deleting the secret."}, 200
                 ############################################################################################################################
                 elif get_factor_response.status_code == 401:
                     if get_factor_response.json()['errorCode'] == "E0000011":
