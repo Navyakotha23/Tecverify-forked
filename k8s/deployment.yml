@@ -42,7 +42,7 @@ spec:
                 - /tmp/healthy
               # path: /healthz
               # port: 5000
-            initialDelaySeconds: 5
+            initialDelaySeconds: 30
             periodSeconds: 5
           # readinessProbe:
           #   httpGet:
