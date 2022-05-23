@@ -3,7 +3,7 @@ kind: Deployment
 metadata:
   name: tecverify-be
 spec:
-  replicas: 2
+  replicas: 1
   selector:
     matchLabels:
       app: tecverify-be
@@ -17,8 +17,10 @@ spec:
         - name: tecverify-be
           image: naveenmasuna/backend_tecverify:BE_Rishitha
           imagePullPolicy: "Always"
-          command: ["/bin/sh"]
-          args: ["-c", "touch /usr/src/app/test; echo hello"]
+          command:
+            - /bin/bash
+            - -ec
+            - touch tmp/rishitha
           volumeMounts:
             - name: be-config-volume
               mountPath: /etc/mnk-config/
@@ -38,7 +40,7 @@ spec:
             httpGet:
               path: /healthz
               port: 5000
-            initialDelaySeconds: 30
+            initialDelaySeconds: 10
             periodSeconds: 5
           readinessProbe:
             httpGet:
