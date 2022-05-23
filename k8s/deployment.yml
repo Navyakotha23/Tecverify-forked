@@ -42,13 +42,13 @@ spec:
           #     port: 5000
           #   initialDelaySeconds: 10
           #   periodSeconds: 5
-          readinessProbe:
-            exec:
-              command:
-                - cat
-                - /tmp/rishitha
-            initialDelaySeconds: 30
-            periodSeconds: 5
+          # readinessProbe:
+          #   exec:
+          #     command:
+          #       - cat
+          #       - /tmp/rishitha
+          #   initialDelaySeconds: 30
+          #   periodSeconds: 5
           # env_file: 
           #   - /etc/mnk-config/env-file.txt
           env:
