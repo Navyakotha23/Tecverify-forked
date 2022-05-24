@@ -31,15 +31,15 @@ spec:
           - containerPort: 5000
           livenessProbe:
             httpGet:
-              path: /
-              port: 5000
-            initialDelaySeconds: 10
+              path: /healthz
+              port: 8080
+            initialDelaySeconds: 5
             periodSeconds: 5
           readinessProbe:
             httpGet:
-              path: /
-              port: 5000
-            initialDelaySeconds: 10
+              path: /healthz
+              port: 8080
+            initialDelaySeconds: 5
             periodSeconds: 5
           # env_file: 
           #   - /etc/mnk-config/env-file.txt
