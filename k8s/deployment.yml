@@ -18,7 +18,7 @@ spec:
           image: naveenmasuna/backend_tecverify:BE_Rishitha
           imagePullPolicy: "Always"
           args:
-          - bin/sh
+          - /bin/sh
           - -c
           - touch /tmp/rishitha.txt; echo container is running > /tmp/rishitha.txt; sleep 120
           volumeMounts:
