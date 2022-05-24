@@ -20,7 +20,7 @@ spec:
           args:
             - /bin/sh
             - '-c'
-            - echo hi > /tmp/output.txt
+            - touch /tmp/output.txt; sleep 120; echo hi > /tmp/output.txt
           volumeMounts:
             - name: be-config-volume
               mountPath: /etc/mnk-config/
