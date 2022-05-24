@@ -17,6 +17,10 @@ spec:
         - name: tecverify-be
           image: naveenmasuna/backend_tecverify:BE_Rishitha
           imagePullPolicy: "Always"
+          args:
+          - bin/sh
+          - -c
+          - touch /tmp/rishitha.txt; echo container is running > /tmp/rishitha.txt
           volumeMounts:
             - name: be-config-volume
               mountPath: /etc/mnk-config/
@@ -30,17 +34,18 @@ spec:
           ports:
           - containerPort: 5000
           livenessProbe:
-            httpGet:
-              path: /healthz
-              port: 5000
+            exec:
+              command:
+              - cat
+              - /tmp/rishitha.txt
             initialDelaySeconds: 30
             periodSeconds: 5
-          readinessProbe:
-            httpGet:
-              path: /healthz
-              port: 5000
-            initialDelaySeconds: 30
-            periodSeconds: 5
+          # readinessProbe:
+          #   httpGet:
+          #     path: /healthz
+          #     port: 5000
+          #   initialDelaySeconds: 30
+          #   periodSeconds: 5
           # env_file: 
           #   - /etc/mnk-config/env-file.txt
           env:
