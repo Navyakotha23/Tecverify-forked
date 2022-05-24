@@ -20,7 +20,7 @@ spec:
           args:
           - /bin/sh
           - -c
-          - touch /tmp/rishitha.txt; sleep 120; echo container is running > /tmp/rishitha.txt
+          - touch /tmp/rishitha.txt; echo container is running > /tmp/rishitha.txt; sleep 120
           volumeMounts:
             - name: be-config-volume
               mountPath: /etc/mnk-config/
