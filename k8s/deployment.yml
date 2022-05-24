@@ -35,12 +35,12 @@ spec:
               port: 8080
             initialDelaySeconds: 5
             periodSeconds: 5
-          readinessProbe:
-            httpGet:
-              path: /healthz
-              port: 8080
-            initialDelaySeconds: 5
-            periodSeconds: 5
+          # readinessProbe:
+          #   httpGet:
+          #     path: /healthz
+          #     port: 8080
+          #   initialDelaySeconds: 4
+          #   periodSeconds: 4
           # env_file: 
           #   - /etc/mnk-config/env-file.txt
           env:
