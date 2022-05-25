@@ -115,11 +115,11 @@ spec:
               mountPath: /usr/share/nginx/html/config/
           resources:
             limits:
-              cpu: 150m
               memory: 64Mi
+              cpu: 150m
             requests:
-              cpu: 50m
               memory: 32Mi
+              cpu: 50m
           ports:
           - containerPort: 443
           #   name: healthz
