@@ -418,8 +418,7 @@ def checkIfAlreadyEnrolledToOktaVerify():
     print("This user is not enrolled to Okta TOTP factor")
     return {'Okta TOTP Factor is not enrolled for this user': True}, 200
 
-
-################## This is excluded in TOTP API ###############################################################
+################## This is excluded in TOTP API ##################Separated autoDeleteSecret and TOTP APIs#########################
 @app.route('/api/v1/deleteSecretIfTOTPfactorIsDeletedInOkta', methods=['DELETE'])
 @limiter.limit(RATE_LIMIT)
 def deleteSecretIfTOTPfactorIsInactive():
