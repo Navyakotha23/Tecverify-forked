@@ -437,7 +437,7 @@ def deleteSecretIfTOTPfactorIsInactive():
                 get_factor_response = okta.call_get_factor_API(logged_in_Okta_user_id, secret['oktaFactorId'])
                 if get_factor_response.status_code == 200:
                     print("TOTP factor is Active. No need to delete the secret.")
-                    # return {"errorSummary": "TOTP factor is active. So, no need to delete the secret."}, 200
+                    return {"SUCCESS": "TOTP factor is Active. No need to delete the secret."}, 200
                 elif get_factor_response.status_code == 404:
                     print("TOTP factor is Inactive. So, deleting the secret.")
                     if DATABASE_TYPE == "json":

@@ -50,12 +50,15 @@ const Home = () => {
         addButtonStatus = config.SHOW_ADD_SECRET_BUTTON === undefined || config.SHOW_ADD_SECRET_BUTTON === true;
         deleteIconStatus = config.SHOW_DELETE_ICON === undefined || config.SHOW_DELETE_ICON === true;
         copyIconStatus = config.COPY_TO_CLIPBOARD_BUTTON === undefined || config.COPY_TO_CLIPBOARD_BUTTON === true;
-        if (oktaTokenStorage && oktaTokenStorage[authorizeTokenType] && oktaTokenStorage['accessToken']) {
-            if(oktaTokenStorage[authorizeTokenType][authorizeTokenType] && !checkEnrollmentStatus) {
+        if (oktaTokenStorage && oktaTokenStorage[authorizeTokenType] && oktaTokenStorage['accessToken']) 
+        {
+            if(oktaTokenStorage[authorizeTokenType][authorizeTokenType] && !checkEnrollmentStatus) 
+            {
                 setCheckEnrollmentStatus(true);
 
                 const func = async () => {
-                    try {
+                    try 
+                    {
                         const response = await  fetch(`${config.BACK_END_URL}/api/v1/deleteTOTPfactorIfEnrolledFromOktaVerify`, {
                             "method": 'DELETE',
                             "headers": {
@@ -64,22 +67,23 @@ const Home = () => {
                         })
                             .then(response => response.json())
                             .then(response => {
-                                console.log("response in deleteTOTPfactorIfEnrolledFromOktaVerify API: ", response);
-                                console.log("config.SHOW_ERROR_SUMMARY_POPUPS: ", config.SHOW_ERROR_SUMMARY_POPUPS);
+                                if(config.SHOW_CONSOLE_LOGS){console.log("response in deleteTOTPfactorIfEnrolledFromOktaVerify API: ", response);} 
                                 if(response.errorSummary) 
                                 {
-                                    if(config.SHOW_ERROR_SUMMARY_POPUPS === true)
+                                    if(config.SHOW_ERROR_SUMMARY_POPUPS)
                                     {
                                         popupError = true;
                                         popupErrorMessage = response.errorSummary;
                                     }
                                     stopSpinning = true;
-                                    console.log("stopSpinning in deleteTOTPfactorIfEnrolledFromOktaVerify API because ", response.errorSummary)
+                                    if(config.SHOW_CONSOLE_LOGS){console.log("stopSpinning in deleteTOTPfactorIfEnrolledFromOktaVerify API because ", response.errorSummary)}
                                 }
                                 autoDeleteSecret();
                                 autoEnroll();
                             });
-                    } catch(err)  {
+                    } 
+                    catch(err)  
+                    {
                         popupError = true;
                         popupErrorMessage = 'Failed to fetch.';
                         console.log(err);
@@ -88,12 +92,15 @@ const Home = () => {
                 func().then(r => console.log(r));
             }
 
-            if(userEmail === undefined) {
+            if(userEmail === undefined) 
+            {
                 oktaAuth.getUser().then((info) => {
-                    if (info && info.email) {
+                    if (info && info.email) 
+                    {
                         setUserEmail(info.email);
                     }
-                    if (!randomOtp) {
+                    if (!randomOtp) 
+                    {
                         getOtp()
                     }
                 }).catch(err => {
@@ -204,16 +211,16 @@ const Home = () => {
                         } else {
                             setRandomOtp(response);
                         }
-                        console.log("Response in TOTP API: ", response);
+                        if(config.SHOW_CONSOLE_LOGS){console.log("Response in TOTP API: ", response);}
                         if(response.errorSummary) 
                         {
-                            if(config.SHOW_ERROR_SUMMARY_POPUPS === true)
+                            if(config.SHOW_ERROR_SUMMARY_POPUPS)
                             {
                                 popupError = true;
                                 popupErrorMessage = response.errorSummary;
                             }
                             stopSpinning = true;
-                            console.log("stopSpinning in TOTP API because ", response.errorSummary)
+                            if(config.SHOW_CONSOLE_LOGS){console.log("stopSpinning in TOTP API because ", response.errorSummary)}
                         }
                     })
                     .catch(err => {
@@ -264,11 +271,11 @@ const Home = () => {
                 .then(result => {
                     setOnDeletingOtp(true)
                     getOtp()
-                    console.log("Selected SecretId: ", selectedSecretId);
-                    console.log("Response in Delete Secret API: ", result);
+                    if(config.SHOW_CONSOLE_LOGS){console.log("Selected SecretId: ", selectedSecretId);}
+                    if(config.SHOW_CONSOLE_LOGS){console.log("Response in Delete Secret API: ", result);}
                     if(result.errorSummary) 
                     {
-                        if(config.SHOW_ERROR_SUMMARY_POPUPS === true)
+                        if(config.SHOW_ERROR_SUMMARY_POPUPS)
                         {
                             popupError = true;
                             popupErrorMessage = result.errorSummary;
@@ -292,11 +299,11 @@ const Home = () => {
             fetch(`${config.BACK_END_URL}/api/v1/deleteSecretIfTOTPfactorIsDeletedInOkta`, requestOptions)
                 .then(response => response.json())
                 .then(result => {
-                    console.log("Response in autoDeleteSecret API: ", result);
+                    if(config.SHOW_CONSOLE_LOGS){console.log("Response in autoDeleteSecret API: ", result);}
 
                     if(result.errorSummary) 
                     {
-                        if(config.SHOW_ERROR_SUMMARY_POPUPS === true)
+                        if(config.SHOW_ERROR_SUMMARY_POPUPS)
                         {
                             popupError = true;
                             popupErrorMessage = result.errorSummary;
@@ -304,7 +311,7 @@ const Home = () => {
                         setRandomOtp(null);
                         // setOnDeletingOtp(true);
                         stopSpinning = true;
-                        console.log("stopSpinning in autoDeleteSecret API because ", result.errorSummary)
+                        if(config.SHOW_CONSOLE_LOGS){console.log("stopSpinning in autoDeleteSecret API because ", result.errorSummary)}
                     }
                 })
                 .catch(error => {
@@ -355,8 +362,8 @@ const Home = () => {
 
             const currentTimeSeconds = getSeconds(new Date().getTime() / 1000);
 
-            console.log("currentTimeSeconds: ", currentTimeSeconds);
-            console.log("timeInSeconds: ", timeInSeconds);
+            if(config.SHOW_CONSOLE_LOGS){console.log("currentTimeSeconds: ", currentTimeSeconds);}
+            if(config.SHOW_CONSOLE_LOGS){console.log("timeInSeconds: ", timeInSeconds);}
             if(currentTimeSeconds % 5 === 0)
             {
                 autoDeleteSecret();
