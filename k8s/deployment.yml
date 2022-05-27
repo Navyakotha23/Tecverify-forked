@@ -40,8 +40,8 @@ spec:
               port: 5000
             initialDelaySeconds: 30
             periodSeconds: 5
-          env_file: 
-            - /etc/mnk-config/env-file.txt
+          # env_file: 
+          #   - /etc/mnk-config/env-file.txt
           env:
             - name: CLIENT_ID
               value: 0oa164ptl0ySnZSb50h8
