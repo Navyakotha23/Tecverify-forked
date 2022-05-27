@@ -10,8 +10,6 @@ spec:
     - name: https
       port: 3000
       targetPort: 443
-    - port: 3000
-      targetPort: 80
 
 ---
 apiVersion: v1
