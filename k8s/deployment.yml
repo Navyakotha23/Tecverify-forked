@@ -1,19 +1,19 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: tecverify-be
+  name: tecverify-be-deployment
 spec:
   replicas: 1
   selector:
     matchLabels:
-      app: tecverify-be
+      app: tecverify-be-service-pod
   template:
     metadata:
       labels:
-        app: tecverify-be
+        app: tecverify-be-service-pod
     spec:
       containers:
-        - name: tecverify-be
+        - name: tecverify-be-cont
           image: naveenmasuna/backend_tecverify:BE_Rishitha
           imagePullPolicy: "Always"
           volumeMounts:
@@ -94,20 +94,20 @@ spec:
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: tecverify-fe
+  name: tecverify-fe-deployment
 spec:
   replicas: 1
   selector:
     matchLabels:
-      app: tecverify-fe
+      app: tecverify-fe-service-pod
       
   template:
     metadata:
       labels:
-        app: tecverify-fe
+        app: tecverify-fe-service-pod
     spec:
       containers:
-        - name: tecverify-fe
+        - name: tecverify-fe-cont
           image: naveenmasuna/frontend_tecverify:FE_Rishitha
           imagePullPolicy: "Always"
           volumeMounts:
