@@ -10,7 +10,7 @@ spec:
   template:
     metadata:
       labels:
-        app: tecverify-be-service
+        app: tecverify-be-selector-app
     spec:
       containers:
         - name: tecverify-be-container
@@ -104,7 +104,7 @@ spec:
   template:
     metadata:
       labels:
-        app: tecverify-fe-service
+        app: tecverify-fe-selector-app
     spec:
       containers:
         - name: tecverify-fe-container
