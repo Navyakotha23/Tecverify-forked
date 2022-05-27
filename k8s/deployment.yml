@@ -28,20 +28,20 @@ spec:
               cpu: 50m
           ports:
           - containerPort: 5000
-          # livenessProbe:
-          #   httpGet:
-          #     path: /healthz
-          #     port: 5000
-          #   initialDelaySeconds: 30
-          #   periodSeconds: 5
-          # readinessProbe:
-          #   httpGet:
-          #     path: /healthz
-          #     port: 5000
-          #   initialDelaySeconds: 30
-          #   periodSeconds: 5
-          # env_file: 
-          #   - /etc/mnk-config/env-file.txt
+          livenessProbe:
+            httpGet:
+              path: /healthz
+              port: 5000
+            initialDelaySeconds: 30
+            periodSeconds: 5
+          readinessProbe:
+            httpGet:
+              path: /healthz
+              port: 5000
+            initialDelaySeconds: 30
+            periodSeconds: 5
+          env_file: 
+            - /etc/mnk-config/env-file.txt
           env:
             - name: CLIENT_ID
               value: 0oa164ptl0ySnZSb50h8
