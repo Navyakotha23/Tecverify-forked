@@ -68,7 +68,7 @@ spec:
             - name: SALT
               value: MSHANKER
             - name: DATABASE_TYPE
-              value: JSON
+              value: MSSQL
             - name: SECRETS_FILE
               value: secrets.json
             - name: MS_SQL_SERVER
