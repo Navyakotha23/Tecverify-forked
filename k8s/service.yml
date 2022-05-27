@@ -24,4 +24,7 @@ spec:
     - name: https
       port: 5000
       targetPort: 5000
+
+
+# Deleted the services and creating again.
     
