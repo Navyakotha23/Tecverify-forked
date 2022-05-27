@@ -5,7 +5,7 @@ metadata:
 spec:
   type: LoadBalancer
   selector:
-    app: tecverify-fe-service-pod
+    app: tecverify-fe-selector-app
   ports:
     - name: https
       port: 3000
@@ -19,7 +19,7 @@ metadata:
 spec:
   type: LoadBalancer
   selector:
-    app: tecverify-be-service-pod
+    app: tecverify-be-selector-app
   ports:
     - name: https
       port: 5000

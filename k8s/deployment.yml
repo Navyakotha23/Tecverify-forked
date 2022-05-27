@@ -6,14 +6,14 @@ spec:
   replicas: 1
   selector:
     matchLabels:
-      app: tecverify-be-service-pod
+      app: tecverify-be-selector-app
   template:
     metadata:
       labels:
-        app: tecverify-be-service-pod
+        app: tecverify-be-service
     spec:
       containers:
-        - name: tecverify-be-cont
+        - name: tecverify-be-container
           image: naveenmasuna/backend_tecverify:BE_Rishitha
           imagePullPolicy: "Always"
           volumeMounts:
@@ -99,15 +99,15 @@ spec:
   replicas: 1
   selector:
     matchLabels:
-      app: tecverify-fe-service-pod
+      app: tecverify-fe-selector-app
       
   template:
     metadata:
       labels:
-        app: tecverify-fe-service-pod
+        app: tecverify-fe-service
     spec:
       containers:
-        - name: tecverify-fe-cont
+        - name: tecverify-fe-container
           image: naveenmasuna/frontend_tecverify:FE_Rishitha
           imagePullPolicy: "Always"
           volumeMounts:
