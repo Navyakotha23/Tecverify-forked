@@ -4,6 +4,7 @@ metadata:
   name: tecverify-fe
 spec:
   type: LoadBalancer
+  loadBalancerIP: 139.59.51.147
   selector:
     app: tecverify-fe
   ports:
