@@ -26,5 +26,5 @@ spec:
       targetPort: 5000
 
 
-# Deleted the services and creating again.
+# Deleted the Deployments, services and creating again.
     
