@@ -9,7 +9,7 @@ data:
       "ISSUER": "https://tecnics-demo.oktapreview.com",
       "AUTHORIZE_TOKEN_TYPE": "idToken",
       "BACK_END_URL": "https://139.59.54.126:5000",
-      "FRONT_END_URL": "https://68.183.247.209:3000",
+      "FRONT_END_URL": "https://tecverify-k8s-test.tecnics.com",
       "SCOPES": [
         "openid",
         "email",

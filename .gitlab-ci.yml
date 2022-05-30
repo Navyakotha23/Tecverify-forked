@@ -35,17 +35,17 @@ deploy-to-digital-ocean:
     - kubectl get svc tecverify-fe-service -o jsonpath='{.status.loadBalancer.ingress[0].ip}'
     - kubectl get svc tecverify-be-service -o jsonpath='{.status.loadBalancer.ingress[0].ip}'
     # - sleep for 1 minute
-    - sleep 60
+    # - sleep 60
     # - echo 
-    - echo "Echoing after 1 minute"
+    # - echo "Echoing after 1 minute"
     # - destroy created pod
     # - kubectl delete pod tecverify-be-deployment-696bf6dc9f-crgkc tecverify-be-deployment-696bf6dc9f-n5b59
     # - getting the pods list
-    - kubectl get pods
+    # - kubectl get pods
   environment:
     name: dev
-    url: https://68.183.247.209:3000
-    # url: https://tecverify-k8s-test.tecnics.com
+    # url: https://68.183.247.209:3000
+    url: https://tecverify-k8s-test.tecnics.com
   only:
     - devops
 
