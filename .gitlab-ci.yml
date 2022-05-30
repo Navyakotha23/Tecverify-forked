@@ -49,3 +49,6 @@ deploy-to-digital-ocean:
   only:
     - devops
 
+
+  # Accessing with domain name after building the image locally.
+
