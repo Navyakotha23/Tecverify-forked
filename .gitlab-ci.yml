@@ -39,7 +39,9 @@ deploy-to-digital-ocean:
     # - echo 
     - echo "Echoing after 1 minute"
     # - destroy created pod
-    - kubectl delete pod tecverify-be-deployment-696bf6dc9f-crgkc tecverify-be-deployment-696bf6dc9f-n5b59
+    # - kubectl delete pod tecverify-be-deployment-696bf6dc9f-crgkc tecverify-be-deployment-696bf6dc9f-n5b59
+    # - getting the pods list
+    - kubectl get pods
   environment:
     name: dev
     url: https://68.183.247.209:3000
