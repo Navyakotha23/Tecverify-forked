@@ -51,4 +51,5 @@ deploy-to-digital-ocean:
 
 
   # Accessing with domain name after building the image locally.
+  # Pushing with latest image.
 
