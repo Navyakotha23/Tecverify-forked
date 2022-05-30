@@ -3,7 +3,7 @@ kind: Deployment
 metadata:
   name: tecverify-be-deployment
 spec:
-  replicas: 1
+  replicas: 2
   selector:
     matchLabels:
       app: tecverify-be-selector-app
