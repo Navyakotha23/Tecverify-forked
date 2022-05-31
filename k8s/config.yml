@@ -8,8 +8,8 @@ data:
       "CLIENT_ID": "0oa164ptl0ySnZSb50h8", 
       "ISSUER": "https://tecnics-demo.oktapreview.com",
       "AUTHORIZE_TOKEN_TYPE": "idToken",
-      "BACK_END_URL": "https://139.59.52.245:5000",
-      "FRONT_END_URL": "https://68.183.244.245:3000",
+      "BACK_END_URL": "https://68.183.244.181:5000",
+      "FRONT_END_URL": "https://tecverify-k8s-test.tecnics.com",
       "SCOPES": [
         "openid",
         "email",
