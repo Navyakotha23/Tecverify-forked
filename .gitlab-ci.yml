@@ -53,4 +53,4 @@ deploy-to-digital-ocean:
   # Accessing with domain name after building the image locally.
   # Pushing with latest image.
   # Deleted old services, Creating new Services for Tecverify.
-  # Removed Docker Images.
+  # Removed FE and BE Docker Images.
