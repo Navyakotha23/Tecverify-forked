@@ -14,7 +14,7 @@ spec:
     spec:
       containers:
         - name: tecverify-be-container
-          image: naveenmasuna/backend_tecverify:BE_Rishitha
+          image: naveenmasuna/backend_tecverify:Rishitha_BE
           imagePullPolicy: "Always"
           volumeMounts:
             - name: be-config-volume
@@ -88,7 +88,7 @@ spec:
       volumes:
         - name: be-config-volume
           configMap:
-            name: tecverify-be-config 
+            name: tecverify-be-configmap 
  
 ---
 apiVersion: apps/v1
@@ -108,7 +108,7 @@ spec:
     spec:
       containers:
         - name: tecverify-fe-container
-          image: naveenmasuna/frontend_tecverify:FE_Rishitha
+          image: naveenmasuna/frontend_tecverify:Rishitha_FE
           imagePullPolicy: "Always"
           volumeMounts:
             - name: fe-config-volume
@@ -139,7 +139,7 @@ spec:
       volumes:
         - name: fe-config-volume
           configMap:
-            name: tecverify-fe-config
+            name: tecverify-fe-configmap
 
 
 
