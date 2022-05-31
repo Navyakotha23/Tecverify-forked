@@ -41,7 +41,8 @@ data:
       "CONFIRMATION_POPUP_FOR_BYPASS_CODE_FOR_DELETING": {
           "HEADER": "Confirm",
           "QUESTION": "Are you sure you want to delete ByPass code "
-      }
+      },
+      "UPDATE_CHECK_TEXT": "31st May 3.50PM"
     }
 
 ---
