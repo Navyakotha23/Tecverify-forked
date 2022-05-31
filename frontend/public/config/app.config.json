@@ -9,7 +9,7 @@
     "SHOW_DELETE_ICON": true,
     "UPDATE_CHECK_TEXT": "check",
     "MAY23": "5:10 PM Build",
-    "SHOW_ERROR_SUMMARY_POPUPS": true,
+    "SHOW_ERROR_SUMMARY_POPUPS": false,
     "SHOW_CONSOLE_LOGS": false,
     "PKCE": true,
     "COPY_TO_CLIPBOARD_BUTTON": true,

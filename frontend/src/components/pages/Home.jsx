@@ -15,6 +15,7 @@ const GET = 'GET';
 let popupError = false;
 let popupErrorMessage = '';
 let stopSpinning = false;
+let showTOTPs;
 
 const Home = () => {
     const history = useHistory();
@@ -43,7 +44,8 @@ const Home = () => {
         await oktaAuth.signOut('/login');
     };
 
-    if (oktaAuth && config) {
+    if (oktaAuth && config) 
+    {
         const oktaTokenStorage = JSON.parse(localStorage.getItem('okta-token-storage'));
         const authorizeTokenType = config.AUTHORIZE_TOKEN_TYPE
         let transition, authorizeToken, addButtonStatus, deleteIconStatus, copyIconStatus;
@@ -70,13 +72,18 @@ const Home = () => {
                                 if(config.SHOW_CONSOLE_LOGS){console.log("response in deleteTOTPfactorIfEnrolledFromOktaVerify API: ", response);} 
                                 if(response.errorSummary) 
                                 {
-                                    if(config.SHOW_ERROR_SUMMARY_POPUPS)
-                                    {
+                                    showTOTPs = false;
+                                    // if(config.SHOW_ERROR_SUMMARY_POPUPS)
+                                    // {
                                         popupError = true;
                                         popupErrorMessage = response.errorSummary;
-                                    }
+                                    // }
                                     stopSpinning = true;
                                     if(config.SHOW_CONSOLE_LOGS){console.log("stopSpinning in deleteTOTPfactorIfEnrolledFromOktaVerify API because ", response.errorSummary)}
+                                }
+                                else
+                                {
+                                    showTOTPs = true;
                                 }
                                 autoDeleteSecret();
                                 autoEnroll();
@@ -101,7 +108,10 @@ const Home = () => {
                     }
                     if (!randomOtp) 
                     {
-                        getOtp()
+                        if(showTOTPs)
+                        {
+                            getOtp();
+                        }
                     }
                 }).catch(err => {
                     console.log(err);
@@ -135,7 +145,10 @@ const Home = () => {
                 }).then(response => {
                     const promise = response.json();
                     promise.then(() => {
-                        getOtp()
+                        if(showTOTPs)
+                        {
+                            getOtp();
+                        }
                         setShowLoadingSpinnerInAdminSecretPopup(false)
                     });
                     if (response.status !== 200) {
@@ -191,7 +204,8 @@ const Home = () => {
         }
 
         const getOtp = () => {
-            if (oktaTokenStorage && oktaTokenStorage[authorizeTokenType] && oktaTokenStorage[authorizeTokenType][authorizeTokenType]) {
+            if (oktaTokenStorage && oktaTokenStorage[authorizeTokenType] && oktaTokenStorage[authorizeTokenType][authorizeTokenType]) 
+            {
                 fetch(`${config.BACK_END_URL}/api/v1/totp`, {
                     "method": GET,
                     "headers": {
@@ -227,7 +241,9 @@ const Home = () => {
                         console.error(err);
 
                     });
-            } else {
+            } 
+            else 
+            {
                 setError(`Token Error : No token found with key (${authorizeTokenType}).`);
                 showLogoutInErrorPopup(true);
             }
@@ -245,7 +261,10 @@ const Home = () => {
                 })
                     .then(response => response.json())
                     .then(response => {
-                        getOtp();
+                        if(showTOTPs)
+                        {
+                            getOtp();
+                        }
                     })
                     .catch(err => {
                         console.error(err);
@@ -270,16 +289,19 @@ const Home = () => {
                 .then(response => response.json())
                 .then(result => {
                     setOnDeletingOtp(true)
-                    getOtp()
+                    if(showTOTPs)
+                    {
+                        getOtp();
+                    }
                     if(config.SHOW_CONSOLE_LOGS){console.log("Selected SecretId: ", selectedSecretId);}
                     if(config.SHOW_CONSOLE_LOGS){console.log("Response in Delete Secret API: ", result);}
                     if(result.errorSummary) 
                     {
-                        if(config.SHOW_ERROR_SUMMARY_POPUPS)
-                        {
+                        // if(config.SHOW_ERROR_SUMMARY_POPUPS)
+                        // {
                             popupError = true;
                             popupErrorMessage = result.errorSummary;
-                        }
+                        // }
                     }
                 })
                 .catch(error => {
@@ -310,6 +332,14 @@ const Home = () => {
                         }
                         setRandomOtp(null);
                         // setOnDeletingOtp(true);
+
+                        // Need to sleep for say 4 seconds after deleting the secret to avoid displaying "No names found with this user"
+                        // Because after 4 seconds auto-enrolled secret will be displayed.
+                        // console.log("Start Timeout");
+                        // // const logout = async () => { await oktaAuth.signOut('/login'); };
+                        // const TestTimeout = setTimeout(async () => {setOnDeletingOtp(true);}, 15000);
+                        // console.log("End Timeout");
+                        
                         stopSpinning = true;
                         if(config.SHOW_CONSOLE_LOGS){console.log("stopSpinning in autoDeleteSecret API because ", result.errorSummary)}
                     }
@@ -350,13 +380,15 @@ const Home = () => {
             alert('Otp ' + otp + ' copied to clipboard');
         }
 
-        if (oktaTokenStorage && oktaTokenStorage[authorizeTokenType]) {
+        if (oktaTokenStorage && oktaTokenStorage[authorizeTokenType]) 
+        {
             const expiresAt = oktaTokenStorage[authorizeTokenType].expiresAt;
             authorizeToken = oktaTokenStorage[authorizeTokenType][authorizeTokenType];
             setTimeout(() => {
                 setSeconds(convertHMS((expiresAt) - (new Date().getTime() / 1000)));
             }, 1000);
-            if (expiresIn < 100) {
+            if (expiresIn < 100) 
+            {
                 logout();
             }
 
@@ -364,14 +396,21 @@ const Home = () => {
 
             if(config.SHOW_CONSOLE_LOGS){console.log("currentTimeSeconds: ", currentTimeSeconds);}
             if(config.SHOW_CONSOLE_LOGS){console.log("timeInSeconds: ", timeInSeconds);}
+            if(config.SHOW_CONSOLE_LOGS){console.log(currentTimeSeconds, " ,showTOTPs: ", showTOTPs);}
+            
             if(currentTimeSeconds % 5 === 0)
             {
                 autoDeleteSecret();
             }
 
-            if (currentTimeSeconds === 29 || currentTimeSeconds === 59 || currentTimeSeconds === 30 || currentTimeSeconds === 0) {
-                if (!timeInSeconds || ((new Date().getTime() / 1000) - timeInSeconds) > 10) {
-                    getOtp();
+            if (currentTimeSeconds === 29 || currentTimeSeconds === 59 || currentTimeSeconds === 30 || currentTimeSeconds === 0) 
+            {
+                if (!timeInSeconds || ((new Date().getTime() / 1000) - timeInSeconds) > 10) 
+                {
+                    if(showTOTPs)
+                    {
+                        getOtp();
+                    }
                     setTimeInSeconds(new Date().getTime() / 1000)
                 }
             }
@@ -672,7 +711,9 @@ const Home = () => {
                 </div>
             </div>;
         }
-    } else {
+    } 
+    else 
+    {
         return '';
     }
 }
