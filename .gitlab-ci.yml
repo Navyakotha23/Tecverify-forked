@@ -54,4 +54,5 @@ deploy-to-digital-ocean:
   # Pushing with latest image.
   # Deleted old services, Creating new Services for Tecverify.
   # Removed FE and BE Docker Images.
-  # Passing Certificates for Frontend.
+  # Deleted the old pod.
+  
