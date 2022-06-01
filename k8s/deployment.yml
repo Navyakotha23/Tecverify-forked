@@ -1,23 +1,23 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: tecverify-BEdummy-deployment
+  name: tecverify-be-dummy-deployment
 spec:
   replicas: 1
   selector:
     matchLabels:
-      app: tecverify-BEdummy-selector-app
+      app: tecverify-be-dummy-selector-app
   template:
     metadata:
       labels:
-        app: tecverify-BEdummy-selector-app
+        app: tecverify-be-dummy-selector-app
     spec:
       containers:
-        - name: tecverify-BEdummy-container
+        - name: tecverify-be-dummy-container
           image: naveenmasuna/backend_tecverify:Rishitha_BE
           imagePullPolicy: "Always"
           volumeMounts:
-            - name: BEdummy-config-volume
+            - name: be-dummy-config-volume
               mountPath: /etc/mnk-config/
           resources:
             limits:
@@ -86,32 +86,32 @@ spec:
             - name: ENCRYPTED_API_KEY
               value: b'C\xb5\x02M\x10N\x80\xd0O\xc8z\xabV>\x9aW\xb5\x17c&N\x95\x92\xb7&t@Y\xa9\xf5"]\xa0\xd4]\x9f\xc6\xfct\xb9\xefYWy\x86_^\xac'
       volumes:
-        - name: BEdummy-config-volume
+        - name: be-dummy-config-volume
           configMap:
-            name: tecverify-BEdummy-configmap 
+            name: tecverify-be-dummy-configmap 
  
 ---
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: tecverify-FEdummy-deployment
+  name: tecverify-fe-dummy-deployment
 spec:
   replicas: 1
   selector:
     matchLabels:
-      app: tecverify-FEdummy-selector-app
+      app: tecverify-fe-dummy-selector-app
       
   template:
     metadata:
       labels:
-        app: tecverify-FEdummy-selector-app
+        app: tecverify-fe-dummy-selector-app
     spec:
       containers:
-        - name: tecverify-FEdummy-container
+        - name: tecverify-fe-dummy-container
           image: naveenmasuna/frontend_tecverify:Rishitha_FE
           imagePullPolicy: "Always"
           volumeMounts:
-            - name: FEdummy-config-volume
+            - name: fe-dummy-config-volume
               mountPath: /usr/share/nginx/html/config/
           resources:
             limits:
@@ -137,9 +137,9 @@ spec:
           #   initialDelaySeconds: 30
           #   periodSeconds: 5
       volumes:
-        - name: FEdummy-config-volume
+        - name: fe-dummy-config-volume
           configMap:
-            name: tecverify-FEdummy-configmap
+            name: tecverify-fe-dummy-configmap
 
 
 
