@@ -44,8 +44,8 @@ deploy-to-digital-ocean:
     # - kubectl get pods
   environment:
     name: dev
-    url: https://146.190.8.181:3000
-    # url: https://tecverify-k8s-test.tecnics.com
+    # url: https://146.190.8.181:3000
+    url: https://tecverify-k8s-test.tecnics.com
   only:
     - devops
 
@@ -54,5 +54,5 @@ deploy-to-digital-ocean:
   # Pushing with latest image.
   # Deleted old services, Creating new Services for Tecverify.
   # Removed FE and BE Docker Images.
-  # Deleted the old pod.
   
+
