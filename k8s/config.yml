@@ -1,7 +1,7 @@
 apiVersion: v1
 kind: ConfigMap
 metadata:
-  name: tecverify-fe-configmap
+  name: tecverify-FEdummy-configmap
 data:
   app.config.json: |-
     {
@@ -50,7 +50,7 @@ data:
 apiVersion: v1
 kind: ConfigMap
 metadata:
-  name: tecverify-be-configmap
+  name: tecverify-BEdummy-configmap
 data:
   env-file.txt: |-
     CLIENT_ID=0oa164ptl0ySnZSb50h8

@@ -1,23 +1,23 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: tecverify-be-deployment
+  name: tecverify-BEdummy-deployment
 spec:
   replicas: 1
   selector:
     matchLabels:
-      app: tecverify-be-selector-app
+      app: tecverify-BEdummy-selector-app
   template:
     metadata:
       labels:
-        app: tecverify-be-selector-app
+        app: tecverify-BEdummy-selector-app
     spec:
       containers:
-        - name: tecverify-be-container
+        - name: tecverify-BEdummy-container
           image: naveenmasuna/backend_tecverify:Rishitha_BE
           imagePullPolicy: "Always"
           volumeMounts:
-            - name: be-config-volume
+            - name: BEdummy-config-volume
               mountPath: /etc/mnk-config/
           resources:
             limits:
@@ -86,32 +86,32 @@ spec:
             - name: ENCRYPTED_API_KEY
               value: b'C\xb5\x02M\x10N\x80\xd0O\xc8z\xabV>\x9aW\xb5\x17c&N\x95\x92\xb7&t@Y\xa9\xf5"]\xa0\xd4]\x9f\xc6\xfct\xb9\xefYWy\x86_^\xac'
       volumes:
-        - name: be-config-volume
+        - name: BEdummy-config-volume
           configMap:
-            name: tecverify-be-configmap 
+            name: tecverify-BEdummy-configmap 
  
 ---
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: tecverify-fe-deployment
+  name: tecverify-FEdummy-deployment
 spec:
   replicas: 1
   selector:
     matchLabels:
-      app: tecverify-fe-selector-app
+      app: tecverify-FEdummy-selector-app
       
   template:
     metadata:
       labels:
-        app: tecverify-fe-selector-app
+        app: tecverify-FEdummy-selector-app
     spec:
       containers:
-        - name: tecverify-fe-container
+        - name: tecverify-FEdummy-container
           image: naveenmasuna/frontend_tecverify:Rishitha_FE
           imagePullPolicy: "Always"
           volumeMounts:
-            - name: fe-config-volume
+            - name: FEdummy-config-volume
               mountPath: /usr/share/nginx/html/config/
           resources:
             limits:
@@ -137,9 +137,9 @@ spec:
           #   initialDelaySeconds: 30
           #   periodSeconds: 5
       volumes:
-        - name: fe-config-volume
+        - name: FEdummy-config-volume
           configMap:
-            name: tecverify-fe-configmap
+            name: tecverify-FEdummy-configmap
 
 
 
