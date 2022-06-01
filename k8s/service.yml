@@ -8,7 +8,7 @@ spec:
     app: tecverify-fe-selector-app
   ports:
     - name: https
-      port: 3000
+      port: 443
       targetPort: 443
 
 ---
