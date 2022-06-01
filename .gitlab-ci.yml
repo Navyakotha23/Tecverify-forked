@@ -33,7 +33,7 @@ deploy-to-digital-ocean:
     - kubectl apply -f ./k8s/deployment.yml
   after_script:
     - kubectl get svc tecverify-fe-dummy-service -o jsonpath='{.status.loadBalancer.ingress[0].ip}'
-    - kubectl get svc tecverify-be-dummy-service -o jsonpath='{.status.loadBalancer.ingress[0].ip}'
+    # - kubectl get svc tecverify-be-dummy-service -o jsonpath='{.status.loadBalancer.ingress[0].ip}'
     # - sleep for 1 minute
     # - sleep 60
     # - echo 
