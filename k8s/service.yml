@@ -1,29 +1,29 @@
 apiVersion: v1
 kind: Service
 metadata:
-  name: tecverify-fe-dummy-service
+  name: tecverify-fe-service
 spec:
   type: LoadBalancer
   selector:
-    app: tecverify-fe-dummy-selector-app
+    app: tecverify-fe-selector-app
   ports:
     - name: https
       port: 443
       targetPort: 443
 
 ---
-# apiVersion: v1
-# kind: Service
-# metadata: 
-#   name: tecverify-be-dummy-service
-# spec:
-#   type: LoadBalancer
-#   selector:
-#     app: tecverify-be-dummy-selector-app
-#   ports:
-#     - name: https
-#       port: 5000
-#       targetPort: 5000
+apiVersion: v1
+kind: Service
+metadata: 
+  name: tecverify-be-service
+spec:
+  type: LoadBalancer
+  selector:
+    app: tecverify-be-selector-app
+  ports:
+    - name: https
+      port: 5000
+      targetPort: 5000
 
 
 # Deleted the Deployments, services and creating again.

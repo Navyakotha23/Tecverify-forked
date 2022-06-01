@@ -1,117 +1,117 @@
-# apiVersion: apps/v1
-# kind: Deployment
-# metadata:
-#   name: tecverify-be-dummy-deployment
-# spec:
-#   replicas: 1
-#   selector:
-#     matchLabels:
-#       app: tecverify-be-dummy-selector-app
-#   template:
-#     metadata:
-#       labels:
-#         app: tecverify-be-dummy-selector-app
-#     spec:
-#       containers:
-#         - name: tecverify-be-dummy-container
-#           image: naveenmasuna/backend_tecverify:Rishitha_BE
-#           imagePullPolicy: "Always"
-#           volumeMounts:
-#             - name: be-dummy-config-volume
-#               mountPath: /etc/mnk-config/
-#           resources:
-#             limits:
-#               memory: 64Mi
-#               cpu: 150m
-#             requests:
-#               memory: 32Mi
-#               cpu: 50m
-#           ports:
-#           - containerPort: 5000
-#           # livenessProbe:
-#           #   httpGet:
-#           #     path: /healthz
-#           #     port: 5000
-#           #   initialDelaySeconds: 30
-#           #   periodSeconds: 5
-#           # readinessProbe:
-#           #   httpGet:
-#           #     path: /healthz
-#           #     port: 5000
-#           #   initialDelaySeconds: 30
-#           #   periodSeconds: 5
-#           # env_file: 
-#           #   - /etc/mnk-config/env-file.txt
-#           env:
-#             - name: CLIENT_ID
-#               value: 0oa164ptl0ySnZSb50h8
-#             - name: ISSUER
-#               value: https://tecnics-demo.oktapreview.com
-#             - name: AUTHORIZE_TOKEN_TYPE
-#               value: idToken
-#             - name: LOGGING_LEVEL
-#               value: DEBUG
-#             - name: LOGGING_MAX_BYTES
-#               value: "1048576"
-#             - name: LOGGING_BACKUP_COUNT
-#               value: "10"
-#             - name: ENABLE_API_RATE_LIMITS
-#               value: "True"
-#             - name: API_RATE_LIMITS_PER_HOUR
-#               value: "300"
-#             - name: API_RATE_LIMITS_PER_MINUTE
-#               value: "30"
-#             # - name: WHITELISTED_IPS
-#             #   value: "127.0.0.1"
-#             - name: TZ
-#               value: Asia/Kolkata
-#             - name: SALT
-#               value: MSHANKER
-#             - name: DATABASE_TYPE
-#               value: MSSQL
-#             - name: SECRETS_FILE
-#               value: secrets.json
-#             - name: MS_SQL_SERVER
-#               value: "139.59.5.130"
-#             - name: MS_SQL_USERNAME
-#               value: SA
-#             - name: MS_SQL_PASSWORD
-#               value: Welcome@123
-#             - name: DATABASE_NAME
-#               value: TecVerify
-#             - name: TABLE_NAME
-#               value: Secrets
-#             - name: AUTOSAVED_SECRET_USERNAME_HEAD
-#               value: TecVerify
-#             - name: ENCRYPTED_API_KEY
-#               value: b'C\xb5\x02M\x10N\x80\xd0O\xc8z\xabV>\x9aW\xb5\x17c&N\x95\x92\xb7&t@Y\xa9\xf5"]\xa0\xd4]\x9f\xc6\xfct\xb9\xefYWy\x86_^\xac'
-#       volumes:
-#         - name: be-dummy-config-volume
-#           configMap:
-#             name: tecverify-be-dummy-configmap 
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: tecverify-be-deployment
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: tecverify-be-selector-app
+  template:
+    metadata:
+      labels:
+        app: tecverify-be-selector-app
+    spec:
+      containers:
+        - name: tecverify-be-container
+          image: naveenmasuna/backend_tecverify:Rishitha_BE
+          imagePullPolicy: "Always"
+          volumeMounts:
+            - name: be-config-volume
+              mountPath: /etc/mnk-config/
+          resources:
+            limits:
+              memory: 64Mi
+              cpu: 150m
+            requests:
+              memory: 32Mi
+              cpu: 50m
+          ports:
+          - containerPort: 5000
+          # livenessProbe:
+          #   httpGet:
+          #     path: /healthz
+          #     port: 5000
+          #   initialDelaySeconds: 30
+          #   periodSeconds: 5
+          # readinessProbe:
+          #   httpGet:
+          #     path: /healthz
+          #     port: 5000
+          #   initialDelaySeconds: 30
+          #   periodSeconds: 5
+          # env_file: 
+          #   - /etc/mnk-config/env-file.txt
+          env:
+            - name: CLIENT_ID
+              value: 0oa164ptl0ySnZSb50h8
+            - name: ISSUER
+              value: https://tecnics-demo.oktapreview.com
+            - name: AUTHORIZE_TOKEN_TYPE
+              value: idToken
+            - name: LOGGING_LEVEL
+              value: DEBUG
+            - name: LOGGING_MAX_BYTES
+              value: "1048576"
+            - name: LOGGING_BACKUP_COUNT
+              value: "10"
+            - name: ENABLE_API_RATE_LIMITS
+              value: "True"
+            - name: API_RATE_LIMITS_PER_HOUR
+              value: "300"
+            - name: API_RATE_LIMITS_PER_MINUTE
+              value: "30"
+            # - name: WHITELISTED_IPS
+            #   value: "127.0.0.1"
+            - name: TZ
+              value: Asia/Kolkata
+            - name: SALT
+              value: MSHANKER
+            - name: DATABASE_TYPE
+              value: MSSQL
+            - name: SECRETS_FILE
+              value: secrets.json
+            - name: MS_SQL_SERVER
+              value: "139.59.5.130"
+            - name: MS_SQL_USERNAME
+              value: SA
+            - name: MS_SQL_PASSWORD
+              value: Welcome@123
+            - name: DATABASE_NAME
+              value: TecVerify
+            - name: TABLE_NAME
+              value: Secrets
+            - name: AUTOSAVED_SECRET_USERNAME_HEAD
+              value: TecVerify
+            - name: ENCRYPTED_API_KEY
+              value: b'C\xb5\x02M\x10N\x80\xd0O\xc8z\xabV>\x9aW\xb5\x17c&N\x95\x92\xb7&t@Y\xa9\xf5"]\xa0\xd4]\x9f\xc6\xfct\xb9\xefYWy\x86_^\xac'
+      volumes:
+        - name: be-config-volume
+          configMap:
+            name: tecverify-be-configmap 
  
 ---
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: tecverify-fe-dummy-deployment
+  name: tecverify-fe-deployment
 spec:
   replicas: 1
   selector:
     matchLabels:
-      app: tecverify-fe-dummy-selector-app
+      app: tecverify-fe-selector-app
       
   template:
     metadata:
       labels:
-        app: tecverify-fe-dummy-selector-app
+        app: tecverify-fe-selector-app
     spec:
       containers:
-        - name: tecverify-fe-dummy-container
+        - name: tecverify-fe-container
           image: naveenmasuna/frontend_tecverify:Rishitha_FE
           imagePullPolicy: "Always"
           volumeMounts:
-            - name: fe-dummy-config-volume
+            - name: fe-config-volume
               mountPath: /usr/share/nginx/html/config/
           resources:
             limits:
@@ -137,9 +137,9 @@ spec:
           #   initialDelaySeconds: 30
           #   periodSeconds: 5
       volumes:
-        - name: fe-dummy-config-volume
+        - name: fe-config-volume
           configMap:
-            name: tecverify-fe-dummy-configmap
+            name: tecverify-fe-configmap
 
 
 

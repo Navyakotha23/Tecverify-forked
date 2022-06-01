@@ -1,7 +1,7 @@
 apiVersion: v1
 kind: ConfigMap
 metadata:
-  name: tecverify-fe-dummy-configmap
+  name: tecverify-fe-configmap
 data:
   app.config.json: |-
     {
@@ -9,7 +9,7 @@ data:
       "ISSUER": "https://tecnics-demo.oktapreview.com",
       "AUTHORIZE_TOKEN_TYPE": "idToken",
       "BACK_END_URL": "https://68.183.244.181:5000",
-      "FRONT_END_URL": "https://tecverify-naveen-k8s.tecnics.com",
+      "FRONT_END_URL": "https://tecverify-k8s-test.tecnics.com",
       "SCOPES": [
         "openid",
         "email",
@@ -47,30 +47,30 @@ data:
 
 ---
 
-# apiVersion: v1
-# kind: ConfigMap
-# metadata:
-#   name: tecverify-be-dummy-configmap
-# data:
-#   env-file.txt: |-
-#     CLIENT_ID=0oa164ptl0ySnZSb50h8
-#     ISSUER=https://tecnics-demo.oktapreview.com
-#     AUTHORIZE_TOKEN_TYPE=idToken
-#     LOGGING_LEVEL=DEBUG
-#     LOGGING_MAX_BYTES=1048576
-#     LOGGING_BACKUP_COUNT=10
-#     ENABLE_API_RATE_LIMITS=True
-#     API_RATE_LIMITS_PER_HOUR=300
-#     API_RATE_LIMITS_PER_MINUTE=30
-#     TZ=Asia/Kolkata
-#     SALT=MSHANKER
-#     DATABASE_TYPE=JSON
-#     SECRETS_FILE=secrets.json
-#     MS_SQL_SERVER=192.168.1.202
-#     MS_SQL_USERNAME=NaveenMasuna
-#     MS_SQL_PASSWORD=Tecnics@123
-#     DATABASE_NAME=TecVerify
-#     TABLE_NAME=Secrets
-#     AUTOSAVED_SECRET_USERNAME_HEAD=TecVerify
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: tecverify-be-configmap
+data:
+  env-file.txt: |-
+    CLIENT_ID=0oa164ptl0ySnZSb50h8
+    ISSUER=https://tecnics-demo.oktapreview.com
+    AUTHORIZE_TOKEN_TYPE=idToken
+    LOGGING_LEVEL=DEBUG
+    LOGGING_MAX_BYTES=1048576
+    LOGGING_BACKUP_COUNT=10
+    ENABLE_API_RATE_LIMITS=True
+    API_RATE_LIMITS_PER_HOUR=300
+    API_RATE_LIMITS_PER_MINUTE=30
+    TZ=Asia/Kolkata
+    SALT=MSHANKER
+    DATABASE_TYPE=JSON
+    SECRETS_FILE=secrets.json
+    MS_SQL_SERVER=192.168.1.202
+    MS_SQL_USERNAME=NaveenMasuna
+    MS_SQL_PASSWORD=Tecnics@123
+    DATABASE_NAME=TecVerify
+    TABLE_NAME=Secrets
+    AUTOSAVED_SECRET_USERNAME_HEAD=TecVerify
 
 
