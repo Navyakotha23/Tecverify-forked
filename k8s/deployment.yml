@@ -3,7 +3,7 @@ kind: Deployment
 metadata:
   name: tecverify-be-deployment
 spec:
-  replicas: 3
+  replicas: 2
   selector:
     matchLabels:
       app: tecverify-be-selector-app
@@ -19,13 +19,13 @@ spec:
           volumeMounts:
             - name: be-config-volume
               mountPath: /etc/mnk-config/
-          # resources:
-          #   limits:
-          #     memory: 64Mi
-          #     cpu: 150m
-          #   requests:
-          #     memory: 32Mi
-          #     cpu: 50m
+          resources:
+            limits:
+              memory: 64Mi
+              cpu: 150m
+            requests:
+              memory: 32Mi
+              cpu: 50m
           ports:
           - containerPort: 5000
           # livenessProbe:
@@ -96,7 +96,7 @@ kind: Deployment
 metadata:
   name: tecverify-fe-deployment
 spec:
-  replicas: 3
+  replicas: 2
   selector:
     matchLabels:
       app: tecverify-fe-selector-app
@@ -113,13 +113,13 @@ spec:
           volumeMounts:
             - name: fe-config-volume
               mountPath: /usr/share/nginx/html/config/
-          # resources:
-          #   limits:
-          #     cpu: 100m
-          #     memory: 128Mi
-          #   requests:
-          #     cpu: 50m
-          #     memory: 64Mi
+          resources:
+            limits:
+              cpu: 100m
+              memory: 128Mi
+            requests:
+              cpu: 50m
+              memory: 64Mi
           ports:
           - containerPort: 443
           #   name: healthz
