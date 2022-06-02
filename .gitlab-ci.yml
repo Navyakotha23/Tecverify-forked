@@ -55,5 +55,6 @@ deploy-to-digital-ocean:
   # Pushing with latest image.
   # Deleted old services, Creating new Services for Tecverify.
   # Made some changes in nginx file and building locally for BE. 
+  # Deleted old Backend pod.
   
 
