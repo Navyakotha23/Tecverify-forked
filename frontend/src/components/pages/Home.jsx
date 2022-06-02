@@ -265,6 +265,14 @@ const Home = () => {
                         {
                             getOtp();
                         }
+                        if(response.errorSummary) 
+                        {
+                            if(config.SHOW_ERROR_SUMMARY_POPUPS)
+                            {
+                                popupError = true;
+                                popupErrorMessage = response.errorSummary;
+                            }
+                        }
                     })
                     .catch(err => {
                         console.error(err);
