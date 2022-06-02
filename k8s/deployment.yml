@@ -25,7 +25,7 @@ spec:
               cpu: 150m
             requests:
               memory: 32Mi
-              cpu: 50m
+              cpu: 40m
           ports:
           - containerPort: 5000
           # livenessProbe:
@@ -118,7 +118,7 @@ spec:
               cpu: 100m
               memory: 128Mi
             requests:
-              cpu: 30m
+              cpu: 50m
               memory: 64Mi
           ports:
           - containerPort: 443
