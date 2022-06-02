@@ -13,10 +13,13 @@ docker-build-and-push:
   before_script:
     - docker login -u "$CI_REGISTRY_USER" -p "$CI_REGISTRY_PASSWORD" $CI_REGISTRY
   script:
-    - docker build --pull -t "$CI_BE_REGISTRY_IMAGE" ./backend/
-    - docker build --pull -t "$CI_FE_REGISTRY_IMAGE" ./frontend/
-    - docker push "$CI_BE_REGISTRY_IMAGE"
-    - docker push "$CI_FE_REGISTRY_IMAGE"
+    # - docker build --pull -t "$CI_BE_REGISTRY_IMAGE" ./backend/
+    # - docker build --pull -t "$CI_FE_REGISTRY_IMAGE" ./frontend/
+    # - docker push "$CI_BE_REGISTRY_IMAGE"
+    # - docker push "$CI_FE_REGISTRY_IMAGE"
+    - docker build -t be_tecverify_image:Naveen ./backend/
+    - docker tag be_tecverify_image:Naveen naveenmasuna/backend_tecverify:Naveen_BE
+    - docker push naveenmasuna/backend_tecverify:Naveen_BE
   only:
     - devops
   
