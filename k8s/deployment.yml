@@ -19,13 +19,13 @@ spec:
           volumeMounts:
             - name: be-config-volume
               mountPath: /etc/mnk-config/
-          resources:
-            limits:
-              memory: 64Mi
-              cpu: 50m
-            requests:
-              memory: 32Mi
-              cpu: 38m
+          # resources:
+          #   limits:
+          #     memory: 64Mi
+          #     cpu: 50m
+          #   requests:
+          #     memory: 32Mi
+          #     cpu: 38m
           ports:
           - containerPort: 5000
           # livenessProbe:
@@ -113,13 +113,13 @@ spec:
           volumeMounts:
             - name: fe-config-volume
               mountPath: /usr/share/nginx/html/config/
-          resources:
-            limits:
-              cpu: 70m
-              memory: 128Mi
-            requests:
-              cpu: 50m
-              memory: 64Mi
+          # resources:
+          #   limits:
+          #     cpu: 70m
+          #     memory: 128Mi
+          #   requests:
+          #     cpu: 50m
+          #     memory: 64Mi
           ports:
           - containerPort: 443
           #   name: healthz
