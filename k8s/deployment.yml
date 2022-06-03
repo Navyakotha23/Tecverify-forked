@@ -3,7 +3,7 @@ kind: Deployment
 metadata:
   name: tecverify-be-deployment
 spec:
-  replicas: 3
+  replicas: 1
   selector:
     matchLabels:
       app: tecverify-be-selector-app
@@ -22,7 +22,7 @@ spec:
           resources:
             limits:
               memory: 64Mi
-              cpu: 100m
+              cpu: 50m
             requests:
               memory: 32Mi
               cpu: 38m
@@ -96,7 +96,7 @@ kind: Deployment
 metadata:
   name: tecverify-fe-deployment
 spec:
-  replicas: 2
+  replicas: 1
   selector:
     matchLabels:
       app: tecverify-fe-selector-app
@@ -115,7 +115,7 @@ spec:
               mountPath: /usr/share/nginx/html/config/
           resources:
             limits:
-              cpu: 100m
+              cpu: 70m
               memory: 128Mi
             requests:
               cpu: 50m
