@@ -3,7 +3,7 @@ kind: Deployment
 metadata:
   name: tecverify-be-deployment
 spec:
-  replicas:2
+  replicas: 2
   selector:
     matchLabels:
       app: tecverify-be-selector-app
@@ -25,7 +25,7 @@ spec:
               cpu: 150m
             requests:
               memory: 32Mi
-              cpu: 38m
+              cpu: 50m
           ports:
           - containerPort: 5000
           # livenessProbe:
