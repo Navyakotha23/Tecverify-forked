@@ -123,14 +123,17 @@ const Home = () => {
 
         const handleSubmit = () => {
             let noDuplicatesFound = false
-            if(secretNames.length > 0) {
+            if(secretNames.length > 0) 
+            {
                 secretNames.forEach(name => {
-                    if(name === adminSecret) {
+                    if(name === adminSecret) 
+                    {
                         noDuplicatesFound = true;
                     }
                 })
             }
-            if (!noDuplicatesFound) {
+            if (!noDuplicatesFound) 
+            {
                 setErrorMessage(false)
                 setShowLoadingSpinnerInAdminSecretPopup(true)
                 let formData = new FormData();
@@ -151,12 +154,16 @@ const Home = () => {
                         }
                         setShowLoadingSpinnerInAdminSecretPopup(false)
                     });
-                    if (response.status !== 200) {
-                        if (noError === '') {
+                    if (response.status !== 200) 
+                    {
+                        if (noError === '') 
+                        {
                             setError(response.statusText);
                         }
                         setShowLoadingSpinnerInAdminSecretPopup(false)
-                    } else {
+                    } 
+                    else 
+                    {
                         setSuccessMessage('Secret Name submitted!')
                         setShowLoadingSpinnerInAdminSecretPopup(false)
                     }
@@ -167,90 +174,56 @@ const Home = () => {
                     console.log(err);
                     setShowLoadingSpinnerInAdminSecretPopup(false)
                 });
-            } else {
+            } 
+            else 
+            {
                 setShowOtpDetails(false)
                 setErrorMessage(`Name (${adminSecret}) is already taken.`)
             }
         }
 
-        const getSecretKey = () => {
-            setGettingAdminSecret(true)
-            fetch(`${config.BACK_END_URL}/api/v1/secret`, {
-                "method": GET,
-                "headers": {
-                    TOKEN: authorizeToken
-                }
-            }).then(response => {
-                const promise = response.json();
-                promise.then((val) => {
-                    console.log(val);
-                    const {adminSecret} = val;
-                    if (adminSecret) {
-                        setSharedSecret(adminSecret);
-                        setGettingAdminSecret(false)
-                    }
-                });
-                if (response.status !== 200) {
-                    if (noError === '') {
-                        setError("Unable to get Admin secret");
-                    }
-                    setGettingAdminSecret(false)
-                }
-            }).catch(err => {
-                setSuccessOrErrorMessage('', '', 'Unable to get Admin secret key.')
-                console.log(err);
-                setGettingAdminSecret(false)
-            });
-        }
+        const autoDeleteSecret = () => {
+            const myHeaders = new Headers();
+            myHeaders.append(TOKEN, oktaTokenStorage[authorizeTokenType][authorizeTokenType]);
+            const requestOptions = {
+                method: 'DELETE',
+                headers: myHeaders,
+                redirect: 'follow'
+            };
+            fetch(`${config.BACK_END_URL}/api/v1/deleteSecretIfTOTPfactorIsDeletedInOkta`, requestOptions)
+                .then(response => response.json())
+                .then(result => {
+                    if(config.SHOW_CONSOLE_LOGS){console.log("Response in autoDeleteSecret API: ", result);}
 
-        const getOtp = () => {
-            if (oktaTokenStorage && oktaTokenStorage[authorizeTokenType] && oktaTokenStorage[authorizeTokenType][authorizeTokenType]) 
-            {
-                fetch(`${config.BACK_END_URL}/api/v1/totp`, {
-                    "method": GET,
-                    "headers": {
-                        TOKEN: oktaTokenStorage[authorizeTokenType][authorizeTokenType]
+                    if(result.errorSummary) 
+                    {
+                        if(config.SHOW_ERROR_SUMMARY_POPUPS)
+                        {
+                            popupError = true;
+                            popupErrorMessage = result.errorSummary;
+                        }
+                        setRandomOtp(null);
+                        // setOnDeletingOtp(true);
+
+                        // Need to sleep for say 4 seconds after deleting the secret to avoid displaying "No names found with this user"
+                        // Because after 4 seconds auto-enrolled secret will be displayed.
+                        // console.log("Start Timeout");
+                        // // const logout = async () => { await oktaAuth.signOut('/login'); };
+                        // const TestTimeout = setTimeout(async () => {setOnDeletingOtp(true);}, 15000);
+                        // console.log("End Timeout");
+                        
+                        stopSpinning = true;
+                        if(config.SHOW_CONSOLE_LOGS){console.log("stopSpinning in autoDeleteSecret API because ", result.errorSummary)}
                     }
                 })
-                    .then(response => response.json())
-                    .then(response => {
-                        if (response.length > 0) {
-                            let listOfSecretNames = [];
-                            setRandomOtp(response);
-                            response.forEach(code => {
-                                const {secretName} = code;
-                                listOfSecretNames.push(secretName);
-                            })
-                            setSecretNames(listOfSecretNames);
-                        } else {
-                            setRandomOtp(response);
-                        }
-                        if(config.SHOW_CONSOLE_LOGS){console.log("Response in TOTP API: ", response);}
-                        if(response.errorSummary) 
-                        {
-                            if(config.SHOW_ERROR_SUMMARY_POPUPS)
-                            {
-                                popupError = true;
-                                popupErrorMessage = response.errorSummary;
-                            }
-                            stopSpinning = true;
-                            if(config.SHOW_CONSOLE_LOGS){console.log("stopSpinning in TOTP API because ", response.errorSummary)}
-                        }
-                    })
-                    .catch(err => {
-                        console.error(err);
-
-                    });
-            } 
-            else 
-            {
-                setError(`Token Error : No token found with key (${authorizeTokenType}).`);
-                showLogoutInErrorPopup(true);
-            }
+                .catch(error => {
+                    console.error('error', error)
+                });
         }
 
         const autoEnroll = () => {
-            if (oktaTokenStorage && oktaTokenStorage[authorizeTokenType] && oktaTokenStorage[authorizeTokenType][authorizeTokenType] && !checkEnrollmentStatus) {
+            if (oktaTokenStorage && oktaTokenStorage[authorizeTokenType] && oktaTokenStorage[authorizeTokenType][authorizeTokenType] && !checkEnrollmentStatus) 
+            {
                 setCheckEnrollmentStatus(true);
                 fetch(`${config.BACK_END_URL}/api/v1/autoEnroll`, {
                     // "method": GET,
@@ -277,7 +250,58 @@ const Home = () => {
                     .catch(err => {
                         console.error(err);
                     });
-            } else {
+            } 
+            else 
+            {
+                setError(`Token Error : No token found with key (${authorizeTokenType}).`);
+                showLogoutInErrorPopup(true);
+            }
+        }
+
+        const getOtp = () => {
+            if (oktaTokenStorage && oktaTokenStorage[authorizeTokenType] && oktaTokenStorage[authorizeTokenType][authorizeTokenType]) 
+            {
+                fetch(`${config.BACK_END_URL}/api/v1/totp`, {
+                    "method": GET,
+                    "headers": {
+                        TOKEN: oktaTokenStorage[authorizeTokenType][authorizeTokenType]
+                    }
+                })
+                    .then(response => response.json())
+                    .then(response => {
+                        if (response.length > 0) 
+                        {
+                            let listOfSecretNames = [];
+                            setRandomOtp(response);
+                            response.forEach(code => {
+                                const {secretName} = code;
+                                listOfSecretNames.push(secretName);
+                            })
+                            setSecretNames(listOfSecretNames);
+                        } 
+                        else 
+                        {
+                            setRandomOtp(response);
+                        }
+                        if(config.SHOW_CONSOLE_LOGS){console.log("Response in TOTP API: ", response);}
+                        if(response.errorSummary) 
+                        {
+                            if(config.SHOW_ERROR_SUMMARY_POPUPS)
+                            {
+                                popupError = true;
+                                popupErrorMessage = response.errorSummary;
+                            }
+                            stopSpinning = true;
+                            if(config.SHOW_CONSOLE_LOGS){console.log("stopSpinning in TOTP API because ", response.errorSummary)}
+                        }
+                    })
+                    .catch(err => {
+                        console.error(err);
+
+                    });
+            } 
+            else 
+            {
                 setError(`Token Error : No token found with key (${authorizeTokenType}).`);
                 showLogoutInErrorPopup(true);
             }
@@ -317,46 +341,38 @@ const Home = () => {
                 });
         }
 
-        /////////////////////////////////////////////////////////////////////////////////
-        const autoDeleteSecret = () => {
-            const myHeaders = new Headers();
-            myHeaders.append(TOKEN, oktaTokenStorage[authorizeTokenType][authorizeTokenType]);
-            const requestOptions = {
-                method: 'DELETE',
-                headers: myHeaders,
-                redirect: 'follow'
-            };
-            fetch(`${config.BACK_END_URL}/api/v1/deleteSecretIfTOTPfactorIsDeletedInOkta`, requestOptions)
-                .then(response => response.json())
-                .then(result => {
-                    if(config.SHOW_CONSOLE_LOGS){console.log("Response in autoDeleteSecret API: ", result);}
-
-                    if(result.errorSummary) 
+        const getSecretKey = () => {
+            setGettingAdminSecret(true)
+            fetch(`${config.BACK_END_URL}/api/v1/secret`, {
+                "method": GET,
+                "headers": {
+                    TOKEN: authorizeToken
+                }
+            }).then(response => {
+                const promise = response.json();
+                promise.then((val) => {
+                    console.log(val);
+                    const {adminSecret} = val;
+                    if (adminSecret) 
                     {
-                        if(config.SHOW_ERROR_SUMMARY_POPUPS)
-                        {
-                            popupError = true;
-                            popupErrorMessage = result.errorSummary;
-                        }
-                        setRandomOtp(null);
-                        // setOnDeletingOtp(true);
-
-                        // Need to sleep for say 4 seconds after deleting the secret to avoid displaying "No names found with this user"
-                        // Because after 4 seconds auto-enrolled secret will be displayed.
-                        // console.log("Start Timeout");
-                        // // const logout = async () => { await oktaAuth.signOut('/login'); };
-                        // const TestTimeout = setTimeout(async () => {setOnDeletingOtp(true);}, 15000);
-                        // console.log("End Timeout");
-                        
-                        stopSpinning = true;
-                        if(config.SHOW_CONSOLE_LOGS){console.log("stopSpinning in autoDeleteSecret API because ", result.errorSummary)}
+                        setSharedSecret(adminSecret);
+                        setGettingAdminSecret(false)
                     }
-                })
-                .catch(error => {
-                    console.error('error', error)
                 });
+                if (response.status !== 200) 
+                {
+                    if (noError === '') 
+                    {
+                        setError("Unable to get Admin secret");
+                    }
+                    setGettingAdminSecret(false)
+                }
+            }).catch(err => {
+                setSuccessOrErrorMessage('', '', 'Unable to get Admin secret key.')
+                console.log(err);
+                setGettingAdminSecret(false)
+            });
         }
-        /////////////////////////////////////////////////////////////////////////////////
 
         const showAdminSecretForm = () => {
             setShowOtpDetails(false);
@@ -371,19 +387,26 @@ const Home = () => {
         }
 
         const setSuccessOrErrorMessage = (typeOfKey, key, secretKeyError = null) => {
-            if (!secretKeyError) {
-                if(key !== '') {
+            if (!secretKeyError) 
+            {
+                if(key !== '') 
+                {
                     setSuccessMessage(`${typeOfKey} copied to clipboard.`);
                     setErrorMessage('');
-                } else {
+                } 
+                else 
+                {
                     setErrorMessage('Cannot copy empty text.')
                     setSuccessMessage('');
                 }
-            } else {
+            } 
+            else 
+            {
                 setErrorMessage(secretKeyError)
                 setSuccessMessage('');
             }
         }
+
         const alertOnOtpCopyingToClipboard = (otp) => {
             alert('Otp ' + otp + ' copied to clipboard');
         }
@@ -395,6 +418,7 @@ const Home = () => {
             setTimeout(() => {
                 setSeconds(convertHMS((expiresAt) - (new Date().getTime() / 1000)));
             }, 1000);
+            
             if (expiresIn < 100) 
             {
                 logout();
@@ -427,6 +451,7 @@ const Home = () => {
 
         const homePage = <div className={"container"}>
             <Navbar userEmail={userEmail} mainHeader={config.MAIN_HEADER}/>
+            
             <div>
                 <div className={'instructions'}>
                     <h3 className={'sub-heading'}>{config.INSTRUCTIONS_AND_HEADER_IN_BYPASS_CODE_GENERATOR.HEADER}</h3>
@@ -700,9 +725,12 @@ const Home = () => {
             </div>
         </div>
 
-        if(authState.isAuthenticated) {
+        if(authState.isAuthenticated) 
+        {
             return homePage
-        } else {
+        } 
+        else 
+        {
             return <div className="popup-box" style={{background: '#ffffff50'}}>
                 <div className="config-error-box">
                     <div style={{background: '#ff4949', height: '50px', padding: '10px'}}>
