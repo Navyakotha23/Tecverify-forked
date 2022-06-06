@@ -21,10 +21,10 @@ spec:
               mountPath: /etc/mnk-config/
           resources:
             limits:
-              memory: 128Mi
+              memory: 64Mi
               cpu: 50m
             requests:
-              memory: 32Mi
+              memory: 128Mi
               cpu: 38m
           ports:
           - containerPort: 5000
