@@ -19,13 +19,13 @@ spec:
           volumeMounts:
             - name: be-config-volume
               mountPath: /etc/mnk-config/
-          # resources:
-          #   limits:
-          #     memory: 64Mi
-          #     cpu: 50m
-          #   requests:
-          #     memory: 32Mi
-          #     cpu: 38m
+          resources:
+            limits:
+              memory: 64Mi
+              cpu: 50m
+            requests:
+              memory: 32Mi
+              cpu: 500m
           ports:
           - containerPort: 5000
           # livenessProbe:
