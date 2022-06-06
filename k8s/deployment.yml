@@ -24,7 +24,7 @@ spec:
               memory: 64Mi
               cpu: 50m
             requests:
-              memory: 128Mi
+              memory: 32Mi
               cpu: 38m
           ports:
           - containerPort: 5000
