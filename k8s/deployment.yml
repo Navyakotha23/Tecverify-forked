@@ -115,7 +115,7 @@ spec:
       containers:
         - name: tecverify-fe-container
           image: naveenmasuna/frontend_tecverify:Naveen_FE
-          imagePullPolicy: "Always"
+          # imagePullPolicy: "Always"
           volumeMounts:
             - name: fe-config-volume
               mountPath: /usr/share/nginx/html/config/
