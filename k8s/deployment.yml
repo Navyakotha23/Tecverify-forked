@@ -13,7 +13,7 @@ spec:
         app: tecverify-be-selector-app
     spec:
       containers:
-        - name: tecverify-be-container
+        - name: tecverify-be-container-1
           image: naveenmasuna/backend_tecverify:Naveen_BE
           imagePullPolicy: "Always" # This is for pulling the image and for building the image with latest changes.{ while pushing the code to GitLab }
           volumeMounts:
