@@ -64,5 +64,7 @@ deploy-to-digital-ocean:
   # Deleted old services, Creating new Services for Tecverify.
   # Made some changes in nginx file and building locally for BE. 
   # Deleted old Backend pod.
+  # Gave container port 80 BE container.
+  
   
 
