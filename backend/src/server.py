@@ -58,8 +58,8 @@ crypt_obj = Crypto(SALT)
 
 DECRYPTED_API_KEY = crypt_obj.decryptAPIkey(ENCRYPTED_API_KEY, API_KEY_SALT)
 
-SECRET_NAME_KEY_IN_REQUEST_FORM = "adminScrtName" # In home.jsx also this should be same
-SECRET_KEY_KEY_IN_REQUEST_FORM = "adminScrtKey" # In home.jsx also this should be same
+SECRET_NAME_KEY_IN_REQUEST_FORM = "adminScrtName" # In home.jsx(FE) and in docs.json(BE Swagger) also this should be same
+SECRET_KEY_KEY_IN_REQUEST_FORM = "adminScrtKey" # In home.jsx(FE) and in docs.json(BE Swagger) also this should be same
 admin_secret = AdminSecret(SECRETS_FILE, crypt_obj, MS_SQL_SERVER, MS_SQL_USERNAME, MS_SQL_PASSWORD, DATABASE_NAME, TABLE_NAME, AUTOSAVED_SECRET_USERNAME_HEAD, DATABASE_TYPE, SECRET_NAME, SECRET_KEY, OKTA_USER_ID, SECRET_ID, SECRET_UPDATED_AT, OKTA_FACTOR_ID, SECRET_NAME_KEY_IN_REQUEST_FORM, SECRET_KEY_KEY_IN_REQUEST_FORM, SHOW_LOGS)
 
 totp = TOTP(crypt_obj, SECRET_NAME, SECRET_KEY, OKTA_USER_ID, SECRET_ID, SECRET_UPDATED_AT, SHOW_LOGS)
@@ -149,8 +149,12 @@ def check_token_header():
         return {}, 200
     if SWAGGER_URL not in request.url:
         if TOKEN not in request.headers:
-            g.tokenHeaderMissing = True
-            # return {'error': 'Required Headers missing.'}, 400
+            if 'secret' in request.url and request.method == 'POST':
+                print("request.url: ", request.url)
+                print("request.method: ", request.method)
+                g.tokenHeaderMissing = True
+            else:
+                return {'error': 'Required Headers missing.'}, 400
         elif request.headers[TOKEN] == '':
             return {'error': "The 'token' parameter can't be empty"}, 400
         elif request.headers[TOKEN]:
@@ -383,8 +387,10 @@ def save_secret():
                     return {"updated": False, "error": "Update Failed !!!"}, 500
             else:
                 return {"updated": False, "error": SECRET_KEY_KEY_IN_REQUEST_FORM + " is in invalid format. Try another one."}, 500
-        elif form_data[SECRET_KEY] is None or not form_data[SECRET_KEY]:
-            return {'error': "'adminSecret' is missing"}, 400
+        elif form_data[SECRET_KEY] is None or not form_data[SECRET_KEY]: # if secret key is empty or key itself is not there
+            return {'error': "admin Secret is missing"}, 400
+        elif form_data[OKTA_USER_ID] is None or not form_data[OKTA_USER_ID]:
+            return {'error': "okta User ID is missing"}, 400
     else:
         form_data = admin_secret.parse_form_data(request)
         token_info = g.get('user')

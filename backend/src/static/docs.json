@@ -3,7 +3,7 @@
   "info": {
     "description": "<b>TecVERIFY</b> is a lightweight app that is used for 2-step verification \\n so you can verify your identity when you sign in to your <b>TecMFA</b> account \\n using Admin TOTP.<br><br>App Features<br>* Save Secret key. \\n <br>* Generate TOTP for all Secret keys saved.",
       "version": "1.0.0",
-    "title": "TecVERIFY June09 03.50PM",
+    "title": "TecVERIFY June09 05.29PM",
     "contact": {
       "email": "amit.g@tecnics.com"
     },
@@ -98,10 +98,10 @@
             "application/x-www-form-urlencoded": {
               "schema": {
                 "properties": {
-                  "adminSecret": {
+                  "adminScrtKey": {
                     "type": "string"
                   },
-                  "secretName": {
+                  "adminScrtName": {
                     "type": "string"
                   }
                 }
