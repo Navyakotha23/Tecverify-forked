@@ -137,8 +137,8 @@ const Home = () => {
                 setErrorMessage(false)
                 setShowLoadingSpinnerInAdminSecretPopup(true)
                 let formData = new FormData();
-                formData.append('secretName', adminSecret);
-                formData.append('adminSecret', sharedSecret);
+                formData.append('adminScrtName', adminSecret);
+                formData.append('adminScrtKey', sharedSecret);
                 fetch(`${config.BACK_END_URL}/api/v1/secret`, {
                     "method": POST,
                     "headers": {

@@ -7,7 +7,7 @@ import pymssql
 
 class AdminSecret:
 
-    def __init__(self, file: str, crypt_obj, MS_SQL_SERVER, MS_SQL_USERNAME, MS_SQL_PASSWORD, DATABASE_NAME, TABLE_NAME, AUTOSAVED_SECRET_USERNAME_HEAD, DATABASE_TYPE, SECRET_NAME, SECRET_KEY, OKTA_USER_ID, SECRET_ID, SECRET_UPDATED_AT, OKTA_FACTOR_ID, SHOW_LOGS) -> None:
+    def __init__(self, file: str, crypt_obj, MS_SQL_SERVER, MS_SQL_USERNAME, MS_SQL_PASSWORD, DATABASE_NAME, TABLE_NAME, AUTOSAVED_SECRET_USERNAME_HEAD, DATABASE_TYPE, SECRET_NAME, SECRET_KEY, OKTA_USER_ID, SECRET_ID, SECRET_UPDATED_AT, OKTA_FACTOR_ID, SECRET_NAME_KEY_IN_REQUEST_FORM, SECRET_KEY_KEY_IN_REQUEST_FORM, SHOW_LOGS) -> None:
         self.file = file
         self.crypt_obj = crypt_obj
         self.ms_sql_server = MS_SQL_SERVER
@@ -23,6 +23,8 @@ class AdminSecret:
         self.secret_id = SECRET_ID
         self.secret_updated_at = SECRET_UPDATED_AT
         self.okta_factor_id = OKTA_FACTOR_ID
+        self.secret_name_KEY_in_request_form = SECRET_NAME_KEY_IN_REQUEST_FORM
+        self.secret_key_KEY_in_request_form = SECRET_KEY_KEY_IN_REQUEST_FORM
         self.show_logs = SHOW_LOGS
 
     
@@ -267,17 +269,17 @@ class AdminSecret:
         """
         This method parse form data and returns SecretName and Secret
         """
-        secret_name_in_request_form = request.form[self.secret_name] if self.secret_name in request.form else None
-        admin_secret_in_request_form = request.form['adminSecret'] if 'adminSecret' in request.form else None
-        return {self.secret_name: secret_name_in_request_form, self.secret_key: admin_secret_in_request_form}
+        secret_name_VALUE_in_request_form = request.form[self.secret_name_KEY_in_request_form] if self.secret_name_KEY_in_request_form in request.form else None
+        secret_key_VALUE_in_request_form = request.form[self.secret_key_KEY_in_request_form] if self.secret_key_KEY_in_request_form in request.form else None
+        return {self.secret_name: secret_name_VALUE_in_request_form, self.secret_key: secret_key_VALUE_in_request_form}
 
 
     def parse_form_data_for_okta_userid(self, request):
         """
         This method parse form data and returns SecretName, Secret and OktaUserId
         """
-        secret_name_in_request_form = request.form[self.secret_name] if self.secret_name in request.form else None
-        admin_secret_in_request_form = request.form['adminSecret'] if 'adminSecret' in request.form else None
+        secret_name_VALUE_in_request_form = request.form[self.secret_name_KEY_in_request_form] if self.secret_name_KEY_in_request_form in request.form else None
+        secret_key_VALUE_in_request_form = request.form[self.secret_key_KEY_in_request_form] if self.secret_key_KEY_in_request_form in request.form else None
         okta_user_id_in_request_form = request.form[self.okta_user_id] if self.okta_user_id in request.form else None
-        return {self.secret_name: secret_name_in_request_form, self.secret_key: admin_secret_in_request_form, self.okta_user_id: okta_user_id_in_request_form}
+        return {self.secret_name: secret_name_VALUE_in_request_form, self.secret_key: secret_key_VALUE_in_request_form, self.okta_user_id: okta_user_id_in_request_form}
 

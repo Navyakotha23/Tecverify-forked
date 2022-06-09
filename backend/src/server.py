@@ -58,7 +58,10 @@ crypt_obj = Crypto(SALT)
 
 DECRYPTED_API_KEY = crypt_obj.decryptAPIkey(ENCRYPTED_API_KEY, API_KEY_SALT)
 
-admin_secret = AdminSecret(SECRETS_FILE, crypt_obj, MS_SQL_SERVER, MS_SQL_USERNAME, MS_SQL_PASSWORD, DATABASE_NAME, TABLE_NAME, AUTOSAVED_SECRET_USERNAME_HEAD, DATABASE_TYPE, SECRET_NAME, SECRET_KEY, OKTA_USER_ID, SECRET_ID, SECRET_UPDATED_AT, OKTA_FACTOR_ID, SHOW_LOGS)
+SECRET_NAME_KEY_IN_REQUEST_FORM = "adminScrtName" # In home.jsx also this should be same
+SECRET_KEY_KEY_IN_REQUEST_FORM = "adminScrtKey" # In home.jsx also this should be same
+admin_secret = AdminSecret(SECRETS_FILE, crypt_obj, MS_SQL_SERVER, MS_SQL_USERNAME, MS_SQL_PASSWORD, DATABASE_NAME, TABLE_NAME, AUTOSAVED_SECRET_USERNAME_HEAD, DATABASE_TYPE, SECRET_NAME, SECRET_KEY, OKTA_USER_ID, SECRET_ID, SECRET_UPDATED_AT, OKTA_FACTOR_ID, SECRET_NAME_KEY_IN_REQUEST_FORM, SECRET_KEY_KEY_IN_REQUEST_FORM, SHOW_LOGS)
+
 totp = TOTP(crypt_obj, SECRET_NAME, SECRET_KEY, OKTA_USER_ID, SECRET_ID, SECRET_UPDATED_AT, SHOW_LOGS)
 okta = OktaOperations(CLIENT_ID, ISSUER, AUTHORIZING_TOKEN, AUTHORIZE_CLAIM_NAME, DECRYPTED_API_KEY, SHOW_LOGS)
 
@@ -128,7 +131,6 @@ TOKEN = "token"
 ID_TOKEN = "id_token"
 TOKEN_TYPE_HINT = "token_type_hint"
 SCOPE = "scope"
-ADMIN_SECRET = "adminSecret"
 ACTIVE = 'active'
 ISS = 'iss'
 UID = 'uid'
@@ -380,7 +382,7 @@ def save_secret():
                 else:
                     return {"updated": False, "error": "Update Failed !!!"}, 500
             else:
-                return {"updated": False, "error": ADMIN_SECRET + " is in invalid format. Try another one."}, 500
+                return {"updated": False, "error": SECRET_KEY_KEY_IN_REQUEST_FORM + " is in invalid format. Try another one."}, 500
         elif form_data[SECRET_KEY] is None or not form_data[SECRET_KEY]:
             return {'error': "'adminSecret' is missing"}, 400
     else:
@@ -396,7 +398,7 @@ def save_secret():
                 else:
                     return {"updated": False, "error": "Update Failed !!!"}, 500
             else:
-                return {"updated": False, "error": ADMIN_SECRET + " is in invalid format. Try another one."}, 500
+                return {"updated": False, "error": SECRET_KEY_KEY_IN_REQUEST_FORM + " is in invalid format. Try another one."}, 500
         elif form_data[SECRET_KEY] is None or not form_data[SECRET_KEY]:
             return {'error': "'adminSecret' is missing"}, 400
         # else:
