@@ -2,21 +2,28 @@ import os
 
 CLIENT_ID = os.environ.get("CLIENT_ID", default="0oa164ptl0ySnZSb50h8")
 
-DATABASE_TYPE = os.environ.get("DATABASE_TYPE", default="json")
+DATABASE_TYPE = os.environ.get("DATABASE_TYPE", default="mssql")
 if DATABASE_TYPE.lower() == "json":
     DATABASE_TYPE = "json"
 elif DATABASE_TYPE.lower() == "mssql":
     DATABASE_TYPE = "mssql"
 
 MS_SQL_SERVER = os.environ.get("MS_SQL_SERVER", default="192.168.1.202")
-MS_SQL_USERNAME = os.environ.get("MS_SQL_USERNAME", default="SA")
-MS_SQL_PASSWORD = os.environ.get("MS_SQL_PASSWORD", default="Tecnics@123")
+MS_SQL_USERNAME = os.environ.get("MS_SQL_USERNAME", default="NaveenMasuna")
+MS_SQL_PASSWORD = os.environ.get("MS_SQL_PASSWORD", default="Welcome@123")
 DATABASE_NAME = os.environ.get("DATABASE_NAME", default="TecVerify")
-TABLE_NAME = os.environ.get("TABLE_NAME", default="Secrets")
+TABLE_NAME = os.environ.get("TABLE_NAME", default="TecVerifySecrets")
 AUTOSAVED_SECRET_USERNAME_HEAD = os.environ.get("AUTOSAVED_SECRET_USERNAME_HEAD", default="TecVerify")
 
-# ENCRYPTED_API_KEY = os.environ.get("ENCRYPTED_API_KEY")
-ENCRYPTED_API_KEY = os.environ.get("ENCRYPTED_API_KEY", default = 'b\'C\\xb5\\x02M\\x10N\\x80\\xd0O\\xc8z\\xabV>\\x9aW\\xb5\\x17c&N\\x95\\x92\\xb7&t@Y\\xa9\\xf5"]\\xa0\\xd4]\\x9f\\xc6\\xfct\\xb9\\xefYWy\\x86_^\\123\'')
+SECRET_NAME = os.environ.get("SECRET_NAME", default="sName")
+SECRET_KEY = os.environ.get("SECRET_KEY", default="sKey")
+OKTA_USER_ID = os.environ.get("OKTA_USER_ID", default="oUserId")
+SECRET_ID = os.environ.get("SECRET_ID", default="sId")
+SECRET_UPDATED_AT = os.environ.get("SECRET_UPDATED_AT", default="sUpdatedAt")
+OKTA_FACTOR_ID = os.environ.get("OKTA_FACTOR_ID", default="oFactorId")
+
+ENCRYPTED_API_KEY = os.environ.get("ENCRYPTED_API_KEY")
+# ENCRYPTED_API_KEY = os.environ.get("ENCRYPTED_API_KEY", default = 'b\'C\\xb5\\x02M\\x10N\\x80\\xd0O\\xc8z\\xabV>\\x9aW\\xb5\\x17c&N\\x95\\x92\\xb7&t@Y\\xa9\\xf5"]\\xa0\\xd4]\\x9f\\xc6\\xfct\\xb9\\xefYWy\\x86_^\\xac\'')
 
 API_KEY_SALT = os.environ.get("API_KEY_SALT", default="12345678")
 

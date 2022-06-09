@@ -33,6 +33,13 @@ DATABASE_NAME = app.config['DATABASE_NAME']
 TABLE_NAME = app.config['TABLE_NAME']
 AUTOSAVED_SECRET_USERNAME_HEAD = app.config['AUTOSAVED_SECRET_USERNAME_HEAD']
 
+SECRET_NAME = app.config['SECRET_NAME']
+SECRET_KEY = app.config['SECRET_KEY']
+OKTA_USER_ID = app.config['OKTA_USER_ID']
+SECRET_ID = app.config['SECRET_ID']
+SECRET_UPDATED_AT = app.config['SECRET_UPDATED_AT']
+OKTA_FACTOR_ID = app.config['OKTA_FACTOR_ID']
+
 ENCRYPTED_API_KEY = app.config['ENCRYPTED_API_KEY']
 API_KEY_SALT = app.config['API_KEY_SALT']
 
@@ -51,8 +58,8 @@ crypt_obj = Crypto(SALT)
 
 DECRYPTED_API_KEY = crypt_obj.decryptAPIkey(ENCRYPTED_API_KEY, API_KEY_SALT)
 
-admin_secret = AdminSecret(SECRETS_FILE, crypt_obj, MS_SQL_SERVER, MS_SQL_USERNAME, MS_SQL_PASSWORD, DATABASE_NAME, TABLE_NAME, AUTOSAVED_SECRET_USERNAME_HEAD, DATABASE_TYPE, SHOW_LOGS)
-totp = TOTP(crypt_obj, SHOW_LOGS)
+admin_secret = AdminSecret(SECRETS_FILE, crypt_obj, MS_SQL_SERVER, MS_SQL_USERNAME, MS_SQL_PASSWORD, DATABASE_NAME, TABLE_NAME, AUTOSAVED_SECRET_USERNAME_HEAD, DATABASE_TYPE, SECRET_NAME, SECRET_KEY, OKTA_USER_ID, SECRET_ID, SECRET_UPDATED_AT, OKTA_FACTOR_ID, SHOW_LOGS)
+totp = TOTP(crypt_obj, SECRET_NAME, SECRET_KEY, OKTA_USER_ID, SECRET_ID, SECRET_UPDATED_AT, SHOW_LOGS)
 okta = OktaOperations(CLIENT_ID, ISSUER, AUTHORIZING_TOKEN, AUTHORIZE_CLAIM_NAME, DECRYPTED_API_KEY, SHOW_LOGS)
 
 # Begin Rate Limiter
@@ -122,13 +129,11 @@ ID_TOKEN = "id_token"
 TOKEN_TYPE_HINT = "token_type_hint"
 SCOPE = "scope"
 ADMIN_SECRET = "adminSecret"
-SECRETNAME = "secretName"
 ACTIVE = 'active'
 ISS = 'iss'
 UID = 'uid'
 AUD = 'aud'
 OPTIONS = 'OPTIONS'
-SECRET = 'secretKey'
 ID_LENGTH = 12
 # CONNECTION_OBJECT = admin_secret.establish_db_connection()
 
@@ -182,9 +187,9 @@ def checkIfAlreadyEnrolledToOktaVerify():
     usersAutoEnrolledFromTecVerify = 0
     usersAutoEnrolledFromTecVerify_excludingLoginUser = 0
     for secret in secrets_list:
-        if secret['oktaFactorId'] != "":
+        if secret[OKTA_FACTOR_ID] != "":
             usersAutoEnrolledFromTecVerify += 1
-        if secret['oktaFactorId'] != "" and secret['oktaUserId'] != logged_in_Okta_user_id:
+        if secret[OKTA_FACTOR_ID] != "" and secret[OKTA_USER_ID] != logged_in_Okta_user_id:
             usersAutoEnrolledFromTecVerify_excludingLoginUser += 1
     print("usersAutoEnrolledFromTecVerify: ", usersAutoEnrolledFromTecVerify)
     print("usersAutoEnrolledFromTecVerify_excludingLoginUser: ", usersAutoEnrolledFromTecVerify_excludingLoginUser)
@@ -212,8 +217,8 @@ def checkIfAlreadyEnrolledToOktaVerify():
                     return okta.delete_factor(logged_in_Okta_user_id, factor['id'])
             else:     
                 for secret in secrets_list:
-                    if secret['oktaFactorId'] != "" and secret['oktaUserId'] == logged_in_Okta_user_id:
-                        if factor['id'] == secret['oktaFactorId']:
+                    if secret[OKTA_FACTOR_ID] != "" and secret[OKTA_USER_ID] == logged_in_Okta_user_id:
+                        if factor['id'] == secret[OKTA_FACTOR_ID]:
                             print("factor IDs matched. So, user is enrolled to TOTP factor from TecVerify.")
                             return {'User is already Auto Enrolled to Okta from TecVerify': True}, 200
                         else:
@@ -242,8 +247,8 @@ def deleteSecretIfTOTPfactorIsInactive():
         return {"Exception": "Secret List is Empty"}, 200
     else:     
         for secret in secrets_list:
-            if secret['oktaUserId'] == logged_in_Okta_user_id and secret['oktaFactorId'] != "":
-                get_factor_response = okta.call_get_factor_API(logged_in_Okta_user_id, secret['oktaFactorId'])
+            if secret[OKTA_USER_ID] == logged_in_Okta_user_id and secret[OKTA_FACTOR_ID] != "":
+                get_factor_response = okta.call_get_factor_API(logged_in_Okta_user_id, secret[OKTA_FACTOR_ID])
                 
                 if get_factor_response.status_code == 404:
                     if DATABASE_TYPE == "json":
@@ -251,9 +256,9 @@ def deleteSecretIfTOTPfactorIsInactive():
                         admin_secret.write(secrets_list)
                     elif DATABASE_TYPE == "mssql":
                         # admin_secret.delete_secret(secret_id, CONNECTION_OBJECT)
-                        admin_secret.delete_secret(secret['secretId'])
+                        admin_secret.delete_secret(secret[SECRET_ID])
                 
-                return okta.get_factor(logged_in_Okta_user_id, secret['oktaFactorId'])
+                return okta.get_factor(logged_in_Okta_user_id, secret[OKTA_FACTOR_ID])
                 
         return {"SUCCESS": "Secret List is not Empty"}, 200
 
@@ -309,10 +314,10 @@ def delete_secret(secret_id):
     else:     
         for secret in secrets_list:
             if secret_id in secret.values():
-                if secret['oktaFactorId'] == "":
+                if secret[OKTA_FACTOR_ID] == "":
                     deleteManuallySavedSecret = True
                 else:
-                    delete_factor_response = okta.call_delete_factor_API(secret['oktaUserId'], secret['oktaFactorId'])
+                    delete_factor_response = okta.call_delete_factor_API(secret[OKTA_USER_ID], secret[OKTA_FACTOR_ID])
                     if delete_factor_response.status_code == 204:
                         print("Auto Enrolled Okta TOTP Factor deleted")
                         deleteAutoSavedSecret = True
@@ -325,7 +330,7 @@ def delete_secret(secret_id):
                             print("Current user is the Super admin. Group admin API token cannot delete the factor of Super admin user. So, not deleting the secret.")
                         return {"errorSummary": "Current user is the Super admin user. He has to delete the TOTP factor in Okta to delete secret in TecVerify."},400
                     # else:
-                    #     return okta.delete_factor(secret['oktaUserId'], secret['oktaFactorId'])
+                    #     return okta.delete_factor(secret[OKTA_USER_ID], secret[OKTA_FACTOR_ID])
 
                 if deleteManuallySavedSecret or deleteAutoSavedSecret:
                     if DATABASE_TYPE == "json":
@@ -342,7 +347,7 @@ def delete_secret(secret_id):
                     print("Auto Saved Secret Deleted")
                     return {'Deleted both Auto Saved Secret and Auto Enrolled Okta TOTP factor': True}, 200
 
-        return {"ERROR": "Secret with given secretId is not found"}, 400
+        return {"ERROR": "Secret with given " + secret_id + " is not found"}, 400
     # else:
     #     return {'error': 'UnAuthorized !!!'}, 403
 
@@ -366,9 +371,9 @@ def save_secret():
     tokenMissing = g.get('tokenHeaderMissing')
     if tokenMissing:
         form_data = admin_secret.parse_form_data_for_okta_userid(request)
-        okta_user_id_in_form_data = form_data['oktaUserId']
-        if form_data[SECRET] and form_data['oktaUserId']:
-            if totp.is_secret_valid(form_data[SECRET]):
+        okta_user_id_in_form_data = form_data[OKTA_USER_ID]
+        if form_data[SECRET_KEY] and form_data[OKTA_USER_ID]:
+            if totp.is_secret_valid(form_data[SECRET_KEY]):
                 # if admin_secret.update_secret(form_data, okta_user_id_in_form_data, CONNECTION_OBJECT):
                 if admin_secret.update_secret(form_data, okta_user_id_in_form_data):
                     return {"updated": True}, 200
@@ -376,15 +381,15 @@ def save_secret():
                     return {"updated": False, "error": "Update Failed !!!"}, 500
             else:
                 return {"updated": False, "error": ADMIN_SECRET + " is in invalid format. Try another one."}, 500
-        elif form_data[SECRET] is None or not form_data[SECRET]:
+        elif form_data[SECRET_KEY] is None or not form_data[SECRET_KEY]:
             return {'error': "'adminSecret' is missing"}, 400
     else:
         form_data = admin_secret.parse_form_data(request)
         token_info = g.get('user')
         logged_in_Okta_user_id = token_info['sub']
-        # if AUTHORIZE_CLAIM_NAME in token_info and token_info[AUTHORIZE_CLAIM_NAME] and form_data[SECRET]:
-        if form_data[SECRET]:
-            if totp.is_secret_valid(form_data[SECRET]):
+        # if AUTHORIZE_CLAIM_NAME in token_info and token_info[AUTHORIZE_CLAIM_NAME] and form_data[SECRET_KEY]:
+        if form_data[SECRET_KEY]:
+            if totp.is_secret_valid(form_data[SECRET_KEY]):
                 # if admin_secret.update_secret(form_data, logged_in_Okta_user_id, CONNECTION_OBJECT):
                 if admin_secret.update_secret(form_data, logged_in_Okta_user_id):
                     return {"updated": True}, 200
@@ -392,7 +397,7 @@ def save_secret():
                     return {"updated": False, "error": "Update Failed !!!"}, 500
             else:
                 return {"updated": False, "error": ADMIN_SECRET + " is in invalid format. Try another one."}, 500
-        elif form_data[SECRET] is None or not form_data[SECRET]:
+        elif form_data[SECRET_KEY] is None or not form_data[SECRET_KEY]:
             return {'error': "'adminSecret' is missing"}, 400
         # else:
         #     return {'error': 'UnAuthorized !!!'}, 403
