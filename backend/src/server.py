@@ -7,6 +7,9 @@ from adminSecret import AdminSecret
 from totp import TOTP
 from oktaOperations import OktaOperations
 
+from jsonDB import JSON
+from mssqlDB import MSSQL
+
 import pyotp
 import requests
 from flask_swagger_ui import get_swaggerui_blueprint
@@ -54,13 +57,18 @@ WHITELISTED_IPS = app.config['WHITELISTED_IPS']
 SALT = app.config['SALT']
 
 crypt_obj = Crypto(SALT)
-# admin_secret = AdminSecret(SECRETS_FILE, crypt_obj)
 
 DECRYPTED_API_KEY = crypt_obj.decryptAPIkey(ENCRYPTED_API_KEY, API_KEY_SALT)
 
 SECRET_NAME_KEY_IN_REQUEST_FORM = "adminScrtName" # In home.jsx(FE) and in docs.json(BE Swagger) also this should be same
 SECRET_KEY_KEY_IN_REQUEST_FORM = "adminScrtKey" # In home.jsx(FE) and in docs.json(BE Swagger) also this should be same
-admin_secret = AdminSecret(SECRETS_FILE, crypt_obj, MS_SQL_SERVER, MS_SQL_USERNAME, MS_SQL_PASSWORD, DATABASE_NAME, TABLE_NAME, AUTOSAVED_SECRET_USERNAME_HEAD, DATABASE_TYPE, SECRET_NAME, SECRET_KEY, OKTA_USER_ID, SECRET_ID, SECRET_UPDATED_AT, OKTA_FACTOR_ID, SECRET_NAME_KEY_IN_REQUEST_FORM, SECRET_KEY_KEY_IN_REQUEST_FORM, SHOW_LOGS)
+
+if(DATABASE_TYPE == "json"):
+    db_obj = JSON(SECRETS_FILE, crypt_obj, MS_SQL_SERVER, MS_SQL_USERNAME, MS_SQL_PASSWORD, DATABASE_NAME, TABLE_NAME, AUTOSAVED_SECRET_USERNAME_HEAD, DATABASE_TYPE, SECRET_NAME, SECRET_KEY, OKTA_USER_ID, SECRET_ID, SECRET_UPDATED_AT, OKTA_FACTOR_ID, SECRET_NAME_KEY_IN_REQUEST_FORM, SECRET_KEY_KEY_IN_REQUEST_FORM, SHOW_LOGS)
+elif(DATABASE_TYPE == "mssql"):
+    db_obj = MSSQL(SECRETS_FILE, crypt_obj, MS_SQL_SERVER, MS_SQL_USERNAME, MS_SQL_PASSWORD, DATABASE_NAME, TABLE_NAME, AUTOSAVED_SECRET_USERNAME_HEAD, DATABASE_TYPE, SECRET_NAME, SECRET_KEY, OKTA_USER_ID, SECRET_ID, SECRET_UPDATED_AT, OKTA_FACTOR_ID, SECRET_NAME_KEY_IN_REQUEST_FORM, SECRET_KEY_KEY_IN_REQUEST_FORM, SHOW_LOGS)
+
+# db_obj = AdminSecret(SECRETS_FILE, crypt_obj, MS_SQL_SERVER, MS_SQL_USERNAME, MS_SQL_PASSWORD, DATABASE_NAME, TABLE_NAME, AUTOSAVED_SECRET_USERNAME_HEAD, DATABASE_TYPE, SECRET_NAME, SECRET_KEY, OKTA_USER_ID, SECRET_ID, SECRET_UPDATED_AT, OKTA_FACTOR_ID, SECRET_NAME_KEY_IN_REQUEST_FORM, SECRET_KEY_KEY_IN_REQUEST_FORM, SHOW_LOGS)
 
 totp = TOTP(crypt_obj, SECRET_NAME, SECRET_KEY, OKTA_USER_ID, SECRET_ID, SECRET_UPDATED_AT, SHOW_LOGS)
 okta = OktaOperations(CLIENT_ID, ISSUER, AUTHORIZING_TOKEN, AUTHORIZE_CLAIM_NAME, DECRYPTED_API_KEY, SHOW_LOGS)
@@ -137,7 +145,7 @@ UID = 'uid'
 AUD = 'aud'
 OPTIONS = 'OPTIONS'
 ID_LENGTH = 12
-# CONNECTION_OBJECT = admin_secret.establish_db_connection()
+# CONNECTION_OBJECT = db_obj.establish_db_connection()
 
 
 # Middlewares
@@ -189,7 +197,7 @@ def checkIfAlreadyEnrolledToOktaVerify():
     token_info = g.get('user')
     logged_in_Okta_user_id = token_info['sub']
 
-    secrets_list = admin_secret.read()
+    secrets_list = db_obj.read()
     usersAutoEnrolledFromTecVerify = 0
     usersAutoEnrolledFromTecVerify_excludingLoginUser = 0
     for secret in secrets_list:
@@ -246,7 +254,7 @@ def deleteSecretIfTOTPfactorIsInactive():
     token_info = g.get('user')
     logged_in_Okta_user_id = token_info['sub']
 
-    secrets_list = admin_secret.read()
+    secrets_list = db_obj.read()
 
     if not secrets_list:
         print("No secret in secrets_list")
@@ -255,14 +263,8 @@ def deleteSecretIfTOTPfactorIsInactive():
         for secret in secrets_list:
             if secret[OKTA_USER_ID] == logged_in_Okta_user_id and secret[OKTA_FACTOR_ID] != "":
                 get_factor_response = okta.call_get_factor_API(logged_in_Okta_user_id, secret[OKTA_FACTOR_ID])
-                
                 if get_factor_response.status_code == 404:
-                    if DATABASE_TYPE == "json":
-                        secrets_list.remove(secret)
-                        admin_secret.write(secrets_list)
-                    elif DATABASE_TYPE == "mssql":
-                        # admin_secret.delete_secret(secret_id, CONNECTION_OBJECT)
-                        admin_secret.delete_secret(secret[SECRET_ID])
+                    db_obj.delete_secret(secret[SECRET_ID])
                 
                 return okta.get_factor(logged_in_Okta_user_id, secret[OKTA_FACTOR_ID])
                 
@@ -283,8 +285,8 @@ def enrollToTecVerify():
         oktaFactorID = enroll_info['id']
         oktaSharedSecret = enroll_info['_embedded']['activation']['sharedSecret']
         generatedOTP = totp.generate_totp(oktaSharedSecret)
-        # admin_secret.auto_save_secret(oktaSharedSecret, logged_in_Okta_user_id, CONNECTION_OBJECT) # For saving secret in TecVerify
-        admin_secret.auto_save_secret(oktaSharedSecret, logged_in_Okta_user_id, logged_in_username, oktaFactorID) # For saving secret in TecVerify with logged in username and oktaFactorID
+        # db_obj.auto_save_secret(oktaSharedSecret, logged_in_Okta_user_id, CONNECTION_OBJECT) # For saving secret in TecVerify
+        db_obj.auto_save_secret(oktaSharedSecret, logged_in_Okta_user_id, logged_in_username, oktaFactorID) # For saving secret in TecVerify with logged in username and oktaFactorID
         return okta.activate_TOTP_factor(logged_in_Okta_user_id, oktaFactorID, generatedOTP)
         
     return okta.enroll_okta_verify_TOTP_factor(logged_in_Okta_user_id)
@@ -297,7 +299,7 @@ def get_totp():
     token_info = g.get('user')
     logged_in_Okta_user_id = token_info['sub']
     # if AUTHORIZE_CLAIM_NAME in token_info:
-    secrets_list = admin_secret.read()             
+    secrets_list = db_obj.read()             
     totp_list = totp.generate_totp_for_all_secrets(secrets_list, logged_in_Okta_user_id)
     return jsonify(totp_list), 200
     # else:
@@ -312,8 +314,8 @@ def delete_secret(secret_id):
     # if AUTHORIZE_CLAIM_NAME in token_info and token_info[AUTHORIZE_CLAIM_NAME]:
     deleteManuallySavedSecret = False
     deleteAutoSavedSecret = False
-    # secrets_list = admin_secret.read(CONNECTION_OBJECT)
-    secrets_list = admin_secret.read()
+    # secrets_list = db_obj.read(CONNECTION_OBJECT)
+    secrets_list = db_obj.read()
     if not secrets_list:
         print("No secret in secrets_list")
         return {"ERROR": "Secret List is Empty"}, 400
@@ -339,12 +341,7 @@ def delete_secret(secret_id):
                     #     return okta.delete_factor(secret[OKTA_USER_ID], secret[OKTA_FACTOR_ID])
 
                 if deleteManuallySavedSecret or deleteAutoSavedSecret:
-                    if DATABASE_TYPE == "json":
-                        secrets_list.remove(secret)
-                        admin_secret.write(secrets_list)
-                    elif DATABASE_TYPE == "mssql":
-                        # admin_secret.delete_secret(secret_id, CONNECTION_OBJECT)
-                        admin_secret.delete_secret(secret_id)
+                    db_obj.delete_secret(secret_id)
 
                 if deleteManuallySavedSecret:
                     print("Manually Saved Secret Deleted")
@@ -376,12 +373,12 @@ def save_secret():
     print("Save Secret API")
     tokenMissing = g.get('tokenHeaderMissing')
     if tokenMissing:
-        form_data = admin_secret.parse_form_data_for_okta_userid(request)
+        form_data = db_obj.parse_form_data_for_okta_userid(request)
         okta_user_id_in_form_data = form_data[OKTA_USER_ID]
         if form_data[SECRET_KEY] and form_data[OKTA_USER_ID]:
             if totp.is_secret_valid(form_data[SECRET_KEY]):
-                # if admin_secret.update_secret(form_data, okta_user_id_in_form_data, CONNECTION_OBJECT):
-                if admin_secret.update_secret(form_data, okta_user_id_in_form_data):
+                # if db_obj.update_secret(form_data, okta_user_id_in_form_data, CONNECTION_OBJECT):
+                if db_obj.update_secret(form_data, okta_user_id_in_form_data):
                     return {"updated": True}, 200
                 else:
                     return {"updated": False, "error": "Update Failed !!!"}, 500
@@ -392,14 +389,14 @@ def save_secret():
         elif form_data[OKTA_USER_ID] is None or not form_data[OKTA_USER_ID]:
             return {'error': "okta User ID is missing"}, 400
     else:
-        form_data = admin_secret.parse_form_data(request)
+        form_data = db_obj.parse_form_data(request)
         token_info = g.get('user')
         logged_in_Okta_user_id = token_info['sub']
         # if AUTHORIZE_CLAIM_NAME in token_info and token_info[AUTHORIZE_CLAIM_NAME] and form_data[SECRET_KEY]:
         if form_data[SECRET_KEY]:
             if totp.is_secret_valid(form_data[SECRET_KEY]):
-                # if admin_secret.update_secret(form_data, logged_in_Okta_user_id, CONNECTION_OBJECT):
-                if admin_secret.update_secret(form_data, logged_in_Okta_user_id):
+                # if db_obj.update_secret(form_data, logged_in_Okta_user_id, CONNECTION_OBJECT):
+                if db_obj.update_secret(form_data, logged_in_Okta_user_id):
                     return {"updated": True}, 200
                 else:
                     return {"updated": False, "error": "Update Failed !!!"}, 500
