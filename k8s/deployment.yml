@@ -12,6 +12,7 @@ spec:
       labels:
         app: tecverify-be-selector-app
     spec:
+      restartPolicy: "Always"
       containers:
         - name: tecverify-be-container-1
           image: naveenmasuna/backend_tecverify:Naveen_BE

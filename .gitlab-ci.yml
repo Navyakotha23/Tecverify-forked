@@ -39,7 +39,7 @@ deploy-to-digital-ocean:
     - kubectl apply -f ./k8s/config.yml
     - kubectl apply -f ./k8s/service.yml
     - kubectl apply -f ./k8s/deployment.yml
-    - kubectl rollout restart deployment tecverify-be-deployment
+    # - kubectl rollout restart deployment tecverify-be-deployment
   after_script:
     - kubectl get svc tecverify-fe-service -o jsonpath='{.status.loadBalancer.ingress[0].ip}'
     - kubectl get svc tecverify-be-service -o jsonpath='{.status.loadBalancer.ingress[0].ip}'
