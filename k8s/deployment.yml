@@ -20,8 +20,8 @@ spec:
           volumeMounts:
             - name: be-config-volume
               mountPath: /etc/mnk-config/
-          # ports:
-          # - containerPort: 5000
+          ports:
+          - containerPort: 5000
           # env:
           #   - name: CLIENT_ID
           #     value: 0oa164ptl0ySnZSb50h8
