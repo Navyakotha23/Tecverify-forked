@@ -22,8 +22,8 @@ spec:
     app: tecverify-be-selector-app
   ports:
     - name: https
-      port: 4000
-      targetPort: 4000
+      port: 5000
+      targetPort: 5000
 
 
 # Deleted the Deployments, services and creating again.

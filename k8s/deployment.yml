@@ -21,7 +21,7 @@ spec:
             - name: be-config-volume
               mountPath: /etc/mnk-config/
           ports:
-          - containerPort: 4000
+          - containerPort: 5000
           env:
             - name: CLIENT_ID
               value: 0oa164ptl0ySnZSb50h8
@@ -79,7 +79,7 @@ spec:
           #     memory: 32Mi
           #     cpu: 38m
           ports:
-          - containerPort: 8080
+          - containerPort: 5000
           # livenessProbe:
           #   httpGet:
           #     path: /healthz
