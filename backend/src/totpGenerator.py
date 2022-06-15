@@ -1,6 +1,6 @@
 import pyotp
 
-class TOTP:
+class TOTP_Generator:
 
     def __init__(self, crypt_obj, SECRET_NAME, SECRET_KEY, OKTA_USER_ID, SECRET_ID, SECRET_UPDATED_AT, SHOW_LOGS) -> None:
         self.crypt_obj = crypt_obj
@@ -24,9 +24,9 @@ class TOTP:
             return None
 
 
-    def generate_totp_for_all_secrets(self, secrets_list, okta_logged_in_user_id):
+    def generate_totp_for_login_user(self, secrets_list, okta_logged_in_user_id):
         """
-        This method generates TOTPs for all admin secrets.
+        This method generates TOTPs for login user.
         """
         secrets_with_totp = []
         for secret in secrets_list:
@@ -42,14 +42,5 @@ class TOTP:
         return secrets_with_totp
 
 
-    def is_secret_valid(self, secret):
-        """
-        This method checks whether the secret is compatible to generate a totp or not.
-        """
-        try:
-            pyotp.TOTP(secret).now()
-            return True
-        except Exception as e:
-            print("Error in is_secret_valid(): ", e)
-            return False
+    
     

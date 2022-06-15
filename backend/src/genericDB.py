@@ -3,28 +3,7 @@ import abc
 import uuid
 from datetime import datetime
 
-class AdminSecret(metaclass=abc.ABCMeta):
-
-    def __init__(self, file: str, crypt_obj, MS_SQL_SERVER, MS_SQL_USERNAME, MS_SQL_PASSWORD, DATABASE_NAME, TABLE_NAME, AUTOSAVED_SECRET_USERNAME_HEAD, DATABASE_TYPE, SECRET_NAME, SECRET_KEY, OKTA_USER_ID, SECRET_ID, SECRET_UPDATED_AT, OKTA_FACTOR_ID, SECRET_NAME_KEY_IN_REQUEST_FORM, SECRET_KEY_KEY_IN_REQUEST_FORM, SHOW_LOGS) -> None:
-        self.file = file
-        self.crypt_obj = crypt_obj
-        self.ms_sql_server = MS_SQL_SERVER
-        self.ms_sql_username = MS_SQL_USERNAME
-        self.ms_sql_password = MS_SQL_PASSWORD
-        self.database_name = DATABASE_NAME
-        self.table_name = TABLE_NAME
-        self.auto_saved_secret_username_head = AUTOSAVED_SECRET_USERNAME_HEAD
-        self.database_type = DATABASE_TYPE
-        self.secret_name = SECRET_NAME
-        self.secret_key = SECRET_KEY
-        self.okta_user_id = OKTA_USER_ID
-        self.secret_id = SECRET_ID
-        self.secret_updated_at = SECRET_UPDATED_AT
-        self.okta_factor_id = OKTA_FACTOR_ID
-        self.secret_name_KEY_in_request_form = SECRET_NAME_KEY_IN_REQUEST_FORM
-        self.secret_key_KEY_in_request_form = SECRET_KEY_KEY_IN_REQUEST_FORM
-        self.show_logs = SHOW_LOGS
-
+class Generic_DB(metaclass=abc.ABCMeta):
 
     def generate_random_id(self) -> str:
         """
@@ -58,7 +37,7 @@ class AdminSecret(metaclass=abc.ABCMeta):
     @abc.abstractmethod
     def read(self):
         """
-        This method reads from file which stores Admin Secrets
+        This method reads Secrets list from database
         """
 
         pass
@@ -67,13 +46,16 @@ class AdminSecret(metaclass=abc.ABCMeta):
     @abc.abstractmethod
     def write(self, data) -> bool:
         """
-        This method writes in to file which stores Admin Secrets
+        This method writes Secret into the database
         """
 
         pass
             
 
     def prepare_secret_dictionary_for_auto_save_secret(self, okta_shared_secret, okta_logged_in_user_id, okta_logged_in_username, okta_factor_id):
+        """
+        This method prepares Secret for auto saving
+        """
         secrets_list = self.read()
         id = self.generate_unique_id(secrets_list)
         secretInfo = {}
@@ -89,13 +71,16 @@ class AdminSecret(metaclass=abc.ABCMeta):
     @abc.abstractmethod
     def auto_save_secret(self, okta_shared_secret, okta_logged_in_user_id, okta_logged_in_username, okta_factor_id) -> bool:
         """
-        This method updates file with form data received.
+        This method auto saves secret into the database
         """
         
         pass
             
 
     def prepare_secret_dictionary_for_update_secret(self, form_data, okta_logged_in_user_id):
+        """
+        This method prepares Secret from the form data received
+        """
         secrets_list = self.read()
         id = self.generate_unique_id(secrets_list)
         form_data[self.secret_key] = self.crypt_obj.encrypt(form_data[self.secret_key])
@@ -109,7 +94,7 @@ class AdminSecret(metaclass=abc.ABCMeta):
     @abc.abstractmethod
     def update_secret(self, form_data, okta_logged_in_user_id) -> bool:
         """
-        This method updates file with form data received.
+        This method manually saves secret into the database from the form data received.
         """
         
         pass
@@ -118,7 +103,7 @@ class AdminSecret(metaclass=abc.ABCMeta):
     @abc.abstractmethod
     def delete_secret(self, secret_id) -> bool:
         """
-        This method deletes a record based on the secret_id
+        This method deletes a secret record in the database based on the secret_id
         """
 
         pass            
@@ -126,8 +111,10 @@ class AdminSecret(metaclass=abc.ABCMeta):
 
     def parse_form_data(self, request):
         """
-        This method parse form data and returns SecretName and Secret
+        This method parse form data and returns SecretName and SecretKey
         """
+        print("request: ", request)
+        print("request.form:", request.form)
         secret_name_VALUE_in_request_form = request.form[self.secret_name_KEY_in_request_form] if self.secret_name_KEY_in_request_form in request.form else None
         secret_key_VALUE_in_request_form = request.form[self.secret_key_KEY_in_request_form] if self.secret_key_KEY_in_request_form in request.form else None
         return {self.secret_name: secret_name_VALUE_in_request_form, self.secret_key: secret_key_VALUE_in_request_form}
@@ -135,7 +122,7 @@ class AdminSecret(metaclass=abc.ABCMeta):
 
     def parse_form_data_for_okta_userid(self, request):
         """
-        This method parse form data and returns SecretName, Secret and OktaUserId
+        This method parse form data and returns SecretName, SecretKey and OktaUserId
         """
         secret_name_VALUE_in_request_form = request.form[self.secret_name_KEY_in_request_form] if self.secret_name_KEY_in_request_form in request.form else None
         secret_key_VALUE_in_request_form = request.form[self.secret_key_KEY_in_request_form] if self.secret_key_KEY_in_request_form in request.form else None

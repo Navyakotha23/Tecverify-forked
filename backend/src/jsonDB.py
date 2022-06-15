@@ -1,9 +1,23 @@
 import os
 import json
 
-from adminSecret import AdminSecret
+from genericDB import Generic_DB
 
-class JSON(AdminSecret):
+class JSON_DB(Generic_DB):
+
+    def __init__(self, file: str, crypt_obj, AUTOSAVED_SECRET_USERNAME_HEAD, SECRET_NAME, SECRET_KEY, OKTA_USER_ID, SECRET_ID, SECRET_UPDATED_AT, OKTA_FACTOR_ID, SECRET_NAME_KEY_IN_REQUEST_FORM, SECRET_KEY_KEY_IN_REQUEST_FORM, SHOW_LOGS) -> None:
+        self.file = file
+        self.crypt_obj = crypt_obj
+        self.auto_saved_secret_username_head = AUTOSAVED_SECRET_USERNAME_HEAD
+        self.secret_name = SECRET_NAME
+        self.secret_key = SECRET_KEY
+        self.okta_user_id = OKTA_USER_ID
+        self.secret_id = SECRET_ID
+        self.secret_updated_at = SECRET_UPDATED_AT
+        self.okta_factor_id = OKTA_FACTOR_ID
+        self.secret_name_KEY_in_request_form = SECRET_NAME_KEY_IN_REQUEST_FORM
+        self.secret_key_KEY_in_request_form = SECRET_KEY_KEY_IN_REQUEST_FORM
+        self.show_logs = SHOW_LOGS
 
     def create_empty_json_file(self) -> bool:
         """

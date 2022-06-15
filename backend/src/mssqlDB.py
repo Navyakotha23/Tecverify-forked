@@ -1,10 +1,31 @@
 import pymssql
 
-from adminSecret import AdminSecret
+from genericDB import Generic_DB
 
-class MSSQL(AdminSecret):
+class MSSQL_DB(Generic_DB):
+
+    def __init__(self, crypt_obj, MS_SQL_SERVER, MS_SQL_USERNAME, MS_SQL_PASSWORD, DATABASE_NAME, TABLE_NAME, AUTOSAVED_SECRET_USERNAME_HEAD, SECRET_NAME, SECRET_KEY, OKTA_USER_ID, SECRET_ID, SECRET_UPDATED_AT, OKTA_FACTOR_ID, SECRET_NAME_KEY_IN_REQUEST_FORM, SECRET_KEY_KEY_IN_REQUEST_FORM, SHOW_LOGS) -> None:
+        self.crypt_obj = crypt_obj
+        self.ms_sql_server = MS_SQL_SERVER
+        self.ms_sql_username = MS_SQL_USERNAME
+        self.ms_sql_password = MS_SQL_PASSWORD
+        self.database_name = DATABASE_NAME
+        self.table_name = TABLE_NAME
+        self.auto_saved_secret_username_head = AUTOSAVED_SECRET_USERNAME_HEAD
+        self.secret_name = SECRET_NAME
+        self.secret_key = SECRET_KEY
+        self.okta_user_id = OKTA_USER_ID
+        self.secret_id = SECRET_ID
+        self.secret_updated_at = SECRET_UPDATED_AT
+        self.okta_factor_id = OKTA_FACTOR_ID
+        self.secret_name_KEY_in_request_form = SECRET_NAME_KEY_IN_REQUEST_FORM
+        self.secret_key_KEY_in_request_form = SECRET_KEY_KEY_IN_REQUEST_FORM
+        self.show_logs = SHOW_LOGS
     
     def establish_db_connection(self):
+        """
+        This method establishes connection with the database server
+        """
         try:
             conn = pymssql.connect(self.ms_sql_server, self.ms_sql_username, self.ms_sql_password)
             
@@ -127,10 +148,13 @@ class MSSQL(AdminSecret):
         return self.write(form_data)
 
 
-    # def destroy_db_connection(self, connObj):
-    #     try:
-    #         connObj.close()
-    #         return True
-    #     except Exception as e:
-    #         print("\nERROR in destroy_db_connection(): ", e)
-    #         return False
+    def destroy_db_connection(self, connObj):
+        """
+        This method destroys connection with the database server
+        """
+        try:
+            connObj.close()
+            return True
+        except Exception as e:
+            print("\nERROR in destroy_db_connection(): ", e)
+            return False

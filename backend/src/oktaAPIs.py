@@ -1,7 +1,7 @@
 import requests
 import json
 
-class OktaOperations:
+class OktaAPIs:
 
     def __init__(self, CLIENT_ID, ISSUER, AUTHORIZING_TOKEN, AUTHORIZE_CLAIM_NAME, TECVERIFY_API_KEY, SHOW_LOGS) -> None:
         self.client_id = CLIENT_ID
@@ -43,8 +43,64 @@ class OktaOperations:
         else:
             return False, token_info
 
+
+    def call_list_factors_API(self, oktaUid):
+        """
+        This method makes List Factors API call to Okta with OktaUserID, APIkey and returns Okta API response.
+        """
+        url = self.issuer + "/api/v1/users/" + oktaUid + "/factors"
+        headers={'Content-Type':'application/json', 'Authorization': 'SSWS {}'.format(self.tecverify_api_key)}
+        response = requests.get(url, headers=headers)  
+        return response
+
+    def list_factors(self, oktaUid):
+        """
+        This method makes List Factors API call to Okta and returns custom response.
+        """
+        list_factors_response = self.call_list_factors_API(oktaUid)
+        if list_factors_response.status_code == 200:
+            return {'Got the List of factors for that user': True}, 200
+        elif list_factors_response.status_code == 401:
+            if list_factors_response.json()['errorCode'] == "E0000011":
+                print("API token provided is invalid. So, cannot get factors list.")
+            return {"errorSummary": "Invalid API token provided. So, cannot get factors list."}, 400
+        elif list_factors_response.status_code == 403:
+            if list_factors_response.json()['errorCode'] == "E0000006":
+                print("This user is not in the group for which API token is generated. So, cannot get factors list.")
+            return {"errorSummary": "Current user is not in the group for which API token is generated. So, cannot get factors list."},400
+
+
+    def call_delete_factor_API(self, oktaUid, oktaFactorID):
+        """
+        This method makes Delete Factor API call to Okta with OktaUserID, OktaTOTPfactorId, APIkey and returns Okta API response.
+        """
+        url = self.issuer + "/api/v1/users/" + oktaUid + "/factors/" + oktaFactorID
+        headers={'Content-Type':'application/json', 'Authorization': 'SSWS{}'.format(self.tecverify_api_key)}
+        response = requests.delete(url, headers=headers)
+        return response
+    
+    def delete_factor(self, oktaUid, oktaFactorID):
+        """
+        This method makes Delete Factor API call to Okta and returns custom response.
+        """
+        delete_factor_response = self.call_delete_factor_API(oktaUid, oktaFactorID)
+        if delete_factor_response.status_code == 204:
+            print("Okta TOTP Factor enrolled from OktaVerify is deleted")
+            return {'Deleted Okta TOTP Factor enrolled from OktaVerify': True}, 200
+        elif delete_factor_response.status_code == 401:
+            if delete_factor_response.json()['errorCode'] == "E0000011":
+                print("API token provided is invalid. So, cannot delete the factor.")
+            return {"errorSummary": "Invalid API token provided. So, cannot delete the factor."}, 400
+        elif delete_factor_response.status_code == 403:
+            if delete_factor_response.json()['errorCode'] == "E0000006":
+                print("Current user is the Super admin. Group admin API token cannot delete the factor of Super admin user.")
+            return {"errorSummary": "Current user is the Super admin user. He has to delete the TOTP factor in Okta to get enrolled in TecVerify."},400
+
     
     def call_enroll_okta_verify_TOTP_factor_API(self, oktaUid):
+        """
+        This method makes an Enroll Okta Verify TOTP factor API call to Okta with OktaUserID, APIkey and returns Okta API response.
+        """
         url = self.issuer + "/api/v1/users/" + oktaUid + "/factors"
         headers={'Content-Type':'application/json', 'Authorization': 'SSWS {}'.format(self.tecverify_api_key)}
         body = {'factorType': 'token:software:totp', 'provider': 'OKTA'}
@@ -52,6 +108,9 @@ class OktaOperations:
         return response
     
     def enroll_okta_verify_TOTP_factor(self, oktaUid):
+        """
+        This method makes an Enroll Okta Verify TOTP factor API call to Okta and returns custom response.
+        """
         enroll_response = self.call_enroll_okta_verify_TOTP_factor_API(oktaUid)
         if enroll_response.status_code == 200:
             return {"SUCCESS": "Enrolled TOTP factor Successfully. Need to Activate that."}
@@ -70,6 +129,9 @@ class OktaOperations:
     
 
     def call_activate_TOTP_factor_API(self, oktaUid, oktaFactorID, generatedOTP):
+        """
+        This method makes an Activate TOTP Factor API call to Okta with OktaUserID, OktaTOTPfactorId, OTP generated with OktaSharedSecret, APIkey and returns Okta API response.
+        """
         url = self.issuer + "/api/v1/users/" + oktaUid + "/factors/" + oktaFactorID + "/lifecycle/activate"
         headers={'Content-Type':'application/json', 'Authorization': 'SSWS {}'.format(self.tecverify_api_key)}
         body = {'passCode': generatedOTP}
@@ -77,60 +139,28 @@ class OktaOperations:
         return response
 
     def activate_TOTP_factor(self, oktaUid, oktaFactorID, generatedOTP):
+        """
+        This method makes an Activate TOTP Factor API call to Okta and returns custom response.
+        """
         activation_response = self.call_activate_TOTP_factor_API(oktaUid, oktaFactorID, generatedOTP)
         if activation_response.status_code == 200:
             return {"SUCCESS": "Auto-enrolled Successfully"}
         return {"ERROR": "Auto-enrollment Failed"}
     
 
-    def call_delete_factor_API(self, oktaUid, oktaFactorID):
-        url = self.issuer + "/api/v1/users/" + oktaUid + "/factors/" + oktaFactorID
-        headers={'Content-Type':'application/json', 'Authorization': 'SSWS{}'.format(self.tecverify_api_key)}
-        response = requests.delete(url, headers=headers)
-        return response
-    
-    def delete_factor(self, oktaUid, oktaFactorID):
-        delete_factor_response = self.call_delete_factor_API(oktaUid, oktaFactorID)
-        if delete_factor_response.status_code == 204:
-            print("Okta TOTP Factor enrolled from OktaVerify is deleted")
-            return {'Deleted Okta TOTP Factor enrolled from OktaVerify': True}, 200
-        elif delete_factor_response.status_code == 401:
-            if delete_factor_response.json()['errorCode'] == "E0000011":
-                print("API token provided is invalid. So, cannot delete the factor.")
-            return {"errorSummary": "Invalid API token provided. So, cannot delete the factor."}, 400
-        elif delete_factor_response.status_code == 403:
-            if delete_factor_response.json()['errorCode'] == "E0000006":
-                print("Current user is the Super admin. Group admin API token cannot delete the factor of Super admin user.")
-            return {"errorSummary": "Current user is the Super admin user. He has to delete the TOTP factor in Okta to get enrolled in TecVerify."},400
-    
-
-    def call_list_factors_API(self, oktaUid):
-        url = self.issuer + "/api/v1/users/" + oktaUid + "/factors"
-        headers={'Content-Type':'application/json', 'Authorization': 'SSWS {}'.format(self.tecverify_api_key)}
-        response = requests.get(url, headers=headers)  
-        return response
-
-    def list_factors(self, oktaUid):
-        list_factors_response = self.call_list_factors_API(oktaUid)
-        if list_factors_response.status_code == 200:
-            return {'Got the List of factors for that user': True}, 200
-        elif list_factors_response.status_code == 401:
-            if list_factors_response.json()['errorCode'] == "E0000011":
-                print("API token provided is invalid. So, cannot get factors list.")
-            return {"errorSummary": "Invalid API token provided. So, cannot get factors list."}, 400
-        elif list_factors_response.status_code == 403:
-            if list_factors_response.json()['errorCode'] == "E0000006":
-                print("This user is not in the group for which API token is generated. So, cannot get factors list.")
-            return {"errorSummary": "Current user is not in the group for which API token is generated. So, cannot get factors list."},400
-    
-
     def call_get_factor_API(self, oktaUid, oktaFactorID):
+        """
+        This method makes Get Factor API call to Okta with OktaUserID, OktaTOTPfactorId, APIkey and returns Okta API response.
+        """
         url = self.issuer + "/api/v1/users/" + oktaUid + "/factors/" + oktaFactorID
         headers={'Content-Type':'application/json', 'Authorization': 'SSWS {}'.format(self.tecverify_api_key)}
         response = requests.get(url, headers=headers)
         return response
 
     def get_factor(self, oktaUid, oktaFactorID):
+        """
+        This method makes Get Factor API call to Okta and returns custom response.
+        """
         get_factor_response = self.call_get_factor_API(oktaUid, oktaFactorID)
         if get_factor_response.status_code == 200:
             print("TOTP factor is Active. No need to delete the secret.")
