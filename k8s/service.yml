@@ -24,6 +24,9 @@ spec:
     - name: https
       port: 5000
       targetPort: 5000
+    - name: something
+      port: 5001
+      targetport: 5001
 
 
 # Deleted the Deployments, services and creating again.
