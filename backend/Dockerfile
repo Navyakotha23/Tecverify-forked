@@ -4,6 +4,7 @@ WORKDIR /usr/src/app
 COPY . .
 RUN pip install -r requirements.txt
 EXPOSE 5000
+EXPOSE 5001
 # Changing the directory to /usr/scr/app/src to run server.py 
 # HTTP backend without certs and without timeout
 # CMD [ "gunicorn", "--bind", "0.0.0.0:5000", "--chdir", "./src/", "server:app" ]
