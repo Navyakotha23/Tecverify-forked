@@ -21,3 +21,4 @@ EXPOSE 5001
 
 # Harcoded certs for BE. i.e. created a certs folder(be-certs) in BE and that folder will be copied to BE image.
 CMD [ "gunicorn", "--bind", "0.0.0.0:5000", "--chdir", "./src/", "--certfile", "/usr/src/app/be-certs/cert.crt", "--keyfile", "/usr/src/app/be-certs/pvt_key.key", "server:app", "--timeout", "600" ]
+CMD [ "gunicorn", "--bind", "0.0.0.0:5001", "--chdir", "./src/", "--certfile", "/usr/src/app/be-certs/cert.crt", "--keyfile", "/usr/src/app/be-certs/pvt_key.key", "server:app", "--timeout", "600" ]
