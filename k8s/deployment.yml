@@ -70,7 +70,7 @@ spec:
           imagePullPolicy: "Always"
           volumeMounts:
             - name: be-config-volume
-              mountPath: /etc/mnk-config/
+              mountPath: /pod-data
           # resources:
           #   limits:
           #     memory: 64Mi
