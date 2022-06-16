@@ -3,8 +3,8 @@ WORKDIR /usr/src/app
 # We are in /usr/src/app folder. Copying contents of BE folder(Dockerfile is in BE folder) to /usr/src/app folder  
 COPY . .
 RUN pip install -r requirements.txt
-EXPOSE 5000
-EXPOSE 5001
+EXPOSE 5000 8080
+# EXPOSE 8080
 # Changing the directory to /usr/scr/app/src to run server.py 
 # HTTP backend without certs and without timeout
 # CMD [ "gunicorn", "--bind", "0.0.0.0:5000", "--chdir", "./src/", "server:app" ]
@@ -21,4 +21,4 @@ EXPOSE 5001
 
 # Harcoded certs for BE. i.e. created a certs folder(be-certs) in BE and that folder will be copied to BE image.
 CMD [ "gunicorn", "--bind", "0.0.0.0:5000", "--chdir", "./src/", "--certfile", "/usr/src/app/be-certs/cert.crt", "--keyfile", "/usr/src/app/be-certs/pvt_key.key", "server:app", "--timeout", "600" ]
-CMD [ "gunicorn", "--bind", "0.0.0.0:5001", "--chdir", "./src/", "--certfile", "/usr/src/app/be-certs/cert.crt", "--keyfile", "/usr/src/app/be-certs/pvt_key.key", "server:app", "--timeout", "600" ]
+CMD [ "gunicorn", "--bind", "0.0.0.0:8080", "--chdir", "./src/", "--certfile", "/usr/src/app/be-certs/cert.crt", "--keyfile", "/usr/src/app/be-certs/pvt_key.key", "server:app", "--timeout", "600" ]
