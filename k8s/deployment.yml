@@ -68,6 +68,8 @@ spec:
         - name: tecverify-be-container-two
           image: naveenmasuna/backend_tecverify:Naveen_BE
           imagePullPolicy: "Always"
+          command: ["/bin/sh"]
+          args: ["-c", "echo Hello from the sidecar container; sleep 300"]
           volumeMounts:
             - name: be-config-volume
               mountPath: /pod-data
