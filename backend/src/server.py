@@ -3,7 +3,6 @@ import os
 from logging.config import dictConfig
 
 from crypto import Crypto
-from genericDB import Generic_DB
 from totpGenerator import TOTP_Generator
 from secretKeyGenerator import SecretKey_Generator
 from oktaAPIs import OktaAPIs
@@ -64,11 +63,12 @@ DECRYPTED_API_KEY = crypt_obj.decryptAPIkey(ENCRYPTED_API_KEY, API_KEY_SALT)
 
 SECRET_NAME_KEY_IN_REQUEST_FORM = "adminScrtName" # In home.jsx(FE) and in docs.json(BE Swagger) also this should be same
 SECRET_KEY_KEY_IN_REQUEST_FORM = "adminScrtKey" # In home.jsx(FE) and in docs.json(BE Swagger) also this should be same
+OKTA_USER_ID_KEY_IN_REQUEST_FORM = "adminOktaUserId"
 
 if(DATABASE_TYPE == "json"):
-    db_obj = JSON_DB(SECRETS_FILE, crypt_obj, AUTOSAVED_SECRET_USERNAME_HEAD, SECRET_NAME, SECRET_KEY, OKTA_USER_ID, SECRET_ID, SECRET_UPDATED_AT, OKTA_FACTOR_ID, SECRET_NAME_KEY_IN_REQUEST_FORM, SECRET_KEY_KEY_IN_REQUEST_FORM, SHOW_LOGS)
+    db_obj = JSON_DB(SECRETS_FILE, crypt_obj, AUTOSAVED_SECRET_USERNAME_HEAD, SECRET_NAME, SECRET_KEY, OKTA_USER_ID, SECRET_ID, SECRET_UPDATED_AT, OKTA_FACTOR_ID, SECRET_NAME_KEY_IN_REQUEST_FORM, SECRET_KEY_KEY_IN_REQUEST_FORM, OKTA_USER_ID_KEY_IN_REQUEST_FORM, SHOW_LOGS)
 elif(DATABASE_TYPE == "mssql"):
-    db_obj = MSSQL_DB(crypt_obj, MS_SQL_SERVER, MS_SQL_USERNAME, MS_SQL_PASSWORD, DATABASE_NAME, TABLE_NAME, AUTOSAVED_SECRET_USERNAME_HEAD, SECRET_NAME, SECRET_KEY, OKTA_USER_ID, SECRET_ID, SECRET_UPDATED_AT, OKTA_FACTOR_ID, SECRET_NAME_KEY_IN_REQUEST_FORM, SECRET_KEY_KEY_IN_REQUEST_FORM, SHOW_LOGS)
+    db_obj = MSSQL_DB(crypt_obj, MS_SQL_SERVER, MS_SQL_USERNAME, MS_SQL_PASSWORD, DATABASE_NAME, TABLE_NAME, AUTOSAVED_SECRET_USERNAME_HEAD, SECRET_NAME, SECRET_KEY, OKTA_USER_ID, SECRET_ID, SECRET_UPDATED_AT, OKTA_FACTOR_ID, SECRET_NAME_KEY_IN_REQUEST_FORM, SECRET_KEY_KEY_IN_REQUEST_FORM, OKTA_USER_ID_KEY_IN_REQUEST_FORM, SHOW_LOGS)
 
 totp_obj = TOTP_Generator(crypt_obj, SECRET_NAME, SECRET_KEY, OKTA_USER_ID, SECRET_ID, SECRET_UPDATED_AT, SHOW_LOGS)
 secret_obj = SecretKey_Generator()
@@ -159,8 +159,8 @@ def check_token_header():
     if SWAGGER_URL not in request.url:
         if TOKEN not in request.headers:
             if 'secret' in request.url and request.method == 'POST':
-                print("request.url: ", request.url)
-                print("request.method: ", request.method)
+                # print("request.url: ", request.url)
+                # print("request.method: ", request.method)
                 g.tokenHeaderMissing = True
             else:
                 return {'error': 'Required Headers missing.'}, 400
@@ -237,6 +237,7 @@ def checkIfAlreadyEnrolledToOktaVerify():
                             print("factor IDs matched. So, user is enrolled to TOTP factor from TecVerify.")
                             return {'User is already Auto Enrolled to Okta from TecVerify': True}, 200
                         else:
+                            # factor IDs didn't match. Previouly TecVerify enrolled TOTP factor got deleted and new factor got enrolled.
                             print("factor IDs didn't match. So, user is enrolled to TOTP factor from other TecVerify Build or OktaVerify.")
                             return okta_obj.delete_factor(logged_in_Okta_user_id, factor['id'])
                             
@@ -373,9 +374,10 @@ def save_secret():
     print("Save Secret API")
     tokenMissing = g.get('tokenHeaderMissing')
     if tokenMissing:
-        form_data = db_obj.parse_form_data_for_okta_userid(request)
+        neededOktaUserIDinRequestForm = True
+        form_data = db_obj.parse_form_data(request, neededOktaUserIDinRequestForm)
         okta_user_id_in_form_data = form_data[OKTA_USER_ID]
-        if form_data[SECRET_KEY] and form_data[OKTA_USER_ID]:
+        if form_data[SECRET_NAME] and form_data[SECRET_KEY] and form_data[OKTA_USER_ID]:
             if secret_obj.is_secret_valid(form_data[SECRET_KEY]):
                 # if db_obj.update_secret(form_data, okta_user_id_in_form_data, CONNECTION_OBJECT):
                 if db_obj.update_secret(form_data, okta_user_id_in_form_data):
@@ -384,16 +386,19 @@ def save_secret():
                     return {"updated": False, "error": "Update Failed !!!"}, 500
             else:
                 return {"updated": False, "error": SECRET_KEY_KEY_IN_REQUEST_FORM + " is in invalid format. Try another one."}, 500
+        elif form_data[SECRET_NAME] is None or not form_data[SECRET_NAME]:
+            return {'error': "Secret Name is missing"}, 400
         elif form_data[SECRET_KEY] is None or not form_data[SECRET_KEY]: # if secret key is empty or key itself is not there
-            return {'error': "admin Secret is missing"}, 400
+            return {'error': "Admin Secret is missing"}, 400
         elif form_data[OKTA_USER_ID] is None or not form_data[OKTA_USER_ID]:
             return {'error': "Okta User ID is missing"}, 400
     else:
-        form_data = db_obj.parse_form_data(request)
+        neededOktaUserIDinRequestForm = False
+        form_data = db_obj.parse_form_data(request, neededOktaUserIDinRequestForm)
         token_info = g.get('user')
         logged_in_Okta_user_id = token_info['sub']
         # if AUTHORIZE_CLAIM_NAME in token_info and token_info[AUTHORIZE_CLAIM_NAME] and form_data[SECRET_KEY]:
-        if form_data[SECRET_KEY]:
+        if form_data[SECRET_NAME] and form_data[SECRET_KEY]:
             if secret_obj.is_secret_valid(form_data[SECRET_KEY]):
                 # if db_obj.update_secret(form_data, logged_in_Okta_user_id, CONNECTION_OBJECT):
                 if db_obj.update_secret(form_data, logged_in_Okta_user_id):
@@ -402,8 +407,10 @@ def save_secret():
                     return {"updated": False, "error": "Update Failed !!!"}, 500
             else:
                 return {"updated": False, "error": SECRET_KEY_KEY_IN_REQUEST_FORM + " is in invalid format. Try another one."}, 500
+        elif form_data[SECRET_NAME] is None or not form_data[SECRET_NAME]:
+            return {'error': "Secret Name is missing"}, 400
         elif form_data[SECRET_KEY] is None or not form_data[SECRET_KEY]:
-            return {'error': "'adminSecret' is missing"}, 400
+            return {'error': "Admin Secret is missing"}, 400
         # else:
         #     return {'error': 'UnAuthorized !!!'}, 403
 

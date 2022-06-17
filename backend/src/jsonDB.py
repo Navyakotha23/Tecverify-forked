@@ -5,7 +5,7 @@ from genericDB import Generic_DB
 
 class JSON_DB(Generic_DB):
 
-    def __init__(self, file: str, crypt_obj, AUTOSAVED_SECRET_USERNAME_HEAD, SECRET_NAME, SECRET_KEY, OKTA_USER_ID, SECRET_ID, SECRET_UPDATED_AT, OKTA_FACTOR_ID, SECRET_NAME_KEY_IN_REQUEST_FORM, SECRET_KEY_KEY_IN_REQUEST_FORM, SHOW_LOGS) -> None:
+    def __init__(self, file: str, crypt_obj, AUTOSAVED_SECRET_USERNAME_HEAD, SECRET_NAME, SECRET_KEY, OKTA_USER_ID, SECRET_ID, SECRET_UPDATED_AT, OKTA_FACTOR_ID, SECRET_NAME_KEY_IN_REQUEST_FORM, SECRET_KEY_KEY_IN_REQUEST_FORM, OKTA_USER_ID_KEY_IN_REQUEST_FORM, SHOW_LOGS) -> None:
         self.file = file
         self.crypt_obj = crypt_obj
         self.auto_saved_secret_username_head = AUTOSAVED_SECRET_USERNAME_HEAD
@@ -17,6 +17,7 @@ class JSON_DB(Generic_DB):
         self.okta_factor_id = OKTA_FACTOR_ID
         self.secret_name_KEY_in_request_form = SECRET_NAME_KEY_IN_REQUEST_FORM
         self.secret_key_KEY_in_request_form = SECRET_KEY_KEY_IN_REQUEST_FORM
+        self.okta_user_id_KEY_in_request_form = OKTA_USER_ID_KEY_IN_REQUEST_FORM
         self.show_logs = SHOW_LOGS
 
     def create_empty_json_file(self) -> bool:

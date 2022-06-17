@@ -4,7 +4,7 @@ from genericDB import Generic_DB
 
 class MSSQL_DB(Generic_DB):
 
-    def __init__(self, crypt_obj, MS_SQL_SERVER, MS_SQL_USERNAME, MS_SQL_PASSWORD, DATABASE_NAME, TABLE_NAME, AUTOSAVED_SECRET_USERNAME_HEAD, SECRET_NAME, SECRET_KEY, OKTA_USER_ID, SECRET_ID, SECRET_UPDATED_AT, OKTA_FACTOR_ID, SECRET_NAME_KEY_IN_REQUEST_FORM, SECRET_KEY_KEY_IN_REQUEST_FORM, SHOW_LOGS) -> None:
+    def __init__(self, crypt_obj, MS_SQL_SERVER, MS_SQL_USERNAME, MS_SQL_PASSWORD, DATABASE_NAME, TABLE_NAME, AUTOSAVED_SECRET_USERNAME_HEAD, SECRET_NAME, SECRET_KEY, OKTA_USER_ID, SECRET_ID, SECRET_UPDATED_AT, OKTA_FACTOR_ID, SECRET_NAME_KEY_IN_REQUEST_FORM, SECRET_KEY_KEY_IN_REQUEST_FORM, OKTA_USER_ID_KEY_IN_REQUEST_FORM, SHOW_LOGS) -> None:
         self.crypt_obj = crypt_obj
         self.ms_sql_server = MS_SQL_SERVER
         self.ms_sql_username = MS_SQL_USERNAME
@@ -20,6 +20,7 @@ class MSSQL_DB(Generic_DB):
         self.okta_factor_id = OKTA_FACTOR_ID
         self.secret_name_KEY_in_request_form = SECRET_NAME_KEY_IN_REQUEST_FORM
         self.secret_key_KEY_in_request_form = SECRET_KEY_KEY_IN_REQUEST_FORM
+        self.okta_user_id_KEY_in_request_form = OKTA_USER_ID_KEY_IN_REQUEST_FORM
         self.show_logs = SHOW_LOGS
     
     def establish_db_connection(self):

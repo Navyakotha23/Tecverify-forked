@@ -109,25 +109,20 @@ class Generic_DB(metaclass=abc.ABCMeta):
         pass            
         
 
-    def parse_form_data(self, request):
+    def parse_form_data(self, request, neededOktaUserIDinRequestForm):
         """
-        This method parse form data and returns SecretName and SecretKey
+        If idToken is there in Headers then this method parses form-data and returns SecretName, SecretKey
+        Else this method expects oktaUserId in form-data to parse it and return SecretName, SecretKey and OktaUserId
         """
-        print("request: ", request)
-        print("request.form:", request.form)
+        # print("request: ", request)
+        # print("request.form:", request.form)
         secret_name_VALUE_in_request_form = request.form[self.secret_name_KEY_in_request_form] if self.secret_name_KEY_in_request_form in request.form else None
         secret_key_VALUE_in_request_form = request.form[self.secret_key_KEY_in_request_form] if self.secret_key_KEY_in_request_form in request.form else None
-        return {self.secret_name: secret_name_VALUE_in_request_form, self.secret_key: secret_key_VALUE_in_request_form}
-
-
-    def parse_form_data_for_okta_userid(self, request):
-        """
-        This method parse form data and returns SecretName, SecretKey and OktaUserId
-        """
-        secret_name_VALUE_in_request_form = request.form[self.secret_name_KEY_in_request_form] if self.secret_name_KEY_in_request_form in request.form else None
-        secret_key_VALUE_in_request_form = request.form[self.secret_key_KEY_in_request_form] if self.secret_key_KEY_in_request_form in request.form else None
-        okta_user_id_in_request_form = request.form[self.okta_user_id] if self.okta_user_id in request.form else None
-        return {self.secret_name: secret_name_VALUE_in_request_form, self.secret_key: secret_key_VALUE_in_request_form, self.okta_user_id: okta_user_id_in_request_form}
+        if not neededOktaUserIDinRequestForm:
+            return {self.secret_name: secret_name_VALUE_in_request_form, self.secret_key: secret_key_VALUE_in_request_form}
+        else:
+            okta_user_id_VALUE_in_request_form = request.form[self.okta_user_id_KEY_in_request_form] if self.okta_user_id_KEY_in_request_form in request.form else None
+            return {self.secret_name: secret_name_VALUE_in_request_form, self.secret_key: secret_key_VALUE_in_request_form, self.okta_user_id: okta_user_id_VALUE_in_request_form}
 
 
     
