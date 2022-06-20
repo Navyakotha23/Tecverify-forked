@@ -401,14 +401,18 @@ def save_secret_byTakingOktaUserIDfromRequestForm():
     print("notProtectedByIdToken_saveSecret API")
     neededOktaUserIDinRequestForm = True
     form_data = db_obj.parse_form_data(request, neededOktaUserIDinRequestForm)
-    okta_user_id_in_form_data = form_data[OKTA_USER_ID]
     if form_data[SECRET_NAME] and form_data[SECRET_KEY] and form_data[OKTA_USER_ID]:
         if secret_obj.is_secret_valid(form_data[SECRET_KEY]):
-            # if db_obj.manual_save_secret(form_data, okta_user_id_in_form_data, CONNECTION_OBJECT):
-            if db_obj.manual_save_secret(form_data, okta_user_id_in_form_data):
-                return {"updated": True}, 200
+            okta_user_id_in_form_data = form_data[OKTA_USER_ID]
+            get_user_response = okta_obj.call_get_user_API(okta_user_id_in_form_data)
+            if get_user_response.status_code == 200:
+                # if db_obj.manual_save_secret(form_data, okta_user_id_in_form_data, CONNECTION_OBJECT):
+                if db_obj.manual_save_secret(form_data, okta_user_id_in_form_data):
+                    return {"updated": True}, 200
+                else:
+                    return {"updated": False, "error": "Update Failed !!!"}, 500
             else:
-                return {"updated": False, "error": "Update Failed !!!"}, 500
+                return okta_obj.get_user(okta_user_id_in_form_data)
         else:
             return {"updated": False, "error": SECRET_KEY_KEY_IN_REQUEST_FORM + " is in invalid format. Try another one."}, 500
     elif form_data[SECRET_NAME] is None or not form_data[SECRET_NAME]:

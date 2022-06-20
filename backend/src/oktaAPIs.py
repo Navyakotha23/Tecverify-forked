@@ -178,3 +178,35 @@ class OktaAPIs:
             return {"errorSummary": "Current user is not in the group for which API token is generated. So, cannot get the Factor."},400
     
     
+    def call_get_user_API(self, oktaUid):
+        """
+        This method makes Get User API call to Okta with OktaUserID and returns Okta API response.
+        """
+        url = self.issuer + "/api/v1/users/" + oktaUid
+        headers={'Content-Type':'application/json', 'Authorization': 'SSWS {}'.format(self.tecverify_api_key)}
+        response = requests.get(url, headers=headers)
+        return response
+
+    def get_user(self, oktaUid):
+        """
+        This method makes Get User API call to Okta and returns custom response.
+        """
+        get_user_response = self.call_get_user_API(oktaUid)
+        if get_user_response.status_code == 200:
+            print("Got the User with the given Okta User ID.")
+            return {"SUCCESS": "Got the User with the given Okta User ID."}, 200
+        elif get_user_response.status_code == 404:
+            if get_user_response.json()['errorCode'] == "E0000007":
+                print("Not found: Resource not found with the given Okta User ID.")
+            return {"errorSummary": "Invalid Okta User ID provided. So, cannot get the User."}, 400
+        elif get_user_response.status_code == 401:
+            if get_user_response.json()['errorCode'] == "E0000011":
+                print("API token provided is invalid. So, cannot get the User.")
+            return {"errorSummary": "Invalid API token provided. So, cannot get the User."}, 400
+        elif get_user_response.status_code == 403:
+            if get_user_response.json()['errorCode'] == "E0000006":
+                print("This user is not in the group for which API token is generated. So, cannot get the User.")
+            return {"errorSummary": "Current user is not in the group for which API token is generated. So, cannot get the User."},400
+    
+
+    
