@@ -71,8 +71,8 @@ class JSON_DB(Generic_DB):
         return self.write(secrets_list)
 
 
-    def update_secret(self, form_data, okta_logged_in_user_id) -> bool:
-        form_data = self.prepare_secret_dictionary_for_update_secret(form_data, okta_logged_in_user_id)
+    def manual_save_secret(self, form_data, okta_logged_in_user_id) -> bool:
+        form_data = self.prepare_secret_dictionary_for_manual_save_secret(form_data, okta_logged_in_user_id)
         secrets_list = self.read()
         secrets_list.append(form_data)
         return self.write(secrets_list)

@@ -77,7 +77,7 @@ class Generic_DB(metaclass=abc.ABCMeta):
         pass
             
 
-    def prepare_secret_dictionary_for_update_secret(self, form_data, okta_logged_in_user_id):
+    def prepare_secret_dictionary_for_manual_save_secret(self, form_data, okta_logged_in_user_id):
         """
         This method prepares Secret from the form data received
         """
@@ -92,7 +92,7 @@ class Generic_DB(metaclass=abc.ABCMeta):
 
 
     @abc.abstractmethod
-    def update_secret(self, form_data, okta_logged_in_user_id) -> bool:
+    def manual_save_secret(self, form_data, okta_logged_in_user_id) -> bool:
         """
         This method manually saves secret into the database from the form data received.
         """

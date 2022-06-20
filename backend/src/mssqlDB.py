@@ -142,20 +142,20 @@ class MSSQL_DB(Generic_DB):
         self.write(secretInfo)
 
 
-    # def update_secret(self, form_data, okta_logged_in_user_id, connObj) -> bool:
-    def update_secret(self, form_data, okta_logged_in_user_id) -> bool:
+    # def manual_save_secret(self, form_data, okta_logged_in_user_id, connObj) -> bool:
+    def manual_save_secret(self, form_data, okta_logged_in_user_id) -> bool:
         # secrets_list = self.read(connObj)
-        form_data = self.prepare_secret_dictionary_for_update_secret(form_data, okta_logged_in_user_id)
+        form_data = self.prepare_secret_dictionary_for_manual_save_secret(form_data, okta_logged_in_user_id)
         return self.write(form_data)
 
 
-    def destroy_db_connection(self, connObj):
-        """
-        This method destroys connection with the database server
-        """
-        try:
-            connObj.close()
-            return True
-        except Exception as e:
-            print("\nERROR in destroy_db_connection(): ", e)
-            return False
+    # def destroy_db_connection(self, connObj):
+    #     """
+    #     This method destroys connection with the database server
+    #     """
+    #     try:
+    #         connObj.close()
+    #         return True
+    #     except Exception as e:
+    #         print("\nERROR in destroy_db_connection(): ", e)
+    #         return False

@@ -158,12 +158,13 @@ def check_token_header():
         return {}, 200
     if SWAGGER_URL not in request.url:
         if TOKEN not in request.headers:
-            if 'secret' in request.url and request.method == 'POST':
+            if 'notProtectedByIdToken_saveSecret' in request.url and request.method == 'POST':
                 # print("request.url: ", request.url)
                 # print("request.method: ", request.method)
                 g.tokenHeaderMissing = True
             else:
-                return {'error': 'Required Headers missing.'}, 400
+                # return {'error': 'Required Headers missing.'}, 400
+                return {'error': 'idToken is missing.'}, 400
         elif request.headers[TOKEN] == '':
             return {'error': "The 'token' parameter can't be empty"}, 400
         elif request.headers[TOKEN]:
@@ -372,47 +373,50 @@ def generate_random_secret():
 @limiter.limit(RATE_LIMIT)
 def save_secret():
     print("Save Secret API")
-    tokenMissing = g.get('tokenHeaderMissing')
-    if tokenMissing:
-        neededOktaUserIDinRequestForm = True
-        form_data = db_obj.parse_form_data(request, neededOktaUserIDinRequestForm)
-        okta_user_id_in_form_data = form_data[OKTA_USER_ID]
-        if form_data[SECRET_NAME] and form_data[SECRET_KEY] and form_data[OKTA_USER_ID]:
-            if secret_obj.is_secret_valid(form_data[SECRET_KEY]):
-                # if db_obj.update_secret(form_data, okta_user_id_in_form_data, CONNECTION_OBJECT):
-                if db_obj.update_secret(form_data, okta_user_id_in_form_data):
-                    return {"updated": True}, 200
-                else:
-                    return {"updated": False, "error": "Update Failed !!!"}, 500
+    neededOktaUserIDinRequestForm = False
+    form_data = db_obj.parse_form_data(request, neededOktaUserIDinRequestForm)
+    token_info = g.get('user')
+    logged_in_Okta_user_id = token_info['sub']
+    # if AUTHORIZE_CLAIM_NAME in token_info and token_info[AUTHORIZE_CLAIM_NAME] and form_data[SECRET_KEY]:
+    if form_data[SECRET_NAME] and form_data[SECRET_KEY]:
+        if secret_obj.is_secret_valid(form_data[SECRET_KEY]):
+            # if db_obj.manual_save_secret(form_data, logged_in_Okta_user_id, CONNECTION_OBJECT):
+            if db_obj.manual_save_secret(form_data, logged_in_Okta_user_id):
+                return {"updated": True}, 200
             else:
-                return {"updated": False, "error": SECRET_KEY_KEY_IN_REQUEST_FORM + " is in invalid format. Try another one."}, 500
-        elif form_data[SECRET_NAME] is None or not form_data[SECRET_NAME]:
-            return {'error': "Secret Name is missing"}, 400
-        elif form_data[SECRET_KEY] is None or not form_data[SECRET_KEY]: # if secret key is empty or key itself is not there
-            return {'error': "Admin Secret is missing"}, 400
-        elif form_data[OKTA_USER_ID] is None or not form_data[OKTA_USER_ID]:
-            return {'error': "Okta User ID is missing"}, 400
-    else:
-        neededOktaUserIDinRequestForm = False
-        form_data = db_obj.parse_form_data(request, neededOktaUserIDinRequestForm)
-        token_info = g.get('user')
-        logged_in_Okta_user_id = token_info['sub']
-        # if AUTHORIZE_CLAIM_NAME in token_info and token_info[AUTHORIZE_CLAIM_NAME] and form_data[SECRET_KEY]:
-        if form_data[SECRET_NAME] and form_data[SECRET_KEY]:
-            if secret_obj.is_secret_valid(form_data[SECRET_KEY]):
-                # if db_obj.update_secret(form_data, logged_in_Okta_user_id, CONNECTION_OBJECT):
-                if db_obj.update_secret(form_data, logged_in_Okta_user_id):
-                    return {"updated": True}, 200
-                else:
-                    return {"updated": False, "error": "Update Failed !!!"}, 500
+                return {"updated": False, "error": "Update Failed !!!"}, 500
+        else:
+            return {"updated": False, "error": SECRET_KEY_KEY_IN_REQUEST_FORM + " is in invalid format. Try another one."}, 500
+    elif form_data[SECRET_NAME] is None or not form_data[SECRET_NAME]:
+        return {'error': "Secret Name is missing"}, 400
+    elif form_data[SECRET_KEY] is None or not form_data[SECRET_KEY]:
+        return {'error': "Admin Secret is missing"}, 400
+    # else:
+    #     return {'error': 'UnAuthorized !!!'}, 403
+
+
+@app.route('/api/v1/notProtectedByIdToken_saveSecret', methods=['POST'])
+@limiter.limit(RATE_LIMIT)
+def save_secret_byTakingOktaUserIDfromRequestForm():
+    print("notProtectedByIdToken_saveSecret API")
+    neededOktaUserIDinRequestForm = True
+    form_data = db_obj.parse_form_data(request, neededOktaUserIDinRequestForm)
+    okta_user_id_in_form_data = form_data[OKTA_USER_ID]
+    if form_data[SECRET_NAME] and form_data[SECRET_KEY] and form_data[OKTA_USER_ID]:
+        if secret_obj.is_secret_valid(form_data[SECRET_KEY]):
+            # if db_obj.manual_save_secret(form_data, okta_user_id_in_form_data, CONNECTION_OBJECT):
+            if db_obj.manual_save_secret(form_data, okta_user_id_in_form_data):
+                return {"updated": True}, 200
             else:
-                return {"updated": False, "error": SECRET_KEY_KEY_IN_REQUEST_FORM + " is in invalid format. Try another one."}, 500
-        elif form_data[SECRET_NAME] is None or not form_data[SECRET_NAME]:
-            return {'error': "Secret Name is missing"}, 400
-        elif form_data[SECRET_KEY] is None or not form_data[SECRET_KEY]:
-            return {'error': "Admin Secret is missing"}, 400
-        # else:
-        #     return {'error': 'UnAuthorized !!!'}, 403
+                return {"updated": False, "error": "Update Failed !!!"}, 500
+        else:
+            return {"updated": False, "error": SECRET_KEY_KEY_IN_REQUEST_FORM + " is in invalid format. Try another one."}, 500
+    elif form_data[SECRET_NAME] is None or not form_data[SECRET_NAME]:
+        return {'error': "Secret Name is missing"}, 400
+    elif form_data[SECRET_KEY] is None or not form_data[SECRET_KEY]: # if secret key is empty or key itself is not there
+        return {'error': "Admin Secret is missing"}, 400
+    elif form_data[OKTA_USER_ID] is None or not form_data[OKTA_USER_ID]:
+        return {'error': "Okta User ID is missing"}, 400
 
 
 if __name__ == '__main__':
