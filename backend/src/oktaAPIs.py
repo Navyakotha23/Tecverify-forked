@@ -3,10 +3,10 @@ import json
 
 class OktaAPIs:
 
-    def __init__(self, CLIENT_ID, ISSUER, AUTHORIZING_TOKEN, AUTHORIZE_CLAIM_NAME, TECVERIFY_API_KEY, SHOW_LOGS) -> None:
+    def __init__(self, CLIENT_ID, ISSUER, TOKEN_TYPE_HINT, AUTHORIZE_CLAIM_NAME, TECVERIFY_API_KEY, SHOW_LOGS) -> None:
         self.client_id = CLIENT_ID
         self.issuer = ISSUER
-        self.authorizing_token = AUTHORIZING_TOKEN
+        self.token_type_hint = TOKEN_TYPE_HINT
         self.authorizing_claim = AUTHORIZE_CLAIM_NAME
         self.tecverify_api_key = TECVERIFY_API_KEY
         self.show_logs = SHOW_LOGS
@@ -27,7 +27,7 @@ class OktaAPIs:
         This method makes an introspect api call to Okta with token and returns Okta API response.
         """
         url = self.issuer + "/oauth2/v1/introspect?client_id=" + self.client_id
-        body = {'token': token, 'token_type_hint': self.authorizing_token}
+        body = {'token': token, 'token_type_hint': self.token_type_hint}
         response = requests.post(url, data=body)   
         return response
     

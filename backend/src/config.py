@@ -4,12 +4,12 @@ import os
 CLIENT_ID = os.environ.get("CLIENT_ID", default="0oa164ptl0ySnZSb50h8")
 ISSUER = os.environ.get("ISSUER", default="https://tecnics-demo.oktapreview.com")
 CLAIM_NAME = os.environ.get("AUTHORIZE_CLAIM_NAME", default="Admin")
-AUTHORIZING_TOKEN = os.environ.get("AUTHORIZE_TOKEN_TYPE", default="id_token")
+AUTHORIZE_TOKEN_TYPE = os.environ.get("AUTHORIZE_TOKEN_TYPE", default="accessToken")
 # These are for introspect API call.
-if AUTHORIZING_TOKEN.lower() == "idtoken":
-    AUTHORIZING_TOKEN = "id_token" # If we pass idToken then token_type_hint should be id_token
-elif AUTHORIZING_TOKEN.lower() == "accesstoken":
-    AUTHORIZING_TOKEN = "token" # If we pass accessToken then token_type_hint should be token
+if AUTHORIZE_TOKEN_TYPE.lower() == "idtoken":
+    TOKEN_TYPE_HINT = "id_token" # If we pass idToken then token_type_hint should be id_token
+elif AUTHORIZE_TOKEN_TYPE.lower() == "accesstoken":
+    TOKEN_TYPE_HINT = "token" # If we pass accessToken then token_type_hint should be token
 ENCRYPTED_API_KEY = os.environ.get("ENCRYPTED_API_KEY")
 # ENCRYPTED_API_KEY = os.environ.get("ENCRYPTED_API_KEY", default = 'b\'C\\xb5\\x02M\\x10N\\x80\\xd0O\\xc8z\\xabV>\\x9aW\\xb5\\x17c&N\\x95\\x92\\xb7&t@Y\\xa9\\xf5"]\\xa0\\xd4]\\x9f\\xc6\\xfct\\xb9\\xefYWy\\x86_^\\123\'')
 API_KEY_SALT = os.environ.get("API_KEY_SALT", default="12345678")

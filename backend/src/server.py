@@ -26,7 +26,8 @@ CORS(app)
 CLIENT_ID = app.config['CLIENT_ID']
 ISSUER = app.config['ISSUER']
 AUTHORIZE_CLAIM_NAME = app.config['CLAIM_NAME']
-AUTHORIZING_TOKEN = app.config['AUTHORIZING_TOKEN']
+AUTHORIZE_TOKEN_TYPE = app.config['AUTHORIZE_TOKEN_TYPE']
+TOKEN_TYPE_HINT = app.config['TOKEN_TYPE_HINT']
 ENCRYPTED_API_KEY = app.config['ENCRYPTED_API_KEY']
 API_KEY_SALT = app.config['API_KEY_SALT']
 
@@ -72,7 +73,7 @@ elif(DATABASE_TYPE == "mssql"):
 
 totp_obj = TOTP_Generator(crypt_obj, SECRET_NAME, SECRET_KEY, OKTA_USER_ID, SECRET_ID, SECRET_UPDATED_AT, SHOW_LOGS)
 secret_obj = SecretKey_Generator()
-okta_obj = OktaAPIs(CLIENT_ID, ISSUER, AUTHORIZING_TOKEN, AUTHORIZE_CLAIM_NAME, DECRYPTED_API_KEY, SHOW_LOGS)
+okta_obj = OktaAPIs(CLIENT_ID, ISSUER, TOKEN_TYPE_HINT, AUTHORIZE_CLAIM_NAME, DECRYPTED_API_KEY, SHOW_LOGS)
 
 # Begin Rate Limiter
 def construct_rate_limit():
@@ -164,14 +165,33 @@ def check_token_header():
                 g.tokenHeaderMissing = True
             else:
                 # return {'error': 'Required Headers missing.'}, 400
-                return {'error': 'idToken is missing.'}, 400
+                return {'error': 'Token is missing in headers.'}, 400
         elif request.headers[TOKEN] == '':
             return {'error': "The 'token' parameter can't be empty"}, 400
         elif request.headers[TOKEN]:
             is_token_valid, token_info = okta_obj.introspect_token(request.headers[TOKEN])
             if not is_token_valid:
                 return {'error': 'Invalid Token', 'info': token_info}, 403
-            g.user = token_info    
+            g.user = token_info   
+            g.loggedInUserName = token_info['username'].split('@', 1)[0] 
+            # print("token_info.keys(): ", token_info.keys())
+            if AUTHORIZE_TOKEN_TYPE.lower() == "idtoken":
+                if token_info['aud'] == CLIENT_ID:
+                    g.loggedInOktaUserId = token_info['sub']
+                else:
+                    if 'deleteTOTPfactorIfEnrolledFromOktaVerify' in request.url and request.method == 'DELETE':
+                        g.errorOccured = "AUTHORIZE_TOKEN_TYPE is idToken in BE but accessToken is passed from FE. AUTHORIZE_TOKEN_TYPE should be same in both FE and BE."
+                    else:
+                        return {'error': 'AUTHORIZE_TOKEN_TYPE is idToken in BE but accessToken is passed from FE. AUTHORIZE_TOKEN_TYPE should be same in both FE and BE.'}, 400
+            elif AUTHORIZE_TOKEN_TYPE.lower() == "accesstoken":
+                if 'client_id' in token_info.keys():
+                    g.loggedInOktaUserId = token_info['uid']
+                else:
+                    if 'deleteTOTPfactorIfEnrolledFromOktaVerify' in request.url and request.method == 'DELETE':
+                        g.errorOccured = "AUTHORIZE_TOKEN_TYPE is accessToken in BE but idToken is passed from FE. AUTHORIZE_TOKEN_TYPE should be same in both FE and BE."
+                    else:
+                        return {'error': 'AUTHORIZE_TOKEN_TYPE is accessToken in BE but idToken is passed from FE. AUTHORIZE_TOKEN_TYPE should be same in both FE and BE.'}, 400
+
 
 @app.after_request
 def logging_after_request(response):
@@ -190,15 +210,20 @@ def logging_after_request(response):
     print("----------End request----------\n\n\n")
     return response
 
+
 # TecVerify EndPoints Begin
 
 @app.route('/api/v1/deleteTOTPfactorIfEnrolledFromOktaVerify', methods=['DELETE'])
 @limiter.limit(RATE_LIMIT)
 def checkIfAlreadyEnrolledToOktaVerify():
     print("deleteTOTPfactorIfEnrolledFromOktaVerify API")
-    token_info = g.get('user')
-    logged_in_Okta_user_id = token_info['sub']
+    # token_info = g.get('user')
+    logged_in_Okta_user_id = g.get('loggedInOktaUserId')
 
+    # This is for showing alert in FE.
+    if g.get('errorOccured'):
+        return {"errorSummary": g.get('errorOccured')}, 400
+    
     secrets_list = db_obj.read()
     usersAutoEnrolledFromTecVerify = 0
     usersAutoEnrolledFromTecVerify_excludingLoginUser = 0
@@ -254,8 +279,8 @@ def checkIfAlreadyEnrolledToOktaVerify():
 @limiter.limit(RATE_LIMIT)
 def deleteSecretIfTOTPfactorIsInactive():
     print("deleteSecretIfTOTPfactorIsDeletedInOkta API")
-    token_info = g.get('user')
-    logged_in_Okta_user_id = token_info['sub']
+    # token_info = g.get('user')
+    logged_in_Okta_user_id = g.get('loggedInOktaUserId')
 
     secrets_list = db_obj.read()
 
@@ -278,9 +303,9 @@ def deleteSecretIfTOTPfactorIsInactive():
 @limiter.limit(RATE_LIMIT)
 def enrollToTecVerify():
     print("autoEnroll API")
-    token_info = g.get('user')
-    logged_in_Okta_user_id = token_info['sub']
-    logged_in_username = token_info['username'].split('@', 1)[0]
+    # token_info = g.get('user')
+    logged_in_Okta_user_id = g.get('loggedInOktaUserId')
+    logged_in_username = g.get('loggedInUserName')
     enroll_response = okta_obj.call_enroll_okta_verify_TOTP_factor_API(logged_in_Okta_user_id)
     enroll_info = enroll_response.json()
 
@@ -299,8 +324,8 @@ def enrollToTecVerify():
 @limiter.limit(RATE_LIMIT)
 def get_totp():
     print("TOTP API")
-    token_info = g.get('user')
-    logged_in_Okta_user_id = token_info['sub']
+    # token_info = g.get('user')
+    logged_in_Okta_user_id = g.get('loggedInOktaUserId')
     # if AUTHORIZE_CLAIM_NAME in token_info:
     secrets_list = db_obj.read()             
     totp_list = totp_obj.generate_totp_for_login_user(secrets_list, logged_in_Okta_user_id)
@@ -313,7 +338,7 @@ def get_totp():
 @limiter.limit(RATE_LIMIT)
 def delete_secret(secret_id):
     print("Delete Secret API")
-    token_info = g.get('user')
+    # token_info = g.get('user')
     # if AUTHORIZE_CLAIM_NAME in token_info and token_info[AUTHORIZE_CLAIM_NAME]:
     deleteManuallySavedSecret = False
     deleteAutoSavedSecret = False
@@ -362,7 +387,7 @@ def delete_secret(secret_id):
 @limiter.limit(RATE_LIMIT)
 def generate_random_secret():
     print("Generate Secret API")
-    token_info = g.get('user')
+    # token_info = g.get('user')
     # if AUTHORIZE_CLAIM_NAME in token_info and token_info[AUTHORIZE_CLAIM_NAME]:
     return secret_obj.generate_secret()
     # else:
@@ -375,8 +400,8 @@ def save_secret():
     print("Save Secret API")
     neededOktaUserIDinRequestForm = False
     form_data = db_obj.parse_form_data(request, neededOktaUserIDinRequestForm)
-    token_info = g.get('user')
-    logged_in_Okta_user_id = token_info['sub']
+    # token_info = g.get('user')
+    logged_in_Okta_user_id = g.get('loggedInOktaUserId')
     # if AUTHORIZE_CLAIM_NAME in token_info and token_info[AUTHORIZE_CLAIM_NAME] and form_data[SECRET_KEY]:
     if form_data[SECRET_NAME] and form_data[SECRET_KEY]:
         if secret_obj.is_secret_valid(form_data[SECRET_KEY]):

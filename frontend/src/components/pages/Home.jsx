@@ -52,7 +52,8 @@ const Home = () => {
         addButtonStatus = config.SHOW_ADD_SECRET_BUTTON === undefined || config.SHOW_ADD_SECRET_BUTTON === true;
         deleteIconStatus = config.SHOW_DELETE_ICON === undefined || config.SHOW_DELETE_ICON === true;
         copyIconStatus = config.COPY_TO_CLIPBOARD_BUTTON === undefined || config.COPY_TO_CLIPBOARD_BUTTON === true;
-        if (oktaTokenStorage && oktaTokenStorage[authorizeTokenType] && oktaTokenStorage['accessToken']) 
+        
+        if (oktaTokenStorage && oktaTokenStorage['idToken'] && oktaTokenStorage['accessToken']) 
         {
             if(oktaTokenStorage[authorizeTokenType][authorizeTokenType] && !checkEnrollmentStatus) 
             {
