@@ -11,10 +11,11 @@ from mssqlDB import MSSQL_DB
 
 from constants import Constants
 from envVars import EnvVars
+# from test_be_swagger import BE_SWAGGER
 
 import requests
-from flask_swagger_ui import get_swaggerui_blueprint
 from flask import Flask, request, g, jsonify
+from flask_swagger_ui import get_swaggerui_blueprint
 from flask_cors import CORS
 from flask_limiter import Limiter
 from flask_limiter.util import get_remote_address
@@ -36,6 +37,8 @@ elif(EnvVars.DATABASE_TYPE == "mssql"):
 totp_obj = TOTP_Generator(crypt_obj, EnvVars.SHOW_LOGS)
 secret_obj = SecretKey_Generator()
 okta_obj = OktaAPIs(DECRYPTED_API_KEY)
+
+
 
 # Begin Rate Limiter
 def construct_rate_limit():
@@ -90,11 +93,14 @@ app.logger.info(app.config)
 # end logger specifc
 
 # swagger specific #
-SWAGGER_URL = '/docs'
 SWAGGER_FILE = '/static/docs.json'
-SWAGGERUI_BLUEPRINT = get_swaggerui_blueprint(SWAGGER_URL, SWAGGER_FILE)
+SWAGGERUI_BLUEPRINT = get_swaggerui_blueprint(Constants.SWAGGER_URL, SWAGGER_FILE)
 app.register_blueprint(SWAGGERUI_BLUEPRINT)
 # end swagger specific #
+
+# swagger_obj = BE_SWAGGER()
+# swagger_obj.prepare_swagger_UI_for_BE()
+
 
 
 # CONNECTION_OBJECT = db_obj.establish_db_connection()
@@ -107,7 +113,7 @@ def check_token_header():
     print("\n\n\n----------Start request----------")
     if request.method == Constants.OPTIONS:
         return {}, 200
-    if SWAGGER_URL not in request.url:
+    if Constants.SWAGGER_URL not in request.url:
         if Constants.TOKEN not in request.headers:
             if 'notProtectedByIdToken_saveSecret' in request.url and request.method == Constants.POST:
                 # print("request.url: ", request.url)
@@ -123,7 +129,7 @@ def check_token_header():
             if not is_token_valid:
                 return {'error': 'Invalid Token', 'info': token_info}, 403
             g.user = token_info   
-            g.loggedInUserName = token_info['username'].split('@', 1)[0] 
+            g.loggedInUserName = token_info[Constants.USERNAME].split('@', 1)[0] 
             # print("token_info.keys(): ", token_info.keys())
             if EnvVars.AUTHORIZE_TOKEN_TYPE.lower() == Constants.ID_TOKEN:
                 if token_info[Constants.AUD] == EnvVars.CLIENT_ID:

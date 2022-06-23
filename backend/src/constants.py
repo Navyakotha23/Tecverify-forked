@@ -1,4 +1,6 @@
 class Constants:
+    SWAGGER_URL = '/docs'
+
     TOKEN = "token"
     ID_TOKEN = "idtoken"
     ACCESS_TOKEN = "accesstoken"
@@ -13,6 +15,7 @@ class Constants:
     CLIENT_ID = 'client_id'
     UID = 'uid'
     ID = 'id'
+    USERNAME = 'username'
     EMBEDDED = '_embedded'
     ACTIVATION = 'activation'
     SHARED_SECRET = 'sharedSecret'

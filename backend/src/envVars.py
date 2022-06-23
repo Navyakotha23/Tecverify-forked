@@ -6,7 +6,6 @@ class EnvVars:
     app = Flask(__name__)
     app.config.from_pyfile('config.py')
 
-
     # Okta 
     CLIENT_ID = app.config['CLIENT_ID']
     ISSUER = app.config['ISSUER']
