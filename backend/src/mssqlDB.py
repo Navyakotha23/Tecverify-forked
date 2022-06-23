@@ -1,60 +1,45 @@
 import pymssql
 
 from genericDB import Generic_DB
+from envVars import EnvVars
 
 class MSSQL_DB(Generic_DB):
 
-    def __init__(self, crypt_obj, MS_SQL_SERVER, MS_SQL_USERNAME, MS_SQL_PASSWORD, DATABASE_NAME, TABLE_NAME, AUTOSAVED_SECRET_USERNAME_HEAD, SECRET_NAME, SECRET_KEY, OKTA_USER_ID, SECRET_ID, SECRET_UPDATED_AT, OKTA_FACTOR_ID, SECRET_NAME_KEY_IN_REQUEST_FORM, SECRET_KEY_KEY_IN_REQUEST_FORM, OKTA_USER_ID_KEY_IN_REQUEST_FORM, SHOW_LOGS) -> None:
+    def __init__(self, crypt_obj) -> None:
         self.crypt_obj = crypt_obj
-        self.ms_sql_server = MS_SQL_SERVER
-        self.ms_sql_username = MS_SQL_USERNAME
-        self.ms_sql_password = MS_SQL_PASSWORD
-        self.database_name = DATABASE_NAME
-        self.table_name = TABLE_NAME
-        self.auto_saved_secret_username_head = AUTOSAVED_SECRET_USERNAME_HEAD
-        self.secret_name = SECRET_NAME
-        self.secret_key = SECRET_KEY
-        self.okta_user_id = OKTA_USER_ID
-        self.secret_id = SECRET_ID
-        self.secret_updated_at = SECRET_UPDATED_AT
-        self.okta_factor_id = OKTA_FACTOR_ID
-        self.secret_name_KEY_in_request_form = SECRET_NAME_KEY_IN_REQUEST_FORM
-        self.secret_key_KEY_in_request_form = SECRET_KEY_KEY_IN_REQUEST_FORM
-        self.okta_user_id_KEY_in_request_form = OKTA_USER_ID_KEY_IN_REQUEST_FORM
-        self.show_logs = SHOW_LOGS
     
     def establish_db_connection(self):
         """
         This method establishes connection with the database server
         """
         try:
-            conn = pymssql.connect(self.ms_sql_server, self.ms_sql_username, self.ms_sql_password)
+            conn = pymssql.connect(EnvVars.MS_SQL_SERVER, EnvVars.MS_SQL_USERNAME, EnvVars.MS_SQL_PASSWORD)
             
             cursor = conn.cursor()
             conn.autocommit(True)
 
             create_db_query = '''
-                        if not exists (select * from sys.databases where name = '''"'" + self.database_name + "'"''') 
+                        if not exists (select * from sys.databases where name = '''"'" + EnvVars.DATABASE_NAME + "'"''') 
                         begin 
-                            create database ''' + self.database_name + ''' 
+                            create database ''' + EnvVars.DATABASE_NAME + ''' 
                         end
                       '''
             cursor.execute(create_db_query)
 
-            use_db_query = "use " + self.database_name
+            use_db_query = "use " + EnvVars.DATABASE_NAME
             cursor.execute(use_db_query)
 
             create_table_query = '''
-                                    if not exists (SELECT * FROM sys.tables where name = '''"'" + self.table_name + "'"''') 
+                                    if not exists (SELECT * FROM sys.tables where name = '''"'" + EnvVars.TABLE_NAME + "'"''') 
                                     begin 
-                                        CREATE TABLE ''' + self.table_name + '''
+                                        CREATE TABLE ''' + EnvVars.TABLE_NAME + '''
                                         (
-                                            ''' + self.secret_name + '''    VARCHAR(50)     NOT NULL, 
-                                            ''' + self.secret_key + '''    VARCHAR(300)    NOT NULL, 
-                                            ''' + self.okta_user_id + '''    VARCHAR(30)     NOT NULL,
-                                            ''' + self.secret_id + '''    VARCHAR(50)     NOT NULL, 
-                                            ''' + self.secret_updated_at + '''    VARCHAR(30)     NOT NULL,
-                                            ''' + self.okta_factor_id + '''    VARCHAR(30)
+                                            ''' + EnvVars.SECRET_NAME + '''    VARCHAR(50)     NOT NULL, 
+                                            ''' + EnvVars.SECRET_KEY + '''    VARCHAR(300)    NOT NULL, 
+                                            ''' + EnvVars.OKTA_USER_ID + '''    VARCHAR(30)     NOT NULL,
+                                            ''' + EnvVars.SECRET_ID + '''    VARCHAR(50)     NOT NULL, 
+                                            ''' + EnvVars.SECRET_UPDATED_AT + '''    VARCHAR(30)     NOT NULL,
+                                            ''' + EnvVars.OKTA_FACTOR_ID + '''    VARCHAR(30)
                                         )
                                     end
                                 '''
@@ -73,17 +58,17 @@ class MSSQL_DB(Generic_DB):
         try:
             # cursor = connObj.cursor()
             cursor = conn.cursor()
-            select_query = '''SELECT ''' + self.secret_name + ''', ''' + self.secret_key + ''', ''' + self.okta_user_id + ''', ''' + self.secret_id + ''', ''' + self.secret_updated_at + ''', ''' + self.okta_factor_id + ''' from ''' + self.table_name
+            select_query = '''SELECT ''' + EnvVars.SECRET_NAME + ''', ''' + EnvVars.SECRET_KEY + ''', ''' + EnvVars.OKTA_USER_ID + ''', ''' + EnvVars.SECRET_ID + ''', ''' + EnvVars.SECRET_UPDATED_AT + ''', ''' + EnvVars.OKTA_FACTOR_ID + ''' from ''' + EnvVars.TABLE_NAME
             cursor.execute(select_query)
             secrets = []
             for row in cursor:
                 secretInfo = {}
-                secretInfo[self.secret_name] = row[0]
-                secretInfo[self.secret_key] = row[1]
-                secretInfo[self.okta_user_id] = row[2]
-                secretInfo[self.secret_id] = row[3]
-                secretInfo[self.secret_updated_at] = row[4]
-                secretInfo[self.okta_factor_id] = row[5]
+                secretInfo[EnvVars.SECRET_NAME] = row[0]
+                secretInfo[EnvVars.SECRET_KEY] = row[1]
+                secretInfo[EnvVars.OKTA_USER_ID] = row[2]
+                secretInfo[EnvVars.SECRET_ID] = row[3]
+                secretInfo[EnvVars.SECRET_UPDATED_AT] = row[4]
+                secretInfo[EnvVars.OKTA_FACTOR_ID] = row[5]
                 secrets.append(secretInfo)
             # connObj.close()
             conn.close()
@@ -99,13 +84,13 @@ class MSSQL_DB(Generic_DB):
         try:
             # cursor = connObj.cursor()
             cursor = conn.cursor()
-            insert_query = '''INSERT INTO '''+ self.table_name + '''(''' + self.secret_name + ''', ''' + self.secret_key + ''', ''' + self.okta_user_id + ''', ''' + self.secret_id + ''', ''' + self.secret_updated_at + ''', ''' + self.okta_factor_id + ''') VALUES(%s, %s, %s, %s, %s, %s)'''
-            string1 = data[self.secret_name]
-            string2 = data[self.secret_key]
-            string3 = data[self.okta_user_id]
-            string4 = data[self.secret_id]
-            string5 = data[self.secret_updated_at]
-            string6 = data[self.okta_factor_id]
+            insert_query = '''INSERT INTO '''+ EnvVars.TABLE_NAME + '''(''' + EnvVars.SECRET_NAME + ''', ''' + EnvVars.SECRET_KEY + ''', ''' + EnvVars.OKTA_USER_ID + ''', ''' + EnvVars.SECRET_ID + ''', ''' + EnvVars.SECRET_UPDATED_AT + ''', ''' + EnvVars.OKTA_FACTOR_ID + ''') VALUES(%s, %s, %s, %s, %s, %s)'''
+            string1 = data[EnvVars.SECRET_NAME]
+            string2 = data[EnvVars.SECRET_KEY]
+            string3 = data[EnvVars.OKTA_USER_ID]
+            string4 = data[EnvVars.SECRET_ID]
+            string5 = data[EnvVars.SECRET_UPDATED_AT]
+            string6 = data[EnvVars.OKTA_FACTOR_ID]
             cursor.execute(insert_query, (string1, string2, string3, string4, string5, string6))
             # connObj.commit()
             conn.commit()
@@ -123,7 +108,7 @@ class MSSQL_DB(Generic_DB):
         try:
             # cursor = connObj.cursor()
             cursor = conn.cursor()
-            delete_query = '''DELETE from ''' + self.table_name + ''' where ''' + self.secret_id + ''' = %s'''
+            delete_query = '''DELETE from ''' + EnvVars.TABLE_NAME + ''' where ''' + EnvVars.SECRET_ID + ''' = %s'''
             cursor.execute(delete_query, secret_id)
             # connObj.commit()
             conn.commit()

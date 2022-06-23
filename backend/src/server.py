@@ -10,8 +10,7 @@ from jsonDB import JSON_DB
 from mssqlDB import MSSQL_DB
 
 from constants import Constants
-from test_envVars import Test_EnvVars
-from test_classConfig import Test_ClassConfig
+from envVars import EnvVars
 
 import requests
 from flask_swagger_ui import get_swaggerui_blueprint
@@ -25,59 +24,18 @@ app = Flask(__name__)
 app.config.from_pyfile('config.py')
 CORS(app)
 
+# Objects Creation 
+crypt_obj = Crypto(EnvVars.SALT)
+DECRYPTED_API_KEY = crypt_obj.decryptAPIkey(EnvVars.ENCRYPTED_API_KEY, EnvVars.API_KEY_SALT)
 
-# Get config values from file and assign
-CLIENT_ID = app.config['CLIENT_ID']
-ISSUER = app.config['ISSUER']
-AUTHORIZE_CLAIM_NAME = app.config['CLAIM_NAME']
-AUTHORIZE_TOKEN_TYPE = app.config['AUTHORIZE_TOKEN_TYPE']
-TOKEN_TYPE_HINT = app.config['TOKEN_TYPE_HINT']
-ENCRYPTED_API_KEY = app.config['ENCRYPTED_API_KEY']
-API_KEY_SALT = app.config['API_KEY_SALT']
+if(EnvVars.DATABASE_TYPE == "json"):
+    db_obj = JSON_DB(crypt_obj, EnvVars.SECRETS_FILE)
+elif(EnvVars.DATABASE_TYPE == "mssql"):
+    db_obj = MSSQL_DB(crypt_obj)
 
-
-DATABASE_TYPE = app.config['DATABASE_TYPE']
-
-SECRETS_FILE = app.config['SECRETS_FILE']
-
-MS_SQL_SERVER = app.config['MS_SQL_SERVER']
-MS_SQL_USERNAME = app.config['MS_SQL_USERNAME']
-MS_SQL_PASSWORD = app.config['MS_SQL_PASSWORD']
-DATABASE_NAME = app.config['DATABASE_NAME']
-TABLE_NAME = app.config['TABLE_NAME']
-AUTOSAVED_SECRET_USERNAME_HEAD = app.config['AUTOSAVED_SECRET_USERNAME_HEAD']
-
-SECRET_NAME = app.config['SECRET_NAME']
-SECRET_KEY = app.config['SECRET_KEY']
-OKTA_USER_ID = app.config['OKTA_USER_ID']
-SECRET_ID = app.config['SECRET_ID']
-SECRET_UPDATED_AT = app.config['SECRET_UPDATED_AT']
-OKTA_FACTOR_ID = app.config['OKTA_FACTOR_ID']
-
-SALT = app.config['SALT']
-
-
-ENABLE_API_RATE_LIMITS = app.config['ENABLE_API_RATE_LIMITS']
-WHITELISTED_IPS = app.config['WHITELISTED_IPS']
-
-
-SHOW_LOGS = app.config['SHOW_LOGS']
-
-crypt_obj = Crypto(SALT)
-DECRYPTED_API_KEY = crypt_obj.decryptAPIkey(ENCRYPTED_API_KEY, API_KEY_SALT)
-
-SECRET_NAME_KEY_IN_REQUEST_FORM = "adminScrtName" # In home.jsx(FE) and in docs.json(BE Swagger) also this should be same
-SECRET_KEY_KEY_IN_REQUEST_FORM = "adminScrtKey" # In home.jsx(FE) and in docs.json(BE Swagger) also this should be same
-OKTA_USER_ID_KEY_IN_REQUEST_FORM = "adminOktaUserId"
-
-if(DATABASE_TYPE == "json"):
-    db_obj = JSON_DB(SECRETS_FILE, crypt_obj, AUTOSAVED_SECRET_USERNAME_HEAD, SECRET_NAME, SECRET_KEY, OKTA_USER_ID, SECRET_ID, SECRET_UPDATED_AT, OKTA_FACTOR_ID, SECRET_NAME_KEY_IN_REQUEST_FORM, SECRET_KEY_KEY_IN_REQUEST_FORM, OKTA_USER_ID_KEY_IN_REQUEST_FORM, SHOW_LOGS)
-elif(DATABASE_TYPE == "mssql"):
-    db_obj = MSSQL_DB(crypt_obj, MS_SQL_SERVER, MS_SQL_USERNAME, MS_SQL_PASSWORD, DATABASE_NAME, TABLE_NAME, AUTOSAVED_SECRET_USERNAME_HEAD, SECRET_NAME, SECRET_KEY, OKTA_USER_ID, SECRET_ID, SECRET_UPDATED_AT, OKTA_FACTOR_ID, SECRET_NAME_KEY_IN_REQUEST_FORM, SECRET_KEY_KEY_IN_REQUEST_FORM, OKTA_USER_ID_KEY_IN_REQUEST_FORM, SHOW_LOGS)
-
-totp_obj = TOTP_Generator(crypt_obj, SECRET_NAME, SECRET_KEY, OKTA_USER_ID, SECRET_ID, SECRET_UPDATED_AT, SHOW_LOGS)
+totp_obj = TOTP_Generator(crypt_obj, EnvVars.SHOW_LOGS)
 secret_obj = SecretKey_Generator()
-okta_obj = OktaAPIs(CLIENT_ID, ISSUER, TOKEN_TYPE_HINT, DECRYPTED_API_KEY, SHOW_LOGS)
+okta_obj = OktaAPIs(DECRYPTED_API_KEY)
 
 # Begin Rate Limiter
 def construct_rate_limit():
@@ -90,18 +48,18 @@ def construct_rate_limit():
         rate_limits = rate_limits + rate_limits_per_hour+'/hour;'
     return rate_limits[:-1] if rate_limits else None
 
-RATE_LIMIT = construct_rate_limit() if ENABLE_API_RATE_LIMITS else None
+RATE_LIMIT = construct_rate_limit() if EnvVars.ENABLE_API_RATE_LIMITS else None
 
 limiter = Limiter(
     app,
     key_func=get_remote_address,
     headers_enabled=True,
-    enabled=ENABLE_API_RATE_LIMITS
+    enabled=EnvVars.ENABLE_API_RATE_LIMITS
 )
 
 @limiter.request_filter
 def ip_whitelist():
-    return request.remote_addr in eval(WHITELISTED_IPS)
+    return request.remote_addr in eval(EnvVars.WHITELISTED_IPS)
 
 # End Rate Limiter
 
@@ -138,9 +96,7 @@ SWAGGERUI_BLUEPRINT = get_swaggerui_blueprint(SWAGGER_URL, SWAGGER_FILE)
 app.register_blueprint(SWAGGERUI_BLUEPRINT)
 # end swagger specific #
 
-# constants
-print("Test_EnvVars.DUMMY_ENV_VAR: ", Test_EnvVars.DUMMY_ENV_VAR)
-print("Test_ClassConfig.JUNE_22_CONFIG_CLASS: ", Test_ClassConfig.JUNE_22_CONFIG_CLASS)
+
 # CONNECTION_OBJECT = db_obj.establish_db_connection()
 
 
@@ -169,15 +125,15 @@ def check_token_header():
             g.user = token_info   
             g.loggedInUserName = token_info['username'].split('@', 1)[0] 
             # print("token_info.keys(): ", token_info.keys())
-            if AUTHORIZE_TOKEN_TYPE.lower() == Constants.ID_TOKEN:
-                if token_info[Constants.AUD] == CLIENT_ID:
+            if EnvVars.AUTHORIZE_TOKEN_TYPE.lower() == Constants.ID_TOKEN:
+                if token_info[Constants.AUD] == EnvVars.CLIENT_ID:
                     g.loggedInOktaUserId = token_info[Constants.SUB]
                 else:
                     if 'deleteTOTPfactorIfEnrolledFromOktaVerify' in request.url and request.method == Constants.DELETE:
                         g.errorOccured = "AUTHORIZE_TOKEN_TYPE is idToken in BE but accessToken is passed from FE. AUTHORIZE_TOKEN_TYPE should be same in both FE and BE."
                     else:
                         return {'error': 'AUTHORIZE_TOKEN_TYPE is idToken in BE but accessToken is passed from FE. AUTHORIZE_TOKEN_TYPE should be same in both FE and BE.'}, 400
-            elif AUTHORIZE_TOKEN_TYPE.lower() == Constants.ACCESS_TOKEN:
+            elif EnvVars.AUTHORIZE_TOKEN_TYPE.lower() == Constants.ACCESS_TOKEN:
                 if Constants.CLIENT_ID in token_info.keys():
                     g.loggedInOktaUserId = token_info[Constants.UID]
                 else:
@@ -222,9 +178,9 @@ def checkIfAlreadyEnrolledToOktaVerify():
     usersAutoEnrolledFromTecVerify = 0
     usersAutoEnrolledFromTecVerify_excludingLoginUser = 0
     for secret in secrets_list:
-        if secret[OKTA_FACTOR_ID] != "":
+        if secret[EnvVars.OKTA_FACTOR_ID] != "":
             usersAutoEnrolledFromTecVerify += 1
-        if secret[OKTA_FACTOR_ID] != "" and secret[OKTA_USER_ID] != logged_in_Okta_user_id:
+        if secret[EnvVars.OKTA_FACTOR_ID] != "" and secret[EnvVars.OKTA_USER_ID] != logged_in_Okta_user_id:
             usersAutoEnrolledFromTecVerify_excludingLoginUser += 1
     print("usersAutoEnrolledFromTecVerify: ", usersAutoEnrolledFromTecVerify)
     print("usersAutoEnrolledFromTecVerify_excludingLoginUser: ", usersAutoEnrolledFromTecVerify_excludingLoginUser)
@@ -252,8 +208,8 @@ def checkIfAlreadyEnrolledToOktaVerify():
                     return okta_obj.delete_factor(logged_in_Okta_user_id, factor[Constants.ID])
             else:     
                 for secret in secrets_list:
-                    if secret[OKTA_FACTOR_ID] != "" and secret[OKTA_USER_ID] == logged_in_Okta_user_id:
-                        if factor[Constants.ID] == secret[OKTA_FACTOR_ID]:
+                    if secret[EnvVars.OKTA_FACTOR_ID] != "" and secret[EnvVars.OKTA_USER_ID] == logged_in_Okta_user_id:
+                        if factor[Constants.ID] == secret[EnvVars.OKTA_FACTOR_ID]:
                             print("factor IDs matched. So, user is enrolled to TOTP factor from TecVerify.")
                             return {'User is already Auto Enrolled to Okta from TecVerify': True}, 200
                         else:
@@ -283,12 +239,12 @@ def deleteSecretIfTOTPfactorIsInactive():
         return {"Exception": "Secret List is Empty"}, 200
     else:     
         for secret in secrets_list:
-            if secret[OKTA_USER_ID] == logged_in_Okta_user_id and secret[OKTA_FACTOR_ID] != "":
-                get_factor_response = okta_obj.call_get_factor_API(logged_in_Okta_user_id, secret[OKTA_FACTOR_ID])
+            if secret[EnvVars.OKTA_USER_ID] == logged_in_Okta_user_id and secret[EnvVars.OKTA_FACTOR_ID] != "":
+                get_factor_response = okta_obj.call_get_factor_API(logged_in_Okta_user_id, secret[EnvVars.OKTA_FACTOR_ID])
                 if get_factor_response.status_code == 404:
-                    db_obj.delete_secret(secret[SECRET_ID])
+                    db_obj.delete_secret(secret[EnvVars.SECRET_ID])
                 
-                return okta_obj.get_factor(logged_in_Okta_user_id, secret[OKTA_FACTOR_ID])
+                return okta_obj.get_factor(logged_in_Okta_user_id, secret[EnvVars.OKTA_FACTOR_ID])
                 
         return {"SUCCESS": "Secret List is not Empty"}, 200
 
@@ -344,10 +300,10 @@ def delete_secret(secret_id):
     else:     
         for secret in secrets_list:
             if secret_id in secret.values():
-                if secret[OKTA_FACTOR_ID] == "":
+                if secret[EnvVars.OKTA_FACTOR_ID] == "":
                     deleteManuallySavedSecret = True
                 else:
-                    delete_factor_response = okta_obj.call_delete_factor_API(secret[OKTA_USER_ID], secret[OKTA_FACTOR_ID])
+                    delete_factor_response = okta_obj.call_delete_factor_API(secret[EnvVars.OKTA_USER_ID], secret[EnvVars.OKTA_FACTOR_ID])
                     if delete_factor_response.status_code == 204:
                         print("Auto Enrolled Okta TOTP Factor deleted")
                         deleteAutoSavedSecret = True
@@ -397,18 +353,18 @@ def save_secret():
     # token_info = g.get('user')
     logged_in_Okta_user_id = g.get('loggedInOktaUserId')
     # if AUTHORIZE_CLAIM_NAME in token_info and token_info[AUTHORIZE_CLAIM_NAME] and form_data[SECRET_KEY]:
-    if form_data[SECRET_NAME] and form_data[SECRET_KEY]:
-        if secret_obj.is_secret_valid(form_data[SECRET_KEY]):
+    if form_data[EnvVars.SECRET_NAME] and form_data[EnvVars.SECRET_KEY]:
+        if secret_obj.is_secret_valid(form_data[EnvVars.SECRET_KEY]):
             # if db_obj.manual_save_secret(form_data, logged_in_Okta_user_id, CONNECTION_OBJECT):
             if db_obj.manual_save_secret(form_data, logged_in_Okta_user_id):
                 return {"updated": True}, 200
             else:
                 return {"updated": False, "error": "Update Failed !!!"}, 500
         else:
-            return {"updated": False, "error": SECRET_KEY_KEY_IN_REQUEST_FORM + " is in invalid format. Try another one."}, 500
-    elif form_data[SECRET_NAME] is None or not form_data[SECRET_NAME]:
+            return {"updated": False, "error": Constants.SECRET_KEY_KEY_IN_REQUEST_FORM + " is in invalid format. Try another one."}, 500
+    elif form_data[EnvVars.SECRET_NAME] is None or not form_data[EnvVars.SECRET_NAME]:
         return {'error': "Secret Name is missing"}, 400
-    elif form_data[SECRET_KEY] is None or not form_data[SECRET_KEY]:
+    elif form_data[EnvVars.SECRET_KEY] is None or not form_data[EnvVars.SECRET_KEY]:
         return {'error': "Admin Secret is missing"}, 400
     # else:
     #     return {'error': 'UnAuthorized !!!'}, 403
@@ -420,9 +376,9 @@ def save_secret_byTakingOktaUserIDfromRequestForm():
     print("notProtectedByIdToken_saveSecret API")
     neededOktaUserIDinRequestForm = True
     form_data = db_obj.parse_form_data(request, neededOktaUserIDinRequestForm)
-    if form_data[SECRET_NAME] and form_data[SECRET_KEY] and form_data[OKTA_USER_ID]:
-        if secret_obj.is_secret_valid(form_data[SECRET_KEY]):
-            okta_user_id_in_form_data = form_data[OKTA_USER_ID]
+    if form_data[EnvVars.SECRET_NAME] and form_data[EnvVars.SECRET_KEY] and form_data[EnvVars.OKTA_USER_ID]:
+        if secret_obj.is_secret_valid(form_data[EnvVars.SECRET_KEY]):
+            okta_user_id_in_form_data = form_data[EnvVars.OKTA_USER_ID]
             get_user_response = okta_obj.call_get_user_API(okta_user_id_in_form_data)
             if get_user_response.status_code == 200:
                 # if db_obj.manual_save_secret(form_data, okta_user_id_in_form_data, CONNECTION_OBJECT):
@@ -433,12 +389,12 @@ def save_secret_byTakingOktaUserIDfromRequestForm():
             else:
                 return okta_obj.get_user(okta_user_id_in_form_data)
         else:
-            return {"updated": False, "error": SECRET_KEY_KEY_IN_REQUEST_FORM + " is in invalid format. Try another one."}, 500
-    elif form_data[SECRET_NAME] is None or not form_data[SECRET_NAME]:
+            return {"updated": False, "error": Constants.SECRET_KEY_KEY_IN_REQUEST_FORM + " is in invalid format. Try another one."}, 500
+    elif form_data[EnvVars.SECRET_NAME] is None or not form_data[EnvVars.SECRET_NAME]:
         return {'error': "Secret Name is missing"}, 400
-    elif form_data[SECRET_KEY] is None or not form_data[SECRET_KEY]: # if secret key is empty or key itself is not there
+    elif form_data[EnvVars.SECRET_KEY] is None or not form_data[EnvVars.SECRET_KEY]: # if secret key is empty or key itself is not there
         return {'error': "Admin Secret is missing"}, 400
-    elif form_data[OKTA_USER_ID] is None or not form_data[OKTA_USER_ID]:
+    elif form_data[EnvVars.OKTA_USER_ID] is None or not form_data[EnvVars.OKTA_USER_ID]:
         return {'error': "Okta User ID is missing"}, 400
 
 

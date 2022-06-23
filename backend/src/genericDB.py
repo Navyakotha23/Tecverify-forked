@@ -3,6 +3,10 @@ import abc
 import uuid
 from datetime import datetime
 
+from constants import Constants
+from envVars import EnvVars
+
+
 class Generic_DB(metaclass=abc.ABCMeta):
 
     def generate_random_id(self) -> str:
@@ -16,7 +20,7 @@ class Generic_DB(metaclass=abc.ABCMeta):
         """
         This method returns boolean by checking whether Id is unique or not
         """
-        id_list = [secret[self.secret_id] for secret in secrets_list]
+        id_list = [secret[EnvVars.SECRET_ID] for secret in secrets_list]
         if id not in id_list:
             return True
         else:
@@ -59,12 +63,12 @@ class Generic_DB(metaclass=abc.ABCMeta):
         secrets_list = self.read()
         id = self.generate_unique_id(secrets_list)
         secretInfo = {}
-        secretInfo[self.secret_name] = self.auto_saved_secret_username_head + '.' + okta_logged_in_username
-        secretInfo[self.secret_key] = self.crypt_obj.encrypt(okta_shared_secret)
-        secretInfo[self.okta_user_id] = okta_logged_in_user_id
-        secretInfo[self.secret_id] = id
-        secretInfo[self.secret_updated_at] = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
-        secretInfo[self.okta_factor_id] = okta_factor_id
+        secretInfo[EnvVars.SECRET_NAME] = EnvVars.AUTOSAVED_SECRET_USERNAME_HEAD + '.' + okta_logged_in_username
+        secretInfo[EnvVars.SECRET_KEY] = self.crypt_obj.encrypt(okta_shared_secret)
+        secretInfo[EnvVars.OKTA_USER_ID] = okta_logged_in_user_id
+        secretInfo[EnvVars.SECRET_ID] = id
+        secretInfo[EnvVars.SECRET_UPDATED_AT] = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+        secretInfo[EnvVars.OKTA_FACTOR_ID] = okta_factor_id
         return secretInfo
 
 
@@ -83,11 +87,11 @@ class Generic_DB(metaclass=abc.ABCMeta):
         """
         secrets_list = self.read()
         id = self.generate_unique_id(secrets_list)
-        form_data[self.secret_key] = self.crypt_obj.encrypt(form_data[self.secret_key])
-        form_data[self.okta_user_id] = okta_logged_in_user_id
-        form_data[self.secret_id] = id
-        form_data[self.secret_updated_at] = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
-        form_data[self.okta_factor_id] = ""
+        form_data[EnvVars.SECRET_KEY] = self.crypt_obj.encrypt(form_data[EnvVars.SECRET_KEY])
+        form_data[EnvVars.OKTA_USER_ID] = okta_logged_in_user_id
+        form_data[EnvVars.SECRET_ID] = id
+        form_data[EnvVars.SECRET_UPDATED_AT] = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+        form_data[EnvVars.OKTA_FACTOR_ID] = ""
         return form_data
 
 
@@ -116,13 +120,13 @@ class Generic_DB(metaclass=abc.ABCMeta):
         """
         # print("request: ", request)
         # print("request.form:", request.form)
-        secret_name_VALUE_in_request_form = request.form[self.secret_name_KEY_in_request_form] if self.secret_name_KEY_in_request_form in request.form else None
-        secret_key_VALUE_in_request_form = request.form[self.secret_key_KEY_in_request_form] if self.secret_key_KEY_in_request_form in request.form else None
+        secret_name_VALUE_in_request_form = request.form[Constants.SECRET_NAME_KEY_IN_REQUEST_FORM] if Constants.SECRET_NAME_KEY_IN_REQUEST_FORM in request.form else None
+        secret_key_VALUE_in_request_form = request.form[Constants.SECRET_KEY_KEY_IN_REQUEST_FORM] if Constants.SECRET_KEY_KEY_IN_REQUEST_FORM in request.form else None
         if not neededOktaUserIDinRequestForm:
-            return {self.secret_name: secret_name_VALUE_in_request_form, self.secret_key: secret_key_VALUE_in_request_form}
+            return {EnvVars.SECRET_NAME: secret_name_VALUE_in_request_form, EnvVars.SECRET_KEY: secret_key_VALUE_in_request_form}
         else:
-            okta_user_id_VALUE_in_request_form = request.form[self.okta_user_id_KEY_in_request_form] if self.okta_user_id_KEY_in_request_form in request.form else None
-            return {self.secret_name: secret_name_VALUE_in_request_form, self.secret_key: secret_key_VALUE_in_request_form, self.okta_user_id: okta_user_id_VALUE_in_request_form}
+            okta_user_id_VALUE_in_request_form = request.form[Constants.OKTA_USER_ID_KEY_IN_REQUEST_FORM] if Constants.OKTA_USER_ID_KEY_IN_REQUEST_FORM in request.form else None
+            return {EnvVars.SECRET_NAME: secret_name_VALUE_in_request_form, EnvVars.SECRET_KEY: secret_key_VALUE_in_request_form, EnvVars.OKTA_USER_ID: okta_user_id_VALUE_in_request_form}
 
 
     

@@ -2,22 +2,13 @@ import requests
 import json
 
 from constants import Constants
-
-# from test_envVars import Test_EnvVars
-from test_classConfig import Test_ClassConfig
+from envVars import EnvVars
 
 
 class OktaAPIs:
 
-    # print("oktaAPIs.py Test_EnvVars.DUMMY_ENV_VAR: ", Test_EnvVars.DUMMY_ENV_VAR)
-    print("oktaAPIs.py Test_ClassConfig.JUNE_22_CONFIG_CLASS: ", Test_ClassConfig.JUNE_22_CONFIG_CLASS)
-
-    def __init__(self, CLIENT_ID, ISSUER, TOKEN_TYPE_HINT, TECVERIFY_API_KEY, SHOW_LOGS) -> None:
-        self.client_id = CLIENT_ID
-        self.issuer = ISSUER
-        self.token_type_hint = TOKEN_TYPE_HINT
+    def __init__(self, TECVERIFY_API_KEY) -> None:
         self.tecverify_api_key = TECVERIFY_API_KEY
-        self.show_logs = SHOW_LOGS
 
 
     def is_token_active(self, response) -> bool:
@@ -34,8 +25,8 @@ class OktaAPIs:
         """
         This method makes an introspect api call to Okta with token and returns Okta API response.
         """
-        url = self.issuer + "/oauth2/v1/introspect?client_id=" + self.client_id
-        body = {'token': token, 'token_type_hint': self.token_type_hint}
+        url = EnvVars.ISSUER + "/oauth2/v1/introspect?client_id=" + EnvVars.CLIENT_ID
+        body = {'token': token, 'token_type_hint': EnvVars.TOKEN_TYPE_HINT}
         response = requests.post(url, data=body)   
         return response
     
@@ -56,7 +47,7 @@ class OktaAPIs:
         """
         This method makes List Factors API call to Okta with OktaUserID, APIkey and returns Okta API response.
         """
-        url = self.issuer + "/api/v1/users/" + oktaUid + "/factors"
+        url = EnvVars.ISSUER + "/api/v1/users/" + oktaUid + "/factors"
         headers={'Content-Type':'application/json', 'Authorization': 'SSWS {}'.format(self.tecverify_api_key)}
         response = requests.get(url, headers=headers)  
         return response
@@ -82,7 +73,7 @@ class OktaAPIs:
         """
         This method makes Delete Factor API call to Okta with OktaUserID, OktaTOTPfactorId, APIkey and returns Okta API response.
         """
-        url = self.issuer + "/api/v1/users/" + oktaUid + "/factors/" + oktaFactorID
+        url = EnvVars.ISSUER + "/api/v1/users/" + oktaUid + "/factors/" + oktaFactorID
         headers={'Content-Type':'application/json', 'Authorization': 'SSWS{}'.format(self.tecverify_api_key)}
         response = requests.delete(url, headers=headers)
         return response
@@ -109,7 +100,7 @@ class OktaAPIs:
         """
         This method makes an Enroll Okta Verify TOTP factor API call to Okta with OktaUserID, APIkey and returns Okta API response.
         """
-        url = self.issuer + "/api/v1/users/" + oktaUid + "/factors"
+        url = EnvVars.ISSUER + "/api/v1/users/" + oktaUid + "/factors"
         headers={'Content-Type':'application/json', 'Authorization': 'SSWS {}'.format(self.tecverify_api_key)}
         body = {'factorType': 'token:software:totp', 'provider': 'OKTA'}
         response = requests.post(url, data=json.dumps(body), headers=headers)   
@@ -140,7 +131,7 @@ class OktaAPIs:
         """
         This method makes an Activate TOTP Factor API call to Okta with OktaUserID, OktaTOTPfactorId, OTP generated with OktaSharedSecret, APIkey and returns Okta API response.
         """
-        url = self.issuer + "/api/v1/users/" + oktaUid + "/factors/" + oktaFactorID + "/lifecycle/activate"
+        url = EnvVars.ISSUER + "/api/v1/users/" + oktaUid + "/factors/" + oktaFactorID + "/lifecycle/activate"
         headers={'Content-Type':'application/json', 'Authorization': 'SSWS {}'.format(self.tecverify_api_key)}
         body = {'passCode': generatedOTP}
         response = requests.post(url, data=json.dumps(body), headers=headers)   
@@ -160,7 +151,7 @@ class OktaAPIs:
         """
         This method makes Get Factor API call to Okta with OktaUserID, OktaTOTPfactorId, APIkey and returns Okta API response.
         """
-        url = self.issuer + "/api/v1/users/" + oktaUid + "/factors/" + oktaFactorID
+        url = EnvVars.ISSUER + "/api/v1/users/" + oktaUid + "/factors/" + oktaFactorID
         headers={'Content-Type':'application/json', 'Authorization': 'SSWS {}'.format(self.tecverify_api_key)}
         response = requests.get(url, headers=headers)
         return response
@@ -190,7 +181,7 @@ class OktaAPIs:
         """
         This method makes Get User API call to Okta with OktaUserID and returns Okta API response.
         """
-        url = self.issuer + "/api/v1/users/" + oktaUid
+        url = EnvVars.ISSUER + "/api/v1/users/" + oktaUid
         headers={'Content-Type':'application/json', 'Authorization': 'SSWS {}'.format(self.tecverify_api_key)}
         response = requests.get(url, headers=headers)
         return response
