@@ -1,13 +1,21 @@
 import requests
 import json
 
+from constants import Constants
+
+# from test_envVars import Test_EnvVars
+from test_classConfig import Test_ClassConfig
+
+
 class OktaAPIs:
 
-    def __init__(self, CLIENT_ID, ISSUER, TOKEN_TYPE_HINT, AUTHORIZE_CLAIM_NAME, TECVERIFY_API_KEY, SHOW_LOGS) -> None:
+    # print("oktaAPIs.py Test_EnvVars.DUMMY_ENV_VAR: ", Test_EnvVars.DUMMY_ENV_VAR)
+    print("oktaAPIs.py Test_ClassConfig.JUNE_22_CONFIG_CLASS: ", Test_ClassConfig.JUNE_22_CONFIG_CLASS)
+
+    def __init__(self, CLIENT_ID, ISSUER, TOKEN_TYPE_HINT, TECVERIFY_API_KEY, SHOW_LOGS) -> None:
         self.client_id = CLIENT_ID
         self.issuer = ISSUER
         self.token_type_hint = TOKEN_TYPE_HINT
-        self.authorizing_claim = AUTHORIZE_CLAIM_NAME
         self.tecverify_api_key = TECVERIFY_API_KEY
         self.show_logs = SHOW_LOGS
 
@@ -16,8 +24,8 @@ class OktaAPIs:
         """
         This method checks whether token is still Active or not.
         """
-        if 'active' in response:
-            return response['active']
+        if Constants.ACTIVE in response:
+            return response[Constants.ACTIVE]
         else:
             return False
 

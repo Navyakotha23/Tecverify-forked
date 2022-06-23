@@ -9,6 +9,10 @@ from oktaAPIs import OktaAPIs
 from jsonDB import JSON_DB
 from mssqlDB import MSSQL_DB
 
+from constants import Constants
+from test_envVars import Test_EnvVars
+from test_classConfig import Test_ClassConfig
+
 import requests
 from flask_swagger_ui import get_swaggerui_blueprint
 from flask import Flask, request, g, jsonify
@@ -73,7 +77,7 @@ elif(DATABASE_TYPE == "mssql"):
 
 totp_obj = TOTP_Generator(crypt_obj, SECRET_NAME, SECRET_KEY, OKTA_USER_ID, SECRET_ID, SECRET_UPDATED_AT, SHOW_LOGS)
 secret_obj = SecretKey_Generator()
-okta_obj = OktaAPIs(CLIENT_ID, ISSUER, TOKEN_TYPE_HINT, AUTHORIZE_CLAIM_NAME, DECRYPTED_API_KEY, SHOW_LOGS)
+okta_obj = OktaAPIs(CLIENT_ID, ISSUER, TOKEN_TYPE_HINT, DECRYPTED_API_KEY, SHOW_LOGS)
 
 # Begin Rate Limiter
 def construct_rate_limit():
@@ -135,18 +139,8 @@ app.register_blueprint(SWAGGERUI_BLUEPRINT)
 # end swagger specific #
 
 # constants
-STANDARD = "STANDARD"
-ADMIN = "ADMIN"
-TOKEN = "token"
-ID_TOKEN = "id_token"
-TOKEN_TYPE_HINT = "token_type_hint"
-SCOPE = "scope"
-ACTIVE = 'active'
-ISS = 'iss'
-UID = 'uid'
-AUD = 'aud'
-OPTIONS = 'OPTIONS'
-ID_LENGTH = 12
+print("Test_EnvVars.DUMMY_ENV_VAR: ", Test_EnvVars.DUMMY_ENV_VAR)
+print("Test_ClassConfig.JUNE_22_CONFIG_CLASS: ", Test_ClassConfig.JUNE_22_CONFIG_CLASS)
 # CONNECTION_OBJECT = db_obj.establish_db_connection()
 
 
@@ -155,39 +149,39 @@ ID_LENGTH = 12
 @app.before_request
 def check_token_header():
     print("\n\n\n----------Start request----------")
-    if request.method == OPTIONS:
+    if request.method == Constants.OPTIONS:
         return {}, 200
     if SWAGGER_URL not in request.url:
-        if TOKEN not in request.headers:
-            if 'notProtectedByIdToken_saveSecret' in request.url and request.method == 'POST':
+        if Constants.TOKEN not in request.headers:
+            if 'notProtectedByIdToken_saveSecret' in request.url and request.method == Constants.POST:
                 # print("request.url: ", request.url)
                 # print("request.method: ", request.method)
                 g.tokenHeaderMissing = True
             else:
                 # return {'error': 'Required Headers missing.'}, 400
                 return {'error': 'Token is missing in headers.'}, 400
-        elif request.headers[TOKEN] == '':
+        elif request.headers[Constants.TOKEN] == '':
             return {'error': "The 'token' parameter can't be empty"}, 400
-        elif request.headers[TOKEN]:
-            is_token_valid, token_info = okta_obj.introspect_token(request.headers[TOKEN])
+        elif request.headers[Constants.TOKEN]:
+            is_token_valid, token_info = okta_obj.introspect_token(request.headers[Constants.TOKEN])
             if not is_token_valid:
                 return {'error': 'Invalid Token', 'info': token_info}, 403
             g.user = token_info   
             g.loggedInUserName = token_info['username'].split('@', 1)[0] 
             # print("token_info.keys(): ", token_info.keys())
-            if AUTHORIZE_TOKEN_TYPE.lower() == "idtoken":
-                if token_info['aud'] == CLIENT_ID:
-                    g.loggedInOktaUserId = token_info['sub']
+            if AUTHORIZE_TOKEN_TYPE.lower() == Constants.ID_TOKEN:
+                if token_info[Constants.AUD] == CLIENT_ID:
+                    g.loggedInOktaUserId = token_info[Constants.SUB]
                 else:
-                    if 'deleteTOTPfactorIfEnrolledFromOktaVerify' in request.url and request.method == 'DELETE':
+                    if 'deleteTOTPfactorIfEnrolledFromOktaVerify' in request.url and request.method == Constants.DELETE:
                         g.errorOccured = "AUTHORIZE_TOKEN_TYPE is idToken in BE but accessToken is passed from FE. AUTHORIZE_TOKEN_TYPE should be same in both FE and BE."
                     else:
                         return {'error': 'AUTHORIZE_TOKEN_TYPE is idToken in BE but accessToken is passed from FE. AUTHORIZE_TOKEN_TYPE should be same in both FE and BE.'}, 400
-            elif AUTHORIZE_TOKEN_TYPE.lower() == "accesstoken":
-                if 'client_id' in token_info.keys():
-                    g.loggedInOktaUserId = token_info['uid']
+            elif AUTHORIZE_TOKEN_TYPE.lower() == Constants.ACCESS_TOKEN:
+                if Constants.CLIENT_ID in token_info.keys():
+                    g.loggedInOktaUserId = token_info[Constants.UID]
                 else:
-                    if 'deleteTOTPfactorIfEnrolledFromOktaVerify' in request.url and request.method == 'DELETE':
+                    if 'deleteTOTPfactorIfEnrolledFromOktaVerify' in request.url and request.method == Constants.DELETE:
                         g.errorOccured = "AUTHORIZE_TOKEN_TYPE is accessToken in BE but idToken is passed from FE. AUTHORIZE_TOKEN_TYPE should be same in both FE and BE."
                     else:
                         return {'error': 'AUTHORIZE_TOKEN_TYPE is accessToken in BE but idToken is passed from FE. AUTHORIZE_TOKEN_TYPE should be same in both FE and BE.'}, 400
@@ -252,24 +246,24 @@ def checkIfAlreadyEnrolledToOktaVerify():
 
     factors_list = list_factors_response.json()
     for factor in factors_list:
-        if factor['factorType'] == "token:software:totp":
+        if factor[Constants.FACTOR_TYPE] == Constants.TOTP_FACTOR:
             if not secrets_list:
                     print("No secret in secrets_list")
-                    return okta_obj.delete_factor(logged_in_Okta_user_id, factor['id'])
+                    return okta_obj.delete_factor(logged_in_Okta_user_id, factor[Constants.ID])
             else:     
                 for secret in secrets_list:
                     if secret[OKTA_FACTOR_ID] != "" and secret[OKTA_USER_ID] == logged_in_Okta_user_id:
-                        if factor['id'] == secret[OKTA_FACTOR_ID]:
+                        if factor[Constants.ID] == secret[OKTA_FACTOR_ID]:
                             print("factor IDs matched. So, user is enrolled to TOTP factor from TecVerify.")
                             return {'User is already Auto Enrolled to Okta from TecVerify': True}, 200
                         else:
                             # factor IDs didn't match. Previouly TecVerify enrolled TOTP factor got deleted and new factor got enrolled.
                             print("factor IDs didn't match. So, user is enrolled to TOTP factor from other TecVerify Build or OktaVerify.")
-                            return okta_obj.delete_factor(logged_in_Okta_user_id, factor['id'])
+                            return okta_obj.delete_factor(logged_in_Okta_user_id, factor[Constants.ID])
                             
                 if usersAutoEnrolledFromTecVerify == usersAutoEnrolledFromTecVerify_excludingLoginUser:
                     print("No auto enrollment is done in TecVerify for this logged in user.")
-                    return okta_obj.delete_factor(logged_in_Okta_user_id, factor['id'])
+                    return okta_obj.delete_factor(logged_in_Okta_user_id, factor[Constants.ID])
 
     print("This user is not enrolled to Okta TOTP factor")
     return {'Okta TOTP Factor is not enrolled for this user': True}, 200
@@ -310,8 +304,8 @@ def enrollToTecVerify():
     enroll_info = enroll_response.json()
 
     if enroll_response.status_code == 200:
-        oktaFactorID = enroll_info['id']
-        oktaSharedSecret = enroll_info['_embedded']['activation']['sharedSecret']
+        oktaFactorID = enroll_info[Constants.ID]
+        oktaSharedSecret = enroll_info[Constants.EMBEDDED][Constants.ACTIVATION][Constants.SHARED_SECRET]
         generatedOTP = totp_obj.generate_totp(oktaSharedSecret)
         # db_obj.auto_save_secret(oktaSharedSecret, logged_in_Okta_user_id, CONNECTION_OBJECT) # For saving secret in TecVerify
         db_obj.auto_save_secret(oktaSharedSecret, logged_in_Okta_user_id, logged_in_username, oktaFactorID) # For saving secret in TecVerify with logged in username and oktaFactorID

@@ -51,5 +51,7 @@ WHITELISTED_IPS = os.environ.get("WHITELISTED_IPS", default="[]")
 
 
 SHOW_LOGS = os.environ.get("SHOW_LOGS", default=False)
+DUMMY_ENV_VAR = os.environ.get("DUMMY_ENV_VAR", default="Dummy Environment Variable")
+
 
 
