@@ -1,5 +1,7 @@
 import pyotp
 
+from requestForm import RequestForm
+
 class SecretKey_Generator:
 
     def is_secret_valid(self, secret):
@@ -18,5 +20,7 @@ class SecretKey_Generator:
         """
         This method generates random secret.
         """
+        # print("calling test_function in requestForm.py")
+        # RequestForm.test_function(self)
         admin_secret = pyotp.random_base32(32)
         return {"adminSecret": admin_secret}, 200

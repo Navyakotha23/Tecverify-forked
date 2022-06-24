@@ -2,15 +2,18 @@ import os.path
 import os
 from logging.config import dictConfig
 
+from constants import Constants
+from envVars import EnvVars
+
 from crypto import Crypto
 from totpGenerator import TOTP_Generator
 from secretKeyGenerator import SecretKey_Generator
 from oktaAPIs import OktaAPIs
+from uniqueIdGenerator import UniqueId_Generator
+from requestForm import RequestForm
 from jsonDB import JSON_DB
 from mssqlDB import MSSQL_DB
 
-from constants import Constants
-from envVars import EnvVars
 # from test_be_swagger import BE_SWAGGER
 
 import requests
@@ -28,15 +31,18 @@ CORS(app)
 # Objects Creation 
 crypt_obj = Crypto(EnvVars.SALT)
 DECRYPTED_API_KEY = crypt_obj.decryptAPIkey(EnvVars.ENCRYPTED_API_KEY, EnvVars.API_KEY_SALT)
+okta_obj = OktaAPIs(DECRYPTED_API_KEY)
+
+idGenerator_obj = UniqueId_Generator()
+requestForm_obj = RequestForm()
 
 if(EnvVars.DATABASE_TYPE == "json"):
-    db_obj = JSON_DB(crypt_obj, EnvVars.SECRETS_FILE)
+    db_obj = JSON_DB(idGenerator_obj, crypt_obj, EnvVars.SECRETS_FILE)
 elif(EnvVars.DATABASE_TYPE == "mssql"):
-    db_obj = MSSQL_DB(crypt_obj)
+    db_obj = MSSQL_DB(idGenerator_obj, crypt_obj)
 
-totp_obj = TOTP_Generator(crypt_obj, EnvVars.SHOW_LOGS)
-secret_obj = SecretKey_Generator()
-okta_obj = OktaAPIs(DECRYPTED_API_KEY)
+totpGenerator_obj = TOTP_Generator(crypt_obj, EnvVars.SHOW_LOGS)
+secretGenerator_obj = SecretKey_Generator()
 
 
 
@@ -268,7 +274,7 @@ def enrollToTecVerify():
     if enroll_response.status_code == 200:
         oktaFactorID = enroll_info[Constants.ID]
         oktaSharedSecret = enroll_info[Constants.EMBEDDED][Constants.ACTIVATION][Constants.SHARED_SECRET]
-        generatedOTP = totp_obj.generate_totp(oktaSharedSecret)
+        generatedOTP = totpGenerator_obj.generate_totp(oktaSharedSecret)
         # db_obj.auto_save_secret(oktaSharedSecret, logged_in_Okta_user_id, CONNECTION_OBJECT) # For saving secret in TecVerify
         db_obj.auto_save_secret(oktaSharedSecret, logged_in_Okta_user_id, logged_in_username, oktaFactorID) # For saving secret in TecVerify with logged in username and oktaFactorID
         return okta_obj.activate_TOTP_factor(logged_in_Okta_user_id, oktaFactorID, generatedOTP)
@@ -284,7 +290,7 @@ def get_totp():
     logged_in_Okta_user_id = g.get('loggedInOktaUserId')
     # if AUTHORIZE_CLAIM_NAME in token_info:
     secrets_list = db_obj.read()             
-    totp_list = totp_obj.generate_totp_for_login_user(secrets_list, logged_in_Okta_user_id)
+    totp_list = totpGenerator_obj.generate_totp_for_login_user(secrets_list, logged_in_Okta_user_id)
     return jsonify(totp_list), 200
     # else:
     #     return {'error': 'UnAuthorized !!!'}, 403
@@ -345,7 +351,7 @@ def generate_random_secret():
     print("Generate Secret API")
     # token_info = g.get('user')
     # if AUTHORIZE_CLAIM_NAME in token_info and token_info[AUTHORIZE_CLAIM_NAME]:
-    return secret_obj.generate_secret()
+    return secretGenerator_obj.generate_secret()
     # else:
     #     return {'error': 'UnAuthorized !!!'}, 403
 
@@ -355,12 +361,12 @@ def generate_random_secret():
 def save_secret():
     print("Save Secret API")
     neededOktaUserIDinRequestForm = False
-    form_data = db_obj.parse_form_data(request, neededOktaUserIDinRequestForm)
+    form_data = requestForm_obj.parse_form_data(request, neededOktaUserIDinRequestForm)
     # token_info = g.get('user')
     logged_in_Okta_user_id = g.get('loggedInOktaUserId')
     # if AUTHORIZE_CLAIM_NAME in token_info and token_info[AUTHORIZE_CLAIM_NAME] and form_data[SECRET_KEY]:
     if form_data[EnvVars.SECRET_NAME] and form_data[EnvVars.SECRET_KEY]:
-        if secret_obj.is_secret_valid(form_data[EnvVars.SECRET_KEY]):
+        if secretGenerator_obj.is_secret_valid(form_data[EnvVars.SECRET_KEY]):
             # if db_obj.manual_save_secret(form_data, logged_in_Okta_user_id, CONNECTION_OBJECT):
             if db_obj.manual_save_secret(form_data, logged_in_Okta_user_id):
                 return {"updated": True}, 200
@@ -381,9 +387,9 @@ def save_secret():
 def save_secret_byTakingOktaUserIDfromRequestForm():
     print("notProtectedByIdToken_saveSecret API")
     neededOktaUserIDinRequestForm = True
-    form_data = db_obj.parse_form_data(request, neededOktaUserIDinRequestForm)
+    form_data = requestForm_obj.parse_form_data(request, neededOktaUserIDinRequestForm)
     if form_data[EnvVars.SECRET_NAME] and form_data[EnvVars.SECRET_KEY] and form_data[EnvVars.OKTA_USER_ID]:
-        if secret_obj.is_secret_valid(form_data[EnvVars.SECRET_KEY]):
+        if secretGenerator_obj.is_secret_valid(form_data[EnvVars.SECRET_KEY]):
             okta_user_id_in_form_data = form_data[EnvVars.OKTA_USER_ID]
             get_user_response = okta_obj.call_get_user_API(okta_user_id_in_form_data)
             if get_user_response.status_code == 200:

@@ -5,8 +5,10 @@ from envVars import EnvVars
 
 class MSSQL_DB(Generic_DB):
 
-    def __init__(self, crypt_obj) -> None:
+    def __init__(self, idGenerator_obj, crypt_obj) -> None:
+        self.idGenerator_obj = idGenerator_obj
         self.crypt_obj = crypt_obj
+    
     
     def establish_db_connection(self):
         """
@@ -130,8 +132,8 @@ class MSSQL_DB(Generic_DB):
     # def manual_save_secret(self, form_data, okta_logged_in_user_id, connObj) -> bool:
     def manual_save_secret(self, form_data, okta_logged_in_user_id) -> bool:
         # secrets_list = self.read(connObj)
-        form_data = self.prepare_secret_dictionary_for_manual_save_secret(form_data, okta_logged_in_user_id)
-        return self.write(form_data)
+        secretInfo = self.prepare_secret_dictionary_for_manual_save_secret(form_data, okta_logged_in_user_id)
+        return self.write(secretInfo)
 
 
     # def destroy_db_connection(self, connObj):

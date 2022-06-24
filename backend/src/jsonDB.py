@@ -5,7 +5,8 @@ from genericDB import Generic_DB
 
 class JSON_DB(Generic_DB):
 
-    def __init__(self, crypt_obj, file: str) -> None:
+    def __init__(self, idGenerator_obj, crypt_obj, file: str) -> None:
+        self.idGenerator_obj = idGenerator_obj
         self.crypt_obj = crypt_obj
         self.file = file
 
@@ -62,7 +63,7 @@ class JSON_DB(Generic_DB):
 
 
     def manual_save_secret(self, form_data, okta_logged_in_user_id) -> bool:
-        form_data = self.prepare_secret_dictionary_for_manual_save_secret(form_data, okta_logged_in_user_id)
+        secretInfo = self.prepare_secret_dictionary_for_manual_save_secret(form_data, okta_logged_in_user_id)
         secrets_list = self.read()
-        secrets_list.append(form_data)
+        secrets_list.append(secretInfo)
         return self.write(secrets_list)
