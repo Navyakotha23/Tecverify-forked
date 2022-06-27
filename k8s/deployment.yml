@@ -14,16 +14,74 @@ spec:
 
     spec:
       containers:
-        - name: tecverify-be
-          image: naveenmasuna/backend_tecverify:version_2
-          imagePullPolicy: "Always"
-          resources:
-            limits:
-              memory: 64Mi
-              cpu: 150m
-            requests:
-              memory: 32Mi
-              cpu: 50m
+        - name: tecverify-be-container
+          image: naveenmasuna/backend_tecverify:Naveen_BE
+          imagePullPolicy: "Always" # This is for pulling the image and for building the image with latest changes.{ while pushing the code to GitLab }
+          volumeMounts:
+            - name: be-config-volume
+              mountPath: /etc/mnk-config/
+          ports:
+          - containerPort: 5000
+          env:
+            - name: CLIENT_ID
+              value: 0oa164ptl0ySnZSb50h8
+            - name: ISSUER
+              value: https://tecnics-demo.oktapreview.com
+            - name: AUTHORIZE_TOKEN_TYPE
+              value: idToken
+            - name: LOGGING_LEVEL
+              value: DEBUG
+            - name: LOGGING_MAX_BYTES
+              value: "1048576"
+            - name: LOGGING_BACKUP_COUNT
+              value: "10"
+            - name: ENABLE_API_RATE_LIMITS
+              value: "True"
+            - name: API_RATE_LIMITS_PER_HOUR
+              value: "300"
+            - name: API_RATE_LIMITS_PER_MINUTE
+              value: "30"
+            # - name: WHITELISTED_IPS
+            #   value: "127.0.0.1"
+            - name: TZ
+              value: Asia/Kolkata
+            - name: SALT
+              value: MSHANKER
+            - name: DATABASE_TYPE
+              value: MSSQL
+            - name: SECRETS_FILE
+              value: secrets.json
+            - name: MS_SQL_SERVER
+              value: "139.59.5.130"
+            - name: MS_SQL_USERNAME
+              value: SA
+            - name: MS_SQL_PASSWORD
+              value: Welcome@123
+            - name: DATABASE_NAME
+              value: TecVerify
+            - name: TABLE_NAME
+              value: Secrets
+            - name: AUTOSAVED_SECRET_USERNAME_HEAD
+              value: TecVerify
+            - name: ENCRYPTED_API_KEY
+              value: b'C\xb5\x02M\x10N\x80\xd0O\xc8z\xabV>\x9aW\xb5\x17c&N\x95\x92\xb7&t@Y\xa9\xf5"]\xa0\xd4]\x9f\xc6\xfct\xb9\xefYWy\x86_^\xac'
+        # - name: tecverify-be-container-two
+        #   image: naveenmasuna/backend_tecverify:Naveen_BE
+        #   imagePullPolicy: "Always"
+        #   # command: ["/bin/sh"]
+        #   # args: ["-c", "echo Hello from the sidecar container; sleep 300"]
+        #   volumeMounts:
+        #     - name: be-config-volume
+        #       mountPath: /pod-data
+          # resources:
+          #   limits:
+          #     memory: 64Mi
+          #     cpu: 50m
+          #   requests:
+          #     memory: 32Mi
+          #     cpu: 38m
+          # ports:
+          # - containerPort: 5001
           # livenessProbe:
           #   httpGet:
           #     path: /health
@@ -90,4 +148,9 @@ spec:
       volumes:
         - name: fe-config-volume
           configMap:
-            name: tecverify-fe-config
+            name: tecverify-fe-configmap
+
+
+
+
+

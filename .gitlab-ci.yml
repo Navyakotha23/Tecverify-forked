@@ -40,5 +40,5 @@ deploy-to-digital-ocean:
   only:
     - TestCI
 
-  # Test2 with updated IP
+  
 
