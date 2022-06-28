@@ -27,7 +27,4 @@ spec:
     # - name: something
     #   port: 5001
     #   targetPort: 5001
-
-
-# Deleted the Deployments, services and creating again.
     

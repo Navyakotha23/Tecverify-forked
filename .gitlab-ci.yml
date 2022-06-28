@@ -59,13 +59,5 @@ deploy-to-digital-ocean:
   only:
     - devops
 
-
-  # Accessing with domain name after building the image locally.
-  # Pushing with latest image.
-  # Deleted old services, Creating new Services for Tecverify.
-  # Made some changes in nginx file and building locally for BE. 
-  # Deleted old Backend pod.
-  # Gave container port 80 in tecverify-be-container2.
-
   
 

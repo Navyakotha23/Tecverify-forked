@@ -3,7 +3,7 @@
   "info": {
     "description": "<b>TecVERIFY</b> is a lightweight app that is used for 2-step verification \\n so you can verify your identity when you sign in to your <b>TecMFA</b> account \\n using Admin TOTP.<br><br>App Features<br>* Save Secret key. \\n <br>* Generate TOTP for all Secret keys saved.",
       "version": "1.0.0",
-    "title": "TecVERIFY 16thJune 2:25PM",
+    "title": "TecVERIFY 28thJune 3:00PM",
     "contact": {
       "email": "amit.g@tecnics.com"
     },
@@ -20,7 +20,8 @@
         "name": "token"
       }
     },
-    "schemas": {
+    "schemas": 
+    {
       "secret": {
         "properties": {
           "Updated": {
@@ -85,8 +86,10 @@
     }
   ],
   "paths": {
-    "/secret": {
-      "post": {
+    "/secret": 
+    {
+      "post": 
+      {
         "tags": [
           "AdminSecret"
         ],
@@ -98,10 +101,10 @@
             "application/x-www-form-urlencoded": {
               "schema": {
                 "properties": {
-                  "adminSecret": {
+                  "adminScrtKey": {
                     "type": "string"
                   },
-                  "secretName": {
+                  "adminScrtName": {
                     "type": "string"
                   }
                 }
@@ -118,7 +121,8 @@
           }
         }
       },
-      "get": {
+      "get": 
+      {
         "tags": [
           "AdminSecret"
         ],
@@ -133,8 +137,49 @@
         }
       }
     },
-    "/secret/{secret_id}": {
-      "delete": {
+    "/notProtectedByIdToken_saveSecret": 
+    {
+      "post": 
+      {
+        "tags": [
+          "AdminSecret"
+        ],
+        "summary": "notProtectedByIdToken Save a Secret key.",
+        "requestBody": {
+          "description": "Admin Secret",
+          "required": true,
+          "content": {
+            "application/x-www-form-urlencoded": {
+              "schema": {
+                "properties": {
+                  "adminScrtKey": {
+                    "type": "string"
+                  },
+                  "adminScrtName": {
+                    "type": "string"
+                  },
+                  "adminOktaUserId": {
+                    "type": "string"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "$ref": "#/components/schemas/secret"
+            }
+          }
+        }
+      }
+    },
+    "/secret/{secret_id}": 
+    {
+      "delete": 
+      {
         "tags": [
           "AdminSecret"
         ],
@@ -159,12 +204,14 @@
         }
       }
     },
-    "/totp": {
-      "get": {
+    "/totp": 
+    {
+      "get": 
+      {
         "tags": [
           "TOTP"
         ],
-        "summary": "Get TOTPs of all Secret keys.",
+        "summary": "Get TOTPs of login user's secret keys.",
         "responses": {
           "200": {
             "description": "Will get a TOTP in JSON with Key 'code'",

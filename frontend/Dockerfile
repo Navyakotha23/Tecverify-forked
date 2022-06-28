@@ -29,15 +29,4 @@ COPY nginx.conf /etc/nginx/conf.d/default.conf
 EXPOSE 80
 CMD ["nginx", "-g", "daemon off;"]
 
-# Image in deployment.yml and local docker image are same.
-
-# Changed redirect-urls in Okta.
-
-# Working with HTTPS after copying nginx.conf to default.conf 
-# but default.conf is not created, nginx.conf itself got created(Need to look into this).
-# made changes to config for FE. 
-# Need to set env vars for BE.
-# Done with the Backend deployment.
-
-
 

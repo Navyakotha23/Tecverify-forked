@@ -1,6 +1,7 @@
 import pyDes
 
 class Crypto:
+    
     def __init__(self, salt) -> None:
         self.key = pyDes.des(salt, pyDes.CBC, "\0\0\0\0\0\0\0\0", pad=None, padmode=pyDes.PAD_PKCS5)
 
@@ -19,6 +20,9 @@ class Crypto:
         return self.key.decrypt(bytes).decode()  
 
     def decryptAPIkey(self, EncryptedAPIkey, SaltOfAPIkey) -> str:
+        """
+        This method decrypts API key using Salt hardcoded in backend config
+        """
         keyMadeWithSaltOfAPIkey = pyDes.des(SaltOfAPIkey, pyDes.CBC, "\0\0\0\0\0\0\0\0", pad=None, padmode=pyDes.PAD_PKCS5)
         bytes = eval(EncryptedAPIkey)
         decryptedAPIkey = keyMadeWithSaltOfAPIkey.decrypt(bytes).decode() 
