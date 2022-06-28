@@ -14,7 +14,7 @@ spec:
     spec:
       # restartPolicy: Never
       containers:
-        - name: tecverify-be-container-one
+        - name: tecverify-be-container-1
           image: naveenmasuna/backend_tecverify:Naveen_BE
           imagePullPolicy: "Always" # This is for pulling the image and for building the image with latest changes.{ while pushing the code to GitLab }
           volumeMounts:
@@ -28,7 +28,7 @@ spec:
             - name: ISSUER
               value: https://tecnics-demo.oktapreview.com
             - name: AUTHORIZE_TOKEN_TYPE
-              value: accessToken
+              value: idToken
             - name: LOGGING_LEVEL
               value: DEBUG
             - name: LOGGING_MAX_BYTES
@@ -161,7 +161,7 @@ spec:
         app: tecverify-fe-selector-app
     spec:
       containers:
-        - name: tecverify-fe-container-one
+        - name: tecverify-fe-container-1
           image: naveenmasuna/frontend_tecverify:Naveen_FE
           imagePullPolicy: "Always"
           volumeMounts:

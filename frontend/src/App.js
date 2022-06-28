@@ -21,7 +21,7 @@ const HasAccessToRouter = ({config}) => {
         authTokenType: config.AUTHORIZE_TOKEN_TYPE,
         scopes: config.SCOPES,
         updateCheckText: config.UPDATE_CHECK_TEXT,
-        june28: 'Rishitha 28thJune 4:20PM'
+        june28: 'Rishitha 28thJune 4:40PM'
     };
     sessionStorage.setItem('authConfig', JSON.stringify(authConfig));
     oktaAuth = new OktaAuth(authConfig);
