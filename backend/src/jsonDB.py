@@ -20,7 +20,7 @@ class JSON_DB(Generic_DB):
             self.write(default_data)
             return True
         except Exception as e:
-            print("\nERROR in create_empty_json_file(): ", e)
+            print("\nException in create_empty_json_file(): ", e)
             return False
 
 
@@ -32,7 +32,7 @@ class JSON_DB(Generic_DB):
                 secrets = json.load(fHandle)
             return secrets
         except Exception as e:
-            print("\nERROR in read(): ", e)
+            print("\nException in read(): ", e)
             return None
 
 
@@ -42,7 +42,7 @@ class JSON_DB(Generic_DB):
                 json.dump(data, fHandle, indent=4)
             return True
         except Exception as e:
-            print("\nERROR in write(): ", e)
+            print("\nException in write(): ", e)
             return False
 
 

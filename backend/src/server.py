@@ -14,7 +14,7 @@ from requestForm import RequestForm
 from jsonDB import JSON_DB
 from mssqlDB import MSSQL_DB
 
-# from test_be_swagger import BE_SWAGGER
+from test_be_swagger import BE_SWAGGER
 
 import requests
 from flask import Flask, request, g, jsonify
@@ -39,7 +39,8 @@ requestForm_obj = RequestForm()
 if(EnvVars.DATABASE_TYPE == "json"):
     db_obj = JSON_DB(idGenerator_obj, crypt_obj, EnvVars.SECRETS_FILE)
 elif(EnvVars.DATABASE_TYPE == "mssql"):
-    db_obj = MSSQL_DB(idGenerator_obj, crypt_obj)
+    mssql_conn = MSSQL_DB.establish_db_connection()
+    db_obj = MSSQL_DB(idGenerator_obj, crypt_obj, mssql_conn, app)
 
 totpGenerator_obj = TOTP_Generator(crypt_obj, EnvVars.SHOW_LOGS)
 secretGenerator_obj = SecretKey_Generator()
@@ -98,18 +99,16 @@ app.logger.info(app.config)
 
 # end logger specifc
 
-# swagger specific #
-SWAGGER_FILE = '/static/docs.json'
-SWAGGERUI_BLUEPRINT = get_swaggerui_blueprint(Constants.SWAGGER_URL, SWAGGER_FILE)
-app.register_blueprint(SWAGGERUI_BLUEPRINT)
-# end swagger specific #
+# # swagger specific #
+# SWAGGER_FILE = '/static/docs.json'
+# SWAGGERUI_BLUEPRINT = get_swaggerui_blueprint(Constants.SWAGGER_URL, SWAGGER_FILE)
+# app.register_blueprint(SWAGGERUI_BLUEPRINT)
+# # end swagger specific #
 
-# swagger_obj = BE_SWAGGER()
-# swagger_obj.prepare_swagger_UI_for_BE()
+swagger_obj = BE_SWAGGER(app)
+swagger_obj.prepare_swagger_UI_for_BE()
 
 
-
-# CONNECTION_OBJECT = db_obj.establish_db_connection()
 
 
 # Middlewares
@@ -408,6 +407,17 @@ def save_secret_byTakingOktaUserIDfromRequestForm():
         return {'error': "Admin Secret is missing"}, 400
     elif form_data[EnvVars.OKTA_USER_ID] is None or not form_data[EnvVars.OKTA_USER_ID]:
         return {'error': "Okta User ID is missing"}, 400
+
+
+@app.route('/api/v1/destroyConnection', methods=['GET'])
+@limiter.limit(RATE_LIMIT)
+def closeConnection():
+    print("destroyConnection API")
+    is_closed = db_obj.destroy_db_connection(mssql_conn)
+    if is_closed:
+        return {"SUCCESS": "DB connection closed successfully"}, 200
+    else:
+        return {"ERROR": "Failed in closing the DB connection"}, 400
 
 
 if __name__ == '__main__':
