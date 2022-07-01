@@ -44,9 +44,11 @@ LOGGING_LEVEL = os.environ.get("LOGGING_LEVEL", default="DEBUG")
 LOGGING_MAX_BYTES = os.environ.get("LOGGING_MAX_BYTES", default=104857600)
 LOGGING_BACKUP_COUNT = os.environ.get("LOGGING_BACKUP_COUNT", default=20)
 
-ENABLE_API_RATE_LIMITS = os.environ.get("ENABLE_API_RATE_LIMITS", default=False)
-API_RATE_LIMITS_PER_HOUR = os.environ.get("API_RATE_LIMITS_PER_HOUR", default="300")
-API_RATE_LIMITS_PER_MINUTE = os.environ.get("API_RATE_LIMITS_PER_MINUTE", default="20")
+
+# These limits apply for each individual API. These are not applied collectively.
+ENABLE_API_RATE_LIMITS = os.environ.get("ENABLE_API_RATE_LIMITS", default=True)
+API_RATE_LIMITS_PER_HOUR = os.environ.get("API_RATE_LIMITS_PER_HOUR", default="3")
+API_RATE_LIMITS_PER_MINUTE = os.environ.get("API_RATE_LIMITS_PER_MINUTE", default="2")
 WHITELISTED_IPS = os.environ.get("WHITELISTED_IPS", default="[]")
 
 

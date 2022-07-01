@@ -1,6 +1,7 @@
-import os.path
-import os
-from logging.config import dictConfig
+import requests
+from flask import Flask, request, g, jsonify
+from flask_cors import CORS
+
 
 from constants import Constants
 from envVars import EnvVars
@@ -14,27 +15,42 @@ from requestForm import RequestForm
 from jsonDB import JSON_DB
 from mssqlDB import MSSQL_DB
 
-from test_be_swagger import BE_SWAGGER
+from be_swagger import BE_SWAGGER
+from be_logger import BE_LOGGER
 
-import requests
-from flask import Flask, request, g, jsonify
-from flask_swagger_ui import get_swaggerui_blueprint
-from flask_cors import CORS
-from flask_limiter import Limiter
-from flask_limiter.util import get_remote_address
+from rateLimits import RATE_LIMITS
 
-# app specific
+
+# app specific #
 app = Flask(__name__)
 app.config.from_pyfile('config.py')
 CORS(app)
+# end app specific #
 
-# Objects Creation 
+
+# Begin Rate Limiter
+rateLimits_obj = RATE_LIMITS(app)
+limiter =  rateLimits_obj.enable_OR_disable_rate_limits()
+RATE_LIMIT = rateLimits_obj.construct_rate_limit() if EnvVars.ENABLE_API_RATE_LIMITS else None
+print("RATE_LIMIT: ", RATE_LIMIT)
+# End Rate Limiter
+
+
+# logger specific #
+logger_obj = BE_LOGGER(app)
+logger_obj.implement_logging_for_BE()
+# end logger specifc #
+
+
+# swagger specific #
+swagger_obj = BE_SWAGGER(app)
+swagger_obj.prepare_swagger_UI_for_BE()
+# end swagger specific #
+
+
+# Objects Creation #
 crypt_obj = Crypto(EnvVars.SALT)
-DECRYPTED_API_KEY = crypt_obj.decryptAPIkey(EnvVars.ENCRYPTED_API_KEY, EnvVars.API_KEY_SALT)
-okta_obj = OktaAPIs(DECRYPTED_API_KEY)
-
 idGenerator_obj = UniqueId_Generator()
-requestForm_obj = RequestForm()
 
 if(EnvVars.DATABASE_TYPE == "json"):
     db_obj = JSON_DB(idGenerator_obj, crypt_obj, EnvVars.SECRETS_FILE)
@@ -42,73 +58,22 @@ elif(EnvVars.DATABASE_TYPE == "mssql"):
     mssql_conn = MSSQL_DB.establish_db_connection()
     db_obj = MSSQL_DB(idGenerator_obj, crypt_obj, mssql_conn, app)
 
+DECRYPTED_API_KEY = crypt_obj.decryptAPIkey(EnvVars.ENCRYPTED_API_KEY, EnvVars.API_KEY_SALT)
+okta_obj = OktaAPIs(DECRYPTED_API_KEY)
+
 totpGenerator_obj = TOTP_Generator(crypt_obj, EnvVars.SHOW_LOGS)
+requestForm_obj = RequestForm()
 secretGenerator_obj = SecretKey_Generator()
+# end Objects Creation #
 
-
-
-# Begin Rate Limiter
-def construct_rate_limit():
-    rate_limits_per_minute = app.config['API_RATE_LIMITS_PER_MINUTE']
-    rate_limits_per_hour = app.config['API_RATE_LIMITS_PER_HOUR']
-    rate_limits = ''
-    if rate_limits_per_minute is not None:
-        rate_limits = rate_limits + rate_limits_per_minute+'/minute;'
-    if rate_limits_per_hour is not None:
-        rate_limits = rate_limits + rate_limits_per_hour+'/hour;'
-    return rate_limits[:-1] if rate_limits else None
-
-RATE_LIMIT = construct_rate_limit() if EnvVars.ENABLE_API_RATE_LIMITS else None
-
-limiter = Limiter(
-    app,
-    key_func=get_remote_address,
-    headers_enabled=True,
-    enabled=EnvVars.ENABLE_API_RATE_LIMITS
-)
 
 @limiter.request_filter
 def ip_whitelist():
+    print("\n $$$$$ In ip_whitelist() $$$$$")
+    print("request.remote_addr : ", request.remote_addr)
+    print("eval(EnvVars.WHITELISTED_IPS) : ", eval(EnvVars.WHITELISTED_IPS))
+    print(request.remote_addr in eval(EnvVars.WHITELISTED_IPS), "\n")
     return request.remote_addr in eval(EnvVars.WHITELISTED_IPS)
-
-# End Rate Limiter
-
-
-# logger specific #
-level = app.config['LOGGING_LEVEL']
-max_bytes = int(app.config['LOGGING_MAX_BYTES'])
-backup_count = int(app.config['LOGGING_BACKUP_COUNT'])
-log_folder = '../logs'
-if not os.path.exists(log_folder):
-    os.makedirs(log_folder)
-
-logging_config = dict(
-    version=1,
-    formatters={
-        'f': {'format': '%(asctime)s %(name)-12s %(levelname)-8s %(message)s'}},
-    handlers={'rotatingFile': {'class': 'logging.handlers.RotatingFileHandler', 'formatter': 'f',
-                    'level': level,
-                    'filename': '../logs/logs.log',
-                    'mode': 'a',
-                    'maxBytes': max_bytes,
-                    'backupCount': backup_count},
-              'stream': {'class': 'logging.StreamHandler', 'formatter': 'f', 'level': level}},
-    root={'handlers': ['rotatingFile', 'stream'], 'level': level, })
-dictConfig(logging_config)
-app.logger.info(app.config)
-
-# end logger specifc
-
-# # swagger specific #
-# SWAGGER_FILE = '/static/docs.json'
-# SWAGGERUI_BLUEPRINT = get_swaggerui_blueprint(Constants.SWAGGER_URL, SWAGGER_FILE)
-# app.register_blueprint(SWAGGERUI_BLUEPRINT)
-# # end swagger specific #
-
-swagger_obj = BE_SWAGGER(app)
-swagger_obj.prepare_swagger_UI_for_BE()
-
-
 
 
 # Middlewares
