@@ -9,11 +9,11 @@ class BE_SWAGGER:
         self.app = app
 
     def prepare_swagger_UI_for_BE(self):
-
-        print("swagger specific")
+        """
+        This method implements Swagger UI for TecVerify backend.
+        """
         SWAGGER_FILE = '/static/docs.json'
         SWAGGERUI_BLUEPRINT = get_swaggerui_blueprint(Constants.SWAGGER_URL, SWAGGER_FILE)
         self.app.register_blueprint(SWAGGERUI_BLUEPRINT)
-        print("end swagger specific")
 
         

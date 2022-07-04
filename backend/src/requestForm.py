@@ -1,6 +1,7 @@
 from constants import Constants
 from envVars import EnvVars
 
+
 class RequestForm:
 
     def parse_form_data(self, request, neededOktaUserIDinRequestForm):

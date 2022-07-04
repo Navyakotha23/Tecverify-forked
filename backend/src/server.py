@@ -5,7 +5,9 @@ from flask_cors import CORS
 
 from constants import Constants
 from envVars import EnvVars
-
+from be_swagger import BE_SWAGGER
+from be_logger import BE_LOGGER
+from rateLimits import RATE_LIMITS
 from crypto import Crypto
 from totpGenerator import TOTP_Generator
 from secretKeyGenerator import SecretKey_Generator
@@ -15,11 +17,6 @@ from requestForm import RequestForm
 from jsonDB import JSON_DB
 from mssqlDB import MSSQL_DB
 
-from be_swagger import BE_SWAGGER
-from be_logger import BE_LOGGER
-
-from rateLimits import RATE_LIMITS
-
 
 # app specific #
 app = Flask(__name__)
@@ -28,12 +25,10 @@ CORS(app)
 # end app specific #
 
 
-# Begin Rate Limiter
-rateLimits_obj = RATE_LIMITS(app)
-limiter =  rateLimits_obj.enable_OR_disable_rate_limits()
-RATE_LIMIT = rateLimits_obj.construct_rate_limit() if EnvVars.ENABLE_API_RATE_LIMITS else None
-print("RATE_LIMIT: ", RATE_LIMIT)
-# End Rate Limiter
+# swagger specific #
+swagger_obj = BE_SWAGGER(app)
+swagger_obj.prepare_swagger_UI_for_BE()
+# end swagger specific #
 
 
 # logger specific #
@@ -42,10 +37,12 @@ logger_obj.implement_logging_for_BE()
 # end logger specifc #
 
 
-# swagger specific #
-swagger_obj = BE_SWAGGER(app)
-swagger_obj.prepare_swagger_UI_for_BE()
-# end swagger specific #
+# Begin Rate Limiter
+rateLimits_obj = RATE_LIMITS(app)
+limiter =  rateLimits_obj.prepare_limiter_obj()
+RATE_LIMIT = rateLimits_obj.construct_rate_limit() if EnvVars.ENABLE_API_RATE_LIMITS else None
+# print("RATE_LIMIT: ", RATE_LIMIT)
+# End Rate Limiter
 
 
 # Objects Creation #
@@ -69,15 +66,13 @@ secretGenerator_obj = SecretKey_Generator()
 
 @limiter.request_filter
 def ip_whitelist():
-    print("\n $$$$$ In ip_whitelist() $$$$$")
-    print("request.remote_addr : ", request.remote_addr)
-    print("eval(EnvVars.WHITELISTED_IPS) : ", eval(EnvVars.WHITELISTED_IPS))
-    print(request.remote_addr in eval(EnvVars.WHITELISTED_IPS), "\n")
+    # print("request.remote_addr : ", request.remote_addr)
+    # print("eval(EnvVars.WHITELISTED_IPS) : ", eval(EnvVars.WHITELISTED_IPS))
+    # print(request.remote_addr in eval(EnvVars.WHITELISTED_IPS), "\n")
     return request.remote_addr in eval(EnvVars.WHITELISTED_IPS)
 
 
-# Middlewares
-
+# Middlewares #
 @app.before_request
 def check_token_header():
     print("\n\n\n----------Start request----------")
@@ -135,10 +130,10 @@ def logging_after_request(response):
     app.logger.info("____________________________________")
     print("----------End request----------\n\n\n")
     return response
+# end Middlewares #
 
 
-# TecVerify EndPoints Begin
-
+# TecVerify EndPoints #
 @app.route('/api/v1/deleteTOTPfactorIfEnrolledFromOktaVerify', methods=['DELETE'])
 @limiter.limit(RATE_LIMIT)
 def checkIfAlreadyEnrolledToOktaVerify():
@@ -378,11 +373,15 @@ def save_secret_byTakingOktaUserIDfromRequestForm():
 @limiter.limit(RATE_LIMIT)
 def closeConnection():
     print("destroyConnection API")
-    is_closed = db_obj.destroy_db_connection(mssql_conn)
-    if is_closed:
-        return {"SUCCESS": "DB connection closed successfully"}, 200
-    else:
-        return {"ERROR": "Failed in closing the DB connection"}, 400
+    if(EnvVars.DATABASE_TYPE == "json"):
+        return {"ERROR": "No need to close DB connection for JSON object"}, 400
+    elif(EnvVars.DATABASE_TYPE == "mssql"):
+        is_closed = db_obj.destroy_db_connection(mssql_conn)
+        if is_closed:
+            return {"SUCCESS": "DB connection closed successfully"}, 200
+        else:
+            return {"ERROR": "Failed in closing the DB connection"}, 400
+# end TecVerify EndPoints #
 
 
 if __name__ == '__main__':

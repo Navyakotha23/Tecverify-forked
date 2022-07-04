@@ -2,6 +2,7 @@ import uuid
 
 from envVars import EnvVars
 
+
 class UniqueId_Generator:
 
     def generate_random_id(self) -> str:

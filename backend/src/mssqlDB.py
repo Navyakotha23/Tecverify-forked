@@ -16,7 +16,7 @@ class MSSQL_DB(Generic_DB):
         """
         This method establishes connection with the database server
         """
-        print("DB Connection Established")
+        # print("DB Connection Established")
         try:
             conn = pymssql.connect(EnvVars.MS_SQL_SERVER, EnvVars.MS_SQL_USERNAME, EnvVars.MS_SQL_PASSWORD)
             
@@ -79,9 +79,7 @@ class MSSQL_DB(Generic_DB):
             return secrets
         except Exception as e:
             print("\nException in read(): ", e)
-            self.app.logger.info("\nException in read() from mssqlDB.py:  ")
-            self.app.logger.info(e)
-            self.app.logger.info("\n")
+            self.app.logger.info("\n\nException in read(): {0}\n".format(e))
             return None
 
 
@@ -104,6 +102,7 @@ class MSSQL_DB(Generic_DB):
             return True
         except Exception as e:
             print("\nException in write(): ", e)
+            self.app.logger.info("\n\nException in write(): {0}\n".format(e))
             return False
 
         
@@ -120,6 +119,7 @@ class MSSQL_DB(Generic_DB):
             return True
         except Exception as e:
             print("\nException in delete_secret(): ", e)
+            self.app.logger.info("\n\nException in delete_secret(): {0}\n".format(e))
             return False
 
     

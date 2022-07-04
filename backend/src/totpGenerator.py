@@ -2,6 +2,7 @@ import pyotp
 
 from envVars import EnvVars
 
+
 class TOTP_Generator:
 
     def __init__(self, crypt_obj, SHOW_LOGS) -> None:

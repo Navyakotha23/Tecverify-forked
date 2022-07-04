@@ -1,7 +1,6 @@
 import abc
 
 from datetime import datetime
-
 from envVars import EnvVars
 
 

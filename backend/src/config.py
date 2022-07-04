@@ -30,12 +30,12 @@ DATABASE_NAME = os.environ.get("DATABASE_NAME", default="TecVerify")
 TABLE_NAME = os.environ.get("TABLE_NAME", default="SecretsTecVerify")
 AUTOSAVED_SECRET_USERNAME_HEAD = os.environ.get("AUTOSAVED_SECRET_USERNAME_HEAD", default="TecVerify")
 
-SECRET_NAME = os.environ.get("SECRET_NAME", default="sName")
-SECRET_KEY = os.environ.get("SECRET_KEY", default="sKey")
-OKTA_USER_ID = os.environ.get("OKTA_USER_ID", default="oUserId")
-SECRET_ID = os.environ.get("SECRET_ID", default="sId")
-SECRET_UPDATED_AT = os.environ.get("SECRET_UPDATED_AT", default="sUpdatedAt")
-OKTA_FACTOR_ID = os.environ.get("OKTA_FACTOR_ID", default="oFactorId")
+SECRET_NAME = os.environ.get("SECRET_NAME", default="sctName")
+SECRET_KEY = os.environ.get("SECRET_KEY", default="sctKey")
+OKTA_USER_ID = os.environ.get("OKTA_USER_ID", default="oktUserId")
+SECRET_ID = os.environ.get("SECRET_ID", default="sctId")
+SECRET_UPDATED_AT = os.environ.get("SECRET_UPDATED_AT", default="sctUpdatedAt")
+OKTA_FACTOR_ID = os.environ.get("OKTA_FACTOR_ID", default="oktFactorId")
 
 SALT = os.environ.get("SALT", default="DES;?SED")
 
