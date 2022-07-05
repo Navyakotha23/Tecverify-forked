@@ -1,7 +1,7 @@
 import os
 import json
 
-from genericDB import Generic_DB
+from database_operations.genericDB import Generic_DB
 
 class JSON_DB(Generic_DB):
 

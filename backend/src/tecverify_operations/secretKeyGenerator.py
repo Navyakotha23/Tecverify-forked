@@ -1,6 +1,6 @@
 import pyotp
 
-from requestForm import RequestForm
+from tecverify_operations.requestForm import RequestForm
 
 class SecretKey_Generator:
 

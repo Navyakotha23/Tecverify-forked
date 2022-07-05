@@ -3,24 +3,27 @@ from flask import Flask, request, g, jsonify
 from flask_cors import CORS
 
 
-from constants import Constants
-from envVars import EnvVars
-from be_swagger import BE_SWAGGER
-from be_logger import BE_LOGGER
-from rateLimits import RATE_LIMITS
-from crypto import Crypto
-from totpGenerator import TOTP_Generator
-from secretKeyGenerator import SecretKey_Generator
-from oktaAPIs import OktaAPIs
-from uniqueIdGenerator import UniqueId_Generator
-from requestForm import RequestForm
-from jsonDB import JSON_DB
-from mssqlDB import MSSQL_DB
+from common.constants import Constants
+from common.envVars import EnvVars
+from common.be_swagger import BE_SWAGGER
+from common.be_logger import BE_LOGGER
+from common.rateLimits import RATE_LIMITS
+
+from tecverify_operations.requestForm import RequestForm
+from tecverify_operations.uniqueIdGenerator import UniqueId_Generator
+from tecverify_operations.crypto import Crypto
+from tecverify_operations.totpGenerator import TOTP_Generator
+from tecverify_operations.secretKeyGenerator import SecretKey_Generator
+
+from okta_operations.oktaAPIs import OktaAPIs
+
+from database_operations.jsonDB import JSON_DB
+from database_operations.mssqlDB import MSSQL_DB
 
 
 # app specific #
 app = Flask(__name__)
-app.config.from_pyfile('config.py')
+app.config.from_pyfile('common/config.py')
 CORS(app)
 # end app specific #
 

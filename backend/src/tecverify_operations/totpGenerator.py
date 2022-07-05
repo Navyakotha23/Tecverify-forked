@@ -1,6 +1,6 @@
 import pyotp
 
-from envVars import EnvVars
+from common.envVars import EnvVars
 
 
 class TOTP_Generator:

@@ -15,7 +15,7 @@ ENCRYPTED_API_KEY = os.environ.get("ENCRYPTED_API_KEY")
 API_KEY_SALT = os.environ.get("API_KEY_SALT", default="12345678")
 
 
-DATABASE_TYPE = os.environ.get("DATABASE_TYPE", default="mssql")
+DATABASE_TYPE = os.environ.get("DATABASE_TYPE", default="json")
 if DATABASE_TYPE.lower() == "json":
     DATABASE_TYPE = "json"
 elif DATABASE_TYPE.lower() == "mssql":

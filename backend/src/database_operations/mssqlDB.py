@@ -1,7 +1,7 @@
 import pymssql
 
-from genericDB import Generic_DB
-from envVars import EnvVars
+from database_operations.genericDB import Generic_DB
+from common.envVars import EnvVars
 
 class MSSQL_DB(Generic_DB):
 

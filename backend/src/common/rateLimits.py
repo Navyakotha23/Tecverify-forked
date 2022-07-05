@@ -1,7 +1,7 @@
 from flask_limiter import Limiter
 from flask_limiter.util import get_remote_address
 
-from envVars import EnvVars
+from common.envVars import EnvVars
 
 
 class RATE_LIMITS:
