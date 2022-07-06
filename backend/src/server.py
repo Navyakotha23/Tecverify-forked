@@ -53,7 +53,7 @@ crypt_obj = Crypto(EnvVars.SALT)
 idGenerator_obj = UniqueId_Generator()
 
 if(EnvVars.DATABASE_TYPE == "json"):
-    db_obj = JSON_DB(idGenerator_obj, crypt_obj, EnvVars.SECRETS_FILE)
+    db_obj = JSON_DB(idGenerator_obj, crypt_obj, EnvVars.SECRETS_FILE, app)
 elif(EnvVars.DATABASE_TYPE == "mssql"):
     mssql_conn = MSSQL_DB.establish_db_connection()
     db_obj = MSSQL_DB(idGenerator_obj, crypt_obj, mssql_conn, app)
