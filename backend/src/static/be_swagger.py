@@ -12,9 +12,7 @@ class BE_SWAGGER:
         """
         This method implements Swagger UI for TecVerify backend.
         """
-        # server is running in src folder. Below path is from src folder.
-        SWAGGER_FILE = '/static/docs.json'
-        SWAGGERUI_BLUEPRINT = get_swaggerui_blueprint(Constants.SWAGGER_URL, SWAGGER_FILE)
+        SWAGGERUI_BLUEPRINT = get_swaggerui_blueprint(Constants.SWAGGER_URL, Constants.SWAGGER_FILE)
         self.app.register_blueprint(SWAGGERUI_BLUEPRINT)
 
         
