@@ -5,8 +5,8 @@ from flask_cors import CORS
 
 from common.constants import Constants
 from common.envVars import EnvVars
-from common.be_swagger import BE_SWAGGER
-from common.be_logger import BE_LOGGER
+from static.be_swagger import BE_SWAGGER
+from tecverify_logging.be_logger import BE_LOGGER
 from common.rateLimits import RATE_LIMITS
 
 from tecverify_operations.requestForm import RequestForm

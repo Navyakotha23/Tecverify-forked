@@ -1,4 +1,5 @@
 import os
+import os.path
 import json
 
 from database_operations.genericDB import Generic_DB
@@ -25,7 +26,11 @@ class JSON_DB(Generic_DB):
 
 
     def read(self):
+        # server is running in src folder. Below path is from src folder.
+        json_db_folder = './database_operations/json_db'
         try:
+            if not os.path.exists(json_db_folder):
+                os.makedirs(json_db_folder)
             if not os.path.isfile(self.file) or os.stat(self.file).st_size == 0:
                 self.create_empty_json_file()
             with open(self.file, 'r') as fHandle:

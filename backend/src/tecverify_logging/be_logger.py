@@ -15,10 +15,17 @@ class BE_LOGGER:
         level = self.app.config['LOGGING_LEVEL']
         max_bytes = int(self.app.config['LOGGING_MAX_BYTES'])
         backup_count = int(self.app.config['LOGGING_BACKUP_COUNT'])
-        log_folder = '../logs'
-        log_file = '../logs/logs.log'
-        if not os.path.exists(log_folder):
-            os.makedirs(log_folder)
+
+        # server is running in src folder. Below paths are from src folder.
+        log_folder = './tecverify_logging/logs'
+        log_file = './tecverify_logging/logs/logs.log'
+        try:
+            if not os.path.exists(log_folder):
+                os.makedirs(log_folder)
+        except Exception as e:
+            print("\nException in creating a folder for logs: ", e)
+            return False
+        # 
 
         logging_config = dict(
             version=1,
@@ -56,3 +63,4 @@ class BE_LOGGER:
         # self.app.logger.info("level: '%s',  myName: '%s'" % (level, "MasunaNaveenKumar"))
         # self.app.logger.info("level: {0},  myName: {1}".format(level, "MasunaNaveenKumar"))
         # self.app.logger.info("level: '{0}',  myName: '{1}'".format(level, "MasunaNaveenKumar"))
+

@@ -21,7 +21,8 @@ if DATABASE_TYPE.lower() == "json":
 elif DATABASE_TYPE.lower() == "mssql":
     DATABASE_TYPE = "mssql"
 
-SECRETS_FILE = os.environ.get("SECRETS_FILE", default="../data/secrets.json")
+# server is running in src folder. Below path is from src folder.
+SECRETS_FILE = os.environ.get("SECRETS_FILE", default="./database_operations/json_db/secrets.json")
 
 MS_SQL_SERVER = os.environ.get("MS_SQL_SERVER", default="localhost")
 MS_SQL_USERNAME = os.environ.get("MS_SQL_USERNAME", default="NaveenMasuna")
