@@ -5,3 +5,5 @@ k8s-deployment.yml
 venv_backend
 env-file.txt
 data
+src/tecverify_logging/logs
+src/database_operations/json_db
