@@ -1,5 +1,11 @@
 class Constants:
+
     SWAGGER_URL = '/docs'
+    SWAGGER_FILE = '/static/docs.json'
+    # server is running in src folder. Above path is from src folder.
+    # Swagger is not accepting dot(for present directory) like this ( './static/docs.json' )
+    # Swagger accepts docs.json from static folder only. 
+    # Renamed static folder and renamed docs.json file will not work with Swaggger.
 
     TOKEN = "token"
     ID_TOKEN = "idtoken"

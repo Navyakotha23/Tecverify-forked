@@ -14,7 +14,7 @@ spec:
     spec:
       # restartPolicy: Never
       containers:
-        - name: tecverify-be-container-1
+        - name: tecverify-be-container
           image: naveenmasuna/backend_tecverify:Naveen_BE
           imagePullPolicy: "Always" # This is for pulling the image and for building the image with latest changes.{ while pushing the code to GitLab }
           volumeMounts:
@@ -161,7 +161,7 @@ spec:
         app: tecverify-fe-selector-app
     spec:
       containers:
-        - name: tecverify-fe-container-1
+        - name: tecverify-fe-container
           image: naveenmasuna/frontend_tecverify:Naveen_FE
           imagePullPolicy: "Always"
           volumeMounts:

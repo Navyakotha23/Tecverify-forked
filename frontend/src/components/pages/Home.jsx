@@ -94,7 +94,9 @@ const Home = () => {
                     {
                         popupError = true;
                         popupErrorMessage = 'Failed to fetch.';
-                        console.log(err);
+                        console.log("MNK-log: ", err);
+                        console.log("MNK-log.text(): ", err.text());
+                        console.error("MNK-error: ", err);
                     }
                 }
                 func().then(r => console.log(r));

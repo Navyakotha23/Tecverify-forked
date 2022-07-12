@@ -1,8 +1,8 @@
 import requests
 import json
 
-from constants import Constants
-from envVars import EnvVars
+from common.constants import Constants
+from common.envVars import EnvVars
 
 
 class OktaAPIs:

@@ -1,8 +1,7 @@
 import abc
-
 from datetime import datetime
 
-from envVars import EnvVars
+from common.envVars import EnvVars
 
 
 class Generic_DB(metaclass=abc.ABCMeta):

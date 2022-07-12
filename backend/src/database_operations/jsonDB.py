@@ -1,14 +1,16 @@
 import os
+import os.path
 import json
 
-from genericDB import Generic_DB
+from database_operations.genericDB import Generic_DB
 
 class JSON_DB(Generic_DB):
 
-    def __init__(self, idGenerator_obj, crypt_obj, file: str) -> None:
+    def __init__(self, idGenerator_obj, crypt_obj, file: str, app) -> None:
         self.idGenerator_obj = idGenerator_obj
         self.crypt_obj = crypt_obj
         self.file = file
+        self.app = app
 
 
     def create_empty_json_file(self) -> bool:
@@ -20,19 +22,25 @@ class JSON_DB(Generic_DB):
             self.write(default_data)
             return True
         except Exception as e:
-            print("\nERROR in create_empty_json_file(): ", e)
+            print("\nException in create_empty_json_file(): ", e)
             return False
 
 
     def read(self):
+        # server is running in src folder. Below path is from src folder.
+        json_db_folder = './database_operations/json_db'
         try:
+            if not os.path.exists(json_db_folder):
+                os.makedirs(json_db_folder)
             if not os.path.isfile(self.file) or os.stat(self.file).st_size == 0:
                 self.create_empty_json_file()
+            # else:
+            #     self.app.logger.info("\n\n Json file is present in the path ( ./database_operations/json_db ).\n")
             with open(self.file, 'r') as fHandle:
                 secrets = json.load(fHandle)
             return secrets
         except Exception as e:
-            print("\nERROR in read(): ", e)
+            print("\nException in read(): ", e)
             return None
 
 
@@ -42,7 +50,7 @@ class JSON_DB(Generic_DB):
                 json.dump(data, fHandle, indent=4)
             return True
         except Exception as e:
-            print("\nERROR in write(): ", e)
+            print("\nException in write(): ", e)
             return False
 
 

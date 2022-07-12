@@ -1,119 +1,83 @@
-import os.path
-import os
-from logging.config import dictConfig
-
-from constants import Constants
-from envVars import EnvVars
-
-from crypto import Crypto
-from totpGenerator import TOTP_Generator
-from secretKeyGenerator import SecretKey_Generator
-from oktaAPIs import OktaAPIs
-from uniqueIdGenerator import UniqueId_Generator
-from requestForm import RequestForm
-from jsonDB import JSON_DB
-from mssqlDB import MSSQL_DB
-
-# from test_be_swagger import BE_SWAGGER
-
 import requests
 from flask import Flask, request, g, jsonify
-from flask_swagger_ui import get_swaggerui_blueprint
 from flask_cors import CORS
-from flask_limiter import Limiter
-from flask_limiter.util import get_remote_address
 
-# app specific
+
+from common.constants import Constants
+from common.envVars import EnvVars
+from common.rateLimits import RATE_LIMITS
+
+from database_operations.jsonDB import JSON_DB
+from database_operations.mssqlDB import MSSQL_DB
+
+from okta_operations.oktaAPIs import OktaAPIs
+
+from static.be_swagger import BE_SWAGGER
+
+from tecverify_logging.be_logger import BE_LOGGER
+
+from tecverify_operations.requestForm import RequestForm
+from tecverify_operations.uniqueIdGenerator import UniqueId_Generator
+from tecverify_operations.crypto import Crypto
+from tecverify_operations.totpGenerator import TOTP_Generator
+from tecverify_operations.secretKeyGenerator import SecretKey_Generator
+
+
+# app specific #
 app = Flask(__name__)
-app.config.from_pyfile('config.py')
+app.config.from_pyfile('common/config.py')
 CORS(app)
-
-# Objects Creation 
-crypt_obj = Crypto(EnvVars.SALT)
-DECRYPTED_API_KEY = crypt_obj.decryptAPIkey(EnvVars.ENCRYPTED_API_KEY, EnvVars.API_KEY_SALT)
-okta_obj = OktaAPIs(DECRYPTED_API_KEY)
-
-idGenerator_obj = UniqueId_Generator()
-requestForm_obj = RequestForm()
-
-if(EnvVars.DATABASE_TYPE == "json"):
-    db_obj = JSON_DB(idGenerator_obj, crypt_obj, EnvVars.SECRETS_FILE)
-elif(EnvVars.DATABASE_TYPE == "mssql"):
-    db_obj = MSSQL_DB(idGenerator_obj, crypt_obj)
-
-totpGenerator_obj = TOTP_Generator(crypt_obj, EnvVars.SHOW_LOGS)
-secretGenerator_obj = SecretKey_Generator()
-
+# end app specific #
 
 
 # Begin Rate Limiter
-def construct_rate_limit():
-    rate_limits_per_minute = app.config['API_RATE_LIMITS_PER_MINUTE']
-    rate_limits_per_hour = app.config['API_RATE_LIMITS_PER_HOUR']
-    rate_limits = ''
-    if rate_limits_per_minute is not None:
-        rate_limits = rate_limits + rate_limits_per_minute+'/minute;'
-    if rate_limits_per_hour is not None:
-        rate_limits = rate_limits + rate_limits_per_hour+'/hour;'
-    return rate_limits[:-1] if rate_limits else None
-
-RATE_LIMIT = construct_rate_limit() if EnvVars.ENABLE_API_RATE_LIMITS else None
-
-limiter = Limiter(
-    app,
-    key_func=get_remote_address,
-    headers_enabled=True,
-    enabled=EnvVars.ENABLE_API_RATE_LIMITS
-)
-
-@limiter.request_filter
-def ip_whitelist():
-    return request.remote_addr in eval(EnvVars.WHITELISTED_IPS)
-
+rateLimits_obj = RATE_LIMITS(app)
+limiter =  rateLimits_obj.prepare_limiter_obj()
+RATE_LIMIT = rateLimits_obj.construct_rate_limit() if EnvVars.ENABLE_API_RATE_LIMITS else None
+# print("RATE_LIMIT: ", RATE_LIMIT)
 # End Rate Limiter
 
 
-# logger specific #
-level = app.config['LOGGING_LEVEL']
-max_bytes = int(app.config['LOGGING_MAX_BYTES'])
-backup_count = int(app.config['LOGGING_BACKUP_COUNT'])
-log_folder = '../logs'
-if not os.path.exists(log_folder):
-    os.makedirs(log_folder)
-
-logging_config = dict(
-    version=1,
-    formatters={
-        'f': {'format': '%(asctime)s %(name)-12s %(levelname)-8s %(message)s'}},
-    handlers={'rotatingFile': {'class': 'logging.handlers.RotatingFileHandler', 'formatter': 'f',
-                    'level': level,
-                    'filename': '../logs/logs.log',
-                    'mode': 'a',
-                    'maxBytes': max_bytes,
-                    'backupCount': backup_count},
-              'stream': {'class': 'logging.StreamHandler', 'formatter': 'f', 'level': level}},
-    root={'handlers': ['rotatingFile', 'stream'], 'level': level, })
-dictConfig(logging_config)
-app.logger.info(app.config)
-
-# end logger specifc
-
 # swagger specific #
-SWAGGER_FILE = '/static/docs.json'
-SWAGGERUI_BLUEPRINT = get_swaggerui_blueprint(Constants.SWAGGER_URL, SWAGGER_FILE)
-app.register_blueprint(SWAGGERUI_BLUEPRINT)
+swagger_obj = BE_SWAGGER(app)
+swagger_obj.prepare_swagger_UI_for_BE()
 # end swagger specific #
 
-# swagger_obj = BE_SWAGGER()
-# swagger_obj.prepare_swagger_UI_for_BE()
+
+# logger specific #
+logger_obj = BE_LOGGER(app)
+logger_obj.implement_logging_for_BE()
+# end logger specifc #
 
 
+# Objects Creation #
+crypt_obj = Crypto(EnvVars.SALT)
+idGenerator_obj = UniqueId_Generator()
 
-# CONNECTION_OBJECT = db_obj.establish_db_connection()
+if(EnvVars.DATABASE_TYPE == "json"):
+    db_obj = JSON_DB(idGenerator_obj, crypt_obj, EnvVars.SECRETS_FILE, app)
+elif(EnvVars.DATABASE_TYPE == "mssql"):
+    mssql_conn = MSSQL_DB.establish_db_connection()
+    db_obj = MSSQL_DB(idGenerator_obj, crypt_obj, mssql_conn, app)
+
+DECRYPTED_API_KEY = crypt_obj.decryptAPIkey(EnvVars.ENCRYPTED_API_KEY, EnvVars.API_KEY_SALT)
+okta_obj = OktaAPIs(DECRYPTED_API_KEY)
+
+totpGenerator_obj = TOTP_Generator(crypt_obj, EnvVars.SHOW_LOGS)
+requestForm_obj = RequestForm()
+secretGenerator_obj = SecretKey_Generator()
+# end Objects Creation #
 
 
-# Middlewares
+@limiter.request_filter
+def ip_whitelist():
+    # print("request.remote_addr : ", request.remote_addr)
+    # print("eval(EnvVars.WHITELISTED_IPS) : ", eval(EnvVars.WHITELISTED_IPS))
+    # print(request.remote_addr in eval(EnvVars.WHITELISTED_IPS), "\n")
+    return request.remote_addr in eval(EnvVars.WHITELISTED_IPS)
 
+
+# Middlewares #
 @app.before_request
 def check_token_header():
     print("\n\n\n----------Start request----------")
@@ -171,10 +135,10 @@ def logging_after_request(response):
     app.logger.info("____________________________________")
     print("----------End request----------\n\n\n")
     return response
+# end Middlewares #
 
 
-# TecVerify EndPoints Begin
-
+# TecVerify EndPoints #
 @app.route('/api/v1/deleteTOTPfactorIfEnrolledFromOktaVerify', methods=['DELETE'])
 @limiter.limit(RATE_LIMIT)
 def checkIfAlreadyEnrolledToOktaVerify():
@@ -408,6 +372,21 @@ def save_secret_byTakingOktaUserIDfromRequestForm():
         return {'error': "Admin Secret is missing"}, 400
     elif form_data[EnvVars.OKTA_USER_ID] is None or not form_data[EnvVars.OKTA_USER_ID]:
         return {'error': "Okta User ID is missing"}, 400
+
+
+@app.route('/api/v1/destroyConnection', methods=['GET'])
+@limiter.limit(RATE_LIMIT)
+def closeConnection():
+    print("destroyConnection API")
+    if(EnvVars.DATABASE_TYPE == "json"):
+        return {"ERROR": "No need to close DB connection for JSON object"}, 400
+    elif(EnvVars.DATABASE_TYPE == "mssql"):
+        is_closed = db_obj.destroy_db_connection(mssql_conn)
+        if is_closed:
+            return {"SUCCESS": "DB connection closed successfully"}, 200
+        else:
+            return {"ERROR": "Failed in closing the DB connection"}, 400
+# end TecVerify EndPoints #
 
 
 if __name__ == '__main__':

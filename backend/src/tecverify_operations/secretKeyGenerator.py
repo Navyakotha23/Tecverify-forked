@@ -1,6 +1,6 @@
 import pyotp
 
-from requestForm import RequestForm
+from tecverify_operations.requestForm import RequestForm
 
 class SecretKey_Generator:
 
@@ -12,7 +12,7 @@ class SecretKey_Generator:
             pyotp.TOTP(secret).now()
             return True
         except Exception as e:
-            print("Error in is_secret_valid(): ", e)
+            print("Exception in is_secret_valid(): ", e)
             return False
 
 

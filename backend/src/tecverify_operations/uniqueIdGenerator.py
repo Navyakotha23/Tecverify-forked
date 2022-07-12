@@ -1,6 +1,7 @@
 import uuid
 
-from envVars import EnvVars
+from common.envVars import EnvVars
+
 
 class UniqueId_Generator:
 
