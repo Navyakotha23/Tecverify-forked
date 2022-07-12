@@ -5,9 +5,16 @@ from flask_cors import CORS
 
 from common.constants import Constants
 from common.envVars import EnvVars
-from static.be_swagger import BE_SWAGGER
-from tecverify_logging.be_logger import BE_LOGGER
 from common.rateLimits import RATE_LIMITS
+
+from database_operations.jsonDB import JSON_DB
+from database_operations.mssqlDB import MSSQL_DB
+
+from okta_operations.oktaAPIs import OktaAPIs
+
+from static.be_swagger import BE_SWAGGER
+
+from tecverify_logging.be_logger import BE_LOGGER
 
 from tecverify_operations.requestForm import RequestForm
 from tecverify_operations.uniqueIdGenerator import UniqueId_Generator
@@ -15,17 +22,20 @@ from tecverify_operations.crypto import Crypto
 from tecverify_operations.totpGenerator import TOTP_Generator
 from tecverify_operations.secretKeyGenerator import SecretKey_Generator
 
-from okta_operations.oktaAPIs import OktaAPIs
-
-from database_operations.jsonDB import JSON_DB
-from database_operations.mssqlDB import MSSQL_DB
-
 
 # app specific #
 app = Flask(__name__)
 app.config.from_pyfile('common/config.py')
 CORS(app)
 # end app specific #
+
+
+# Begin Rate Limiter
+rateLimits_obj = RATE_LIMITS(app)
+limiter =  rateLimits_obj.prepare_limiter_obj()
+RATE_LIMIT = rateLimits_obj.construct_rate_limit() if EnvVars.ENABLE_API_RATE_LIMITS else None
+# print("RATE_LIMIT: ", RATE_LIMIT)
+# End Rate Limiter
 
 
 # swagger specific #
@@ -38,14 +48,6 @@ swagger_obj.prepare_swagger_UI_for_BE()
 logger_obj = BE_LOGGER(app)
 logger_obj.implement_logging_for_BE()
 # end logger specifc #
-
-
-# Begin Rate Limiter
-rateLimits_obj = RATE_LIMITS(app)
-limiter =  rateLimits_obj.prepare_limiter_obj()
-RATE_LIMIT = rateLimits_obj.construct_rate_limit() if EnvVars.ENABLE_API_RATE_LIMITS else None
-# print("RATE_LIMIT: ", RATE_LIMIT)
-# End Rate Limiter
 
 
 # Objects Creation #
