@@ -59,5 +59,7 @@ deploy-to-digital-ocean:
   only:
     - devops
 
+    # Testing with new images.
+
   
 
