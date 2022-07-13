@@ -13,12 +13,20 @@ docker-build-and-push:
   before_script:
     - docker login -u "$CI_REGISTRY_USER" -p "$CI_REGISTRY_PASSWORD" $CI_REGISTRY
   script:
-    - docker build --pull -t "$CI_BE_REGISTRY_IMAGE" ./backend/
-    - docker build --pull -t "$CI_FE_REGISTRY_IMAGE" ./frontend/
-    - docker push "$CI_BE_REGISTRY_IMAGE"
-    - docker push "$CI_FE_REGISTRY_IMAGE"
+    # - docker build --pull -t "$CI_BE_REGISTRY_IMAGE" ./backend/
+    # - docker build --pull -t "$CI_FE_REGISTRY_IMAGE" ./frontend/
+    # - docker push "$CI_BE_REGISTRY_IMAGE"
+    # - docker push "$CI_FE_REGISTRY_IMAGE"
+    # - Backend
+    - docker build -t be_tecverify_image:Naveen ./backend/
+    - docker tag be_tecverify_image:Naveen naveenmasuna/backend_tecverify:Naveen_BE
+    - docker push naveenmasuna/backend_tecverify:Naveen_BE
+    # - Frontend
+    - docker build -t fe_tecverify_image:Naveen ./frontend/
+    - docker tag fe_tecverify_image:Naveen naveenmasuna/frontend_tecverify:Naveen_FE
+    - docker push naveenmasuna/frontend_tecverify:Naveen_FE
   only:
-    - TestCI
+    - devops
   
 deploy-to-digital-ocean:
   image: 
@@ -31,14 +39,25 @@ deploy-to-digital-ocean:
     - kubectl apply -f ./k8s/config.yml
     - kubectl apply -f ./k8s/service.yml
     - kubectl apply -f ./k8s/deployment.yml
+    # - kubectl rollout restart deployment tecverify-be-deployment
   after_script:
-    - kubectl get svc tecverify-fe -o jsonpath='{.status.loadBalancer.ingress[0].ip}'
+    - kubectl get svc tecverify-fe-service -o jsonpath='{.status.loadBalancer.ingress[0].ip}'
+    - kubectl get svc tecverify-be-service -o jsonpath='{.status.loadBalancer.ingress[0].ip}'
+    # - sleep for 1 minute
+    # - sleep 60
+    # - echo 
+    # - echo "Echoing after 1 minute"
+    # - destroy created pod
+    # - kubectl delete pod tecverify-be-deployment-696bf6dc9f-crgkc tecverify-be-deployment-696bf6dc9f-n5b59
+    # - getting the pods list
+    # - kubectl get pods
   environment:
     name: dev
-    # url: http://144.126.253.31:3000/home
+    # url: https://174.138.122.81:3000
     url: https://tecverify-k8s-test.tecnics.com
+    # url: https://tecverify-naveen-k8s.tecnics.com
   only:
-    - TestCI
+    - devops
 
-  # Test2 with updated IP
+  
 
