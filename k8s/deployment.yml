@@ -14,7 +14,7 @@ spec:
     spec:
       restartPolicy: Always
       containers:
-        - name: tecverify-be-container-naveen
+        - name: tecverify-be-container-mnk
           image: naveenmasuna/backend_tecverify:Naveen_BE
           imagePullPolicy: "Always" 
           # command: ["/bin/sh"]
@@ -155,14 +155,15 @@ spec:
   replicas: 1
   selector:
     matchLabels:
-      app: tecverify-fe-selector-app  
+      app: tecverify-fe-selector-app
+      
   template:
     metadata:
       labels:
         app: tecverify-fe-selector-app
     spec:
       containers:
-        - name: tecverify-fe-container-naveen
+        - name: tecverify-fe-container-mnk
           image: naveenmasuna/frontend_tecverify:Naveen_FE
           imagePullPolicy: "Always"
           volumeMounts:
@@ -201,6 +202,3 @@ spec:
         - name: fe-config-volume
           configMap:
             name: tecverify-fe-configmap
-
-
-
