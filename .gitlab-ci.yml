@@ -53,9 +53,8 @@ deploy-to-digital-ocean:
     # - kubectl get pods
   environment:
     name: dev
-    # url: https://174.138.122.81:3000
-    url: https://tecverify-k8s-test.tecnics.com
-    # url: https://tecverify-naveen-k8s.tecnics.com
+    # url: https://tecverify-k8s-test.tecnics.com
+    url: https://146.190.8.181
   only:
     - devops
 

@@ -9,7 +9,7 @@ data:
       "ISSUER": "https://tecnics-demo.oktapreview.com",
       "AUTHORIZE_TOKEN_TYPE": "idToken",
       "BACK_END_URL": "https://139.59.55.61:5000",
-      "FRONT_END_URL": "https://tecverify-k8s-test.tecnics.com",
+      "FRONT_END_URL": "https://146.190.8.181",
       "SCOPES": [
         "openid",
         "email",
@@ -41,8 +41,7 @@ data:
       "CONFIRMATION_POPUP_FOR_BYPASS_CODE_FOR_DELETING": {
           "HEADER": "Confirm",
           "QUESTION": "Are you sure you want to delete ByPass code "
-      },
-      "UPDATE_CHECK_TEXT": "31st May 3.50PM"
+      }
     }
 
 ---
