@@ -8,7 +8,7 @@ from common.envVars import EnvVars
 from common.rateLimits import RATE_LIMITS
 
 from database_operations.jsonDB import JSON_DB
-from database_operations.mssqlDB import MSSQL_DB
+# from database_operations.mssqlDB import MSSQL_DB
 
 from okta_operations.oktaAPIs import OktaAPIs
 
@@ -56,9 +56,9 @@ idGenerator_obj = UniqueId_Generator()
 
 if(EnvVars.DATABASE_TYPE == "json"):
     db_obj = JSON_DB(idGenerator_obj, crypt_obj, EnvVars.SECRETS_FILE, app)
-elif(EnvVars.DATABASE_TYPE == "mssql"):
-    mssql_conn = MSSQL_DB.establish_db_connection()
-    db_obj = MSSQL_DB(idGenerator_obj, crypt_obj, mssql_conn, app)
+# elif(EnvVars.DATABASE_TYPE == "mssql"):
+#     mssql_conn = MSSQL_DB.establish_db_connection()
+#     db_obj = MSSQL_DB(idGenerator_obj, crypt_obj, mssql_conn, app)
 
 DECRYPTED_API_KEY = crypt_obj.decryptAPIkey(EnvVars.ENCRYPTED_API_KEY, EnvVars.API_KEY_SALT)
 okta_obj = OktaAPIs(DECRYPTED_API_KEY)

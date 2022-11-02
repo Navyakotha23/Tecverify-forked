@@ -11,7 +11,7 @@ if AUTHORIZE_TOKEN_TYPE.lower() == "idtoken":
 elif AUTHORIZE_TOKEN_TYPE.lower() == "accesstoken":
     TOKEN_TYPE_HINT = "token" # If we pass accessToken then token_type_hint should be token
 ENCRYPTED_API_KEY = os.environ.get("ENCRYPTED_API_KEY")
-# ENCRYPTED_API_KEY = os.environ.get("ENCRYPTED_API_KEY", default = 'b\'C\\xb5\\x02M\\x10N\\x80\\xd0O\\xc8z\\xabV>\\x9aW\\xb5\\x17c&N\\x95\\x92\\xb7&t@Y\\xa9\\xf5"]\\xa0\\xd4]\\x9f\\xc6\\xfct\\xb9\\xefYWy\\x86_^\\123\'')
+# ENCRYPTED_API_KEY = os.environ.get("ENCRYPTED_API_KEY", default = "b'94\\xc8\\xeezJt\\x1a-\\xe7\\x0c\\xb5\\x95i\\xe0\\xde\\xb9\\x8bFI=\\xa9|\\xb29\\xab]-E\\x08\\x01e\\x95\\x92\\x14\\x1e\\xae\\x12\\x80\\xc3|\\x80\\x00\\x96\\xfe\\abc\'")
 API_KEY_SALT = os.environ.get("API_KEY_SALT", default="12345678")
 
 
